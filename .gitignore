@@ -1,0 +1,15 @@
+# 作業系統檔案
+.DS_Store
+Thumbs.db
+
+# 編輯器檔案
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 臨時檔案
+*.log
+*.tmp
+

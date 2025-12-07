@@ -1,0 +1,273 @@
+/* ============================================
+   基礎樣式重置
+   ============================================ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* 整體頁面樣式 */
+body {
+    font-family: 'Inter', sans-serif;
+    color: #3d2817;
+    background-color: #f5f3f0;
+    line-height: 1.6;
+}
+
+/* 容器：限制最大寬度並置中 */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 40px;
+}
+
+/* ============================================
+   頂部導覽列區域（白色背景）
+   ============================================ */
+.header {
+    padding: 30px 0;
+    background-color: #ffffff;  /* 頂層白色背景 */
+    border-bottom: 1px solid rgba(61, 40, 23, 0.08);
+}
+
+/* 導覽列容器：品牌名稱和導覽連結的容器 */
+.nav-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* 右側導覽區域：包含導覽連結和語言切換 */
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+/* Logo 品牌名稱樣式 */
+.logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;  /* ⭐ 調整 Logo 字型大小：改這個數字 */
+    font-weight: 700;
+    color: #3d2817;
+    letter-spacing: 0.5px;
+}
+
+/* 導覽連結容器 */
+.nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* 導覽連結樣式 */
+.nav-link {
+    font-family: 'Inter', sans-serif;
+    font-size: 20px;  /* ⭐ 調整導覽連結字型大小：改這個數字 */
+    font-weight: 400;
+    color: #3d2817;
+    text-decoration: none;
+    letter-spacing: 0.5px;
+    transition: opacity 0.3s ease;
+}
+
+/* 導覽連結滑鼠懸停效果 */
+.nav-link:hover {
+    opacity: 0.7;
+}
+
+/* 導覽連結分隔符號（|） */
+.nav-separator {
+    color: #3d2817;
+    font-size: 14px;
+}
+
+/* 語言切換器 */
+.language-switcher {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* 語言切換按鈕 */
+.lang-btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    color: #3d2817;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 8px;
+    transition: all 0.3s ease;
+    letter-spacing: 0.5px;
+}
+
+.lang-btn:hover {
+    opacity: 0.7;
+}
+
+.lang-btn.active {
+    font-weight: 500;
+    color: #8b6f47;
+}
+
+/* 語言切換分隔符號 */
+.lang-separator {
+    color: #3d2817;
+    font-size: 14px;
+}
+
+/* ============================================
+   主內容區域（米色背景）
+   ============================================ */
+.main-content {
+    padding: 60px 0;
+    min-height: calc(100vh - 120px);
+    display: flex;
+    align-items: center;
+    background-color: #f0ede8;  /* 下層米色背景 */
+}
+
+/* 內容網格：左右兩欄版面配置 */
+.content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;  /* 左欄較窄，右欄較寬（圖片區域） */
+    gap: 60px;
+    align-items: center;
+}
+
+/* 左側內容區域：標題、描述、按鈕 */
+.content-left {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* 主標題樣式 */
+.main-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: 56px;  /* ⭐ 調整主標題字型大小：改這個數字 */
+    font-weight: 700;
+    color: #3d2817;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+}
+
+/* 描述文字樣式 */
+.description {
+    font-family: 'Inter', sans-serif;
+    font-size: 18px;  /* ⭐ 調整描述文字字型大小：改這個數字 */
+    font-weight: 300;
+    color: #3d2817;
+    line-height: 1.6;
+}
+
+/* 按鈕樣式 */
+.cta-button {
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;  /* ⭐ 調整按鈕文字字型大小：改這個數字 */
+    font-weight: 500;
+    color: #3d2817;
+    background-color: #e8d5c4;
+    border: none;
+    padding: 16px 40px;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 0.5px;
+    width: fit-content;
+    margin-top: 8px;
+}
+
+/* 按鈕滑鼠懸停效果 */
+.cta-button:hover {
+    background-color: #d4c0a8;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(61, 40, 23, 0.15);
+}
+
+/* 右側內容區域：圖片容器 */
+.content-right {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 圖片外層容器 */
+.image-wrapper {
+    width: 100%;
+    max-width: 100%;  /* 讓圖片可以佔滿右欄的寬度 */
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(61, 40, 23, 0.1);
+}
+
+/* 圖片樣式 */
+.hero-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+}
+
+/* ============================================
+   響應式設計（手機和平板適配）
+   ============================================ */
+
+/* 平板尺寸（968px 以下）：改為單欄版面配置 */
+@media (max-width: 968px) {
+    .content-grid {
+        grid-template-columns: 1fr;  /* 改為單欄 */
+        gap: 40px;
+    }
+
+    .content-left {
+        text-align: center;
+        align-items: center;
+    }
+
+    .main-headline {
+        font-size: 42px;  /* 平板上的主標題字型大小 */
+    }
+
+    .nav-wrapper {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .nav-right {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .nav {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
+
+/* 手機尺寸（640px 以下）：進一步縮小字型 */
+@media (max-width: 640px) {
+    .container {
+        padding: 0 20px;
+    }
+
+    .main-headline {
+        font-size: 32px;  /* 手機上的主標題字型大小 */
+    }
+
+    .description {
+        font-size: 16px;  /* 手機上的描述文字字型大小 */
+    }
+
+    .logo {
+        font-size: 24px;  /* 手機上的 Logo 字型大小 */
+    }
+
+    .nav-link {
+        font-size: 12px;  /* 手機上的導覽連結字型大小 */
+    }
+}
+
