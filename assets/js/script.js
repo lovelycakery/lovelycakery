@@ -41,4 +41,3 @@ document.addEventListener('DOMContentLoaded', function() {
         document.documentElement.lang = lang === 'en' ? 'en' : 'zh-TW';
     }
 });
-

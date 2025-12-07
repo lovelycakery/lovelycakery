@@ -13,6 +13,7 @@ body {
     color: #3d2817;
     background-color: #f5f3f0;
     line-height: 1.6;
+    scroll-behavior: smooth;  /* 平滑滾動 */
 }
 
 /* 容器：限制最大寬度並置中 */
@@ -26,9 +27,16 @@ body {
    頂部導覽列區域（白色背景）
    ============================================ */
 .header {
+    position: fixed;  /* 固定導覽列 */
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
     padding: 30px 0;
     background-color: #ffffff;  /* 頂層白色背景 */
     border-bottom: 1px solid rgba(61, 40, 23, 0.08);
+    z-index: 1000;  /* 確保在最上層 */
+    box-shadow: 0 2px 8px rgba(61, 40, 23, 0.05);
 }
 
 /* 導覽列容器：品牌名稱和導覽連結的容器 */
@@ -43,6 +51,38 @@ body {
     display: flex;
     align-items: center;
     gap: 24px;
+}
+
+/* 社群媒體連結 */
+.social-links {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    color: #3d2817;
+    text-decoration: none;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    opacity: 0.8;
+}
+
+.social-link:hover {
+    opacity: 1;
+    transform: translateY(-2px);
+    background-color: rgba(61, 40, 23, 0.05);
+}
+
+.social-icon {
+    width: 18px;
+    height: 18px;
+    display: block;
 }
 
 /* Logo 品牌名稱樣式 */
@@ -123,8 +163,9 @@ body {
    主內容區域（米色背景）
    ============================================ */
 .main-content {
+    margin-top: 100px;  /* 補償固定導覽列的高度 */
     padding: 60px 0;
-    min-height: calc(100vh - 120px);
+    min-height: calc(100vh - 200px);
     display: flex;
     align-items: center;
     background-color: #f0ede8;  /* 下層米色背景 */
@@ -218,6 +259,14 @@ body {
 
 /* 平板尺寸（968px 以下）：改為單欄版面配置 */
 @media (max-width: 968px) {
+    .header {
+        padding: 20px 0;
+    }
+
+    .main-content {
+        margin-top: 120px;  /* 平板上的補償高度 */
+    }
+
     .content-grid {
         grid-template-columns: 1fr;  /* 改為單欄 */
         gap: 40px;
@@ -242,6 +291,10 @@ body {
         gap: 16px;
     }
 
+    .social-links {
+        gap: 16px;
+    }
+
     .nav {
         flex-wrap: wrap;
         justify-content: center;
@@ -250,6 +303,15 @@ body {
 
 /* 手機尺寸（640px 以下）：進一步縮小字型 */
 @media (max-width: 640px) {
+    .header {
+        padding: 15px 0;
+    }
+
+    .main-content {
+        margin-top: 140px;  /* 手機上的補償高度 */
+        padding: 40px 0;
+    }
+
     .container {
         padding: 0 20px;
     }
@@ -268,6 +330,329 @@ body {
 
     .nav-link {
         font-size: 12px;  /* 手機上的導覽連結字型大小 */
+    }
+}
+
+/* ============================================
+   分頁樣式（季節限定、全部品項等）
+   ============================================ */
+
+/* 頁面標題區域 */
+.page-header {
+    text-align: center;
+    margin-bottom: 60px;
+    padding-top: 40px;
+}
+
+.page-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 48px;
+    font-weight: 700;
+    color: #3d2817;
+    margin-bottom: 16px;
+    letter-spacing: -0.5px;
+}
+
+.page-subtitle {
+    font-family: 'Inter', sans-serif;
+    font-size: 18px;
+    font-weight: 300;
+    color: #3d2817;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* 圖片網格布局 */
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    padding-bottom: 60px;
+}
+
+.gallery-item {
+    width: 100%;
+}
+
+.gallery-image-wrapper {
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(61, 40, 23, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    aspect-ratio: 1;
+}
+
+.gallery-image-wrapper:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(61, 40, 23, 0.15);
+}
+
+.gallery-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* 響應式：平板 - 分頁樣式 */
+@media (max-width: 968px) {
+    .page-header {
+        padding-top: 0;  /* 已經有 main-content 的 margin-top 了 */
+    }
+
+    .page-title {
+        font-size: 36px;
+    }
+
+    .page-subtitle {
+        font-size: 16px;
+    }
+
+    .gallery-grid {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 24px;
+    }
+}
+
+/* 響應式：手機 - 分頁樣式 */
+@media (max-width: 640px) {
+    .page-header {
+        margin-bottom: 40px;
+        padding-top: 0;  /* 已經有 main-content 的 margin-top 了 */
+    }
+
+    .page-title {
+        font-size: 28px;
+    }
+
+    .page-subtitle {
+        font-size: 15px;
+        padding: 0 20px;
+    }
+
+    .gallery-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding-bottom: 40px;
+    }
+}
+
+/* ============================================
+   訂購方式頁面樣式
+   ============================================ */
+
+.order-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 60vh;
+    padding: 40px 0;
+}
+
+.order-card {
+    background-color: #ffffff;
+    border-radius: 20px;
+    padding: 60px 50px;
+    max-width: 600px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(61, 40, 23, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.order-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(61, 40, 23, 0.15);
+}
+
+.order-icon {
+    font-size: 64px;
+    margin-bottom: 24px;
+    line-height: 1;
+}
+
+.order-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: #3d2817;
+    margin-bottom: 24px;
+    line-height: 1.3;
+    letter-spacing: -0.5px;
+}
+
+.order-divider {
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(to right, transparent, #e8d5c4, transparent);
+    margin: 0 auto 32px;
+}
+
+.order-description {
+    font-family: 'Inter', sans-serif;
+    font-size: 20px;
+    font-weight: 300;
+    color: #3d2817;
+    line-height: 1.8;
+    letter-spacing: 0.3px;
+}
+
+/* 響應式：平板 */
+@media (max-width: 968px) {
+    .order-card {
+        padding: 50px 40px;
+        max-width: 500px;
+    }
+
+    .order-icon {
+        font-size: 56px;
+        margin-bottom: 20px;
+    }
+
+    .order-title {
+        font-size: 32px;
+        margin-bottom: 20px;
+    }
+
+    .order-description {
+        font-size: 18px;
+    }
+}
+
+/* 響應式：手機 */
+@media (max-width: 640px) {
+    .order-content {
+        padding: 20px 0;
+        min-height: 50vh;
+    }
+
+    .order-card {
+        padding: 40px 30px;
+        border-radius: 16px;
+    }
+
+    .order-icon {
+        font-size: 48px;
+        margin-bottom: 20px;
+    }
+
+    .order-title {
+        font-size: 26px;
+        margin-bottom: 20px;
+    }
+
+    .order-divider {
+        width: 50px;
+        margin-bottom: 24px;
+    }
+
+    .order-description {
+        font-size: 16px;
+        line-height: 1.6;
+    }
+}
+
+/* ============================================
+   聯絡頁面樣式
+   ============================================ */
+
+.contact-content {
+    padding: 40px 0 60px;
+}
+
+/* 聯絡頁面的容器需要更大的寬度 */
+.contact-container {
+    max-width: 1600px !important;
+    padding: 0 20px !important;
+}
+
+.contact-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.contact-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 42px;
+    font-weight: 700;
+    color: #3d2817;
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+}
+
+.contact-subtitle {
+    font-family: 'Inter', sans-serif;
+    font-size: 18px;
+    font-weight: 300;
+    color: #3d2817;
+    opacity: 0.8;
+}
+
+.map-wrapper {
+    width: 100%;
+    max-width: 600px !important;
+    min-width: 600px !important;
+    margin: 0 auto;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(61, 40, 23, 0.15);
+    aspect-ratio: 1 / 1;
+    background-color: #f5f3f0;
+}
+
+.map-wrapper iframe {
+    width: 100%;
+    height: 100%;
+    display: block;
+    border: none;
+}
+
+/* 響應式：平板 */
+@media (max-width: 968px) {
+    .contact-content {
+        padding: 30px 0 50px;
+    }
+
+    .contact-title {
+        font-size: 36px;
+    }
+
+    .contact-subtitle {
+        font-size: 16px;
+    }
+
+    .map-wrapper {
+        border-radius: 12px;
+        max-width: 100% !important;
+        min-width: auto !important;
+    }
+}
+
+/* 響應式：手機 */
+@media (max-width: 640px) {
+    .contact-content {
+        padding: 20px 0 40px;
+    }
+
+    .contact-header {
+        margin-bottom: 30px;
+    }
+
+    .contact-title {
+        font-size: 28px;
+        margin-bottom: 10px;
+    }
+
+    .contact-subtitle {
+        font-size: 15px;
+    }
+
+    .map-wrapper {
+        border-radius: 8px;
+        max-width: 100% !important;
+        min-width: auto !important;
     }
 }
 

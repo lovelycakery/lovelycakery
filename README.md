@@ -55,13 +55,42 @@ git push origin main
 Cursor/
 ├── index.html          # 首頁
 ├── README.md          # 說明文件
+├── deploy.sh          # 部署腳本
 └── assets/            # 靜態資源
     ├── css/
     │   └── styles.css
     ├── js/
     │   └── script.js
     └── images/
-        └── *.jpg
+        ├── cakes.jpg           # 首頁圖片
+        ├── calendar/           # 日曆頁面圖片
+        ├── seasonal/           # 季節限定頁面圖片
+        ├── products/           # 全部品項頁面圖片
+        ├── order/              # 訂購方式頁面圖片
+        └── contact/            # 聯絡頁面圖片
+```
+
+## 圖片組織方式
+
+**分頁圖片存放位置：**
+
+- **首頁圖片**：直接放在 `assets/images/`（例如：`cakes.jpg`）
+- **日曆頁面**：放在 `assets/images/calendar/`
+- **季節限定頁面**：放在 `assets/images/seasonal/`
+- **全部品項頁面**：放在 `assets/images/products/`
+- **訂購方式頁面**：放在 `assets/images/order/`
+- **聯絡頁面**：放在 `assets/images/contact/`
+
+**使用範例：**
+```html
+<!-- 日曆頁面 -->
+<img src="assets/images/calendar/calendar-hero.jpg" alt="Calendar">
+
+<!-- 季節限定頁面 -->
+<img src="assets/images/seasonal/spring-cake.jpg" alt="Spring Cake">
+
+<!-- 產品圖片 -->
+<img src="assets/images/products/matcha-cake.jpg" alt="Matcha Cake">
 ```
 
 ## 功能
