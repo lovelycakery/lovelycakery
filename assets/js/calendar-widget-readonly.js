@@ -35,22 +35,22 @@ class CalendarWidgetReadonly {
     // 通知父窗口調整 iframe 高度
     notifyParentHeight() {
         try {
-            // 延遲一下確保內容已完全渲染
-            setTimeout(() => {
-                const height = Math.max(
-                    document.body.scrollHeight,
-                    document.body.offsetHeight,
-                    document.documentElement.clientHeight,
-                    document.documentElement.scrollHeight,
-                    document.documentElement.offsetHeight
-                );
-                if (height > 0 && window.parent && window.parent !== window) {
-                    window.parent.postMessage({
-                        type: 'calendar-resize',
-                        height: height + 50
-                    }, '*');
-                }
-            }, 500);
+            // 獲取實際內容高度
+            const height = Math.max(
+                document.body.scrollHeight,
+                document.body.offsetHeight,
+                document.documentElement.clientHeight,
+                document.documentElement.scrollHeight,
+                document.documentElement.offsetHeight
+            );
+            if (height > 0 && window.parent && window.parent !== window) {
+                // 考慮到 CSS transform scale(0.67)，但 iframe 高度應該使用原始高度
+                // 因為 transform 只影響視覺顯示，不影響實際空間佔用
+                window.parent.postMessage({
+                    type: 'calendar-resize',
+                    height: height + 100  // 增加額外空間確保完整顯示
+                }, '*');
+            }
         } catch (e) {
             // 跨域時忽略錯誤
         }
@@ -146,8 +146,10 @@ class CalendarWidgetReadonly {
             this.createDayElement(grid, day, true, dateKey);
         }
         
-        // 渲染完成後通知父窗口調整高度
-        this.notifyParentHeight();
+        // 渲染完成後通知父窗口調整高度（多次調用以確保高度正確）
+        setTimeout(() => this.notifyParentHeight(), 100);
+        setTimeout(() => this.notifyParentHeight(), 500);
+        setTimeout(() => this.notifyParentHeight(), 1000);
     }
     
     // 創建日期元素（只讀模式）

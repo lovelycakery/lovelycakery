@@ -121,6 +121,7 @@
                 const iframe = document.querySelector('.calendar-iframe');
                 if (iframe && event.data.height > 0) {
                     // 設置明確的高度，確保日曆完整顯示
+                    // 注意：不使用 scale 調整高度，因為 transform scale 只影響視覺
                     iframe.style.height = event.data.height + 'px';
                     iframe.style.minHeight = event.data.height + 'px';
                 }
