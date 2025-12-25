@@ -27,6 +27,7 @@ class CalendarWidgetReadonly {
     async loadEvents() {
         try {
             // 添加時間戳避免緩存問題，確保載入最新資料
+            const isLocalFile = window.location.protocol === 'file:';
             const response = await fetch(this.dataFile + '?t=' + Date.now());
             if (response.ok) {
                 const data = await response.json();
@@ -40,9 +41,9 @@ class CalendarWidgetReadonly {
                         this.events[dateKey].push(event);
                     });
                 }
-                console.log('從 GitHub 載入日曆資料（只讀版本）');
+                console.log(isLocalFile ? '從本地檔案載入日曆資料（只讀版本）' : '從 GitHub 載入日曆資料（只讀版本）');
             } else {
-                console.log('日曆資料檔案不存在');
+                console.log('日曆資料檔案不存在或無法載入');
                 this.events = {};
             }
         } catch (error) {

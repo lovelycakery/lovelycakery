@@ -1,5 +1,14 @@
 // 管理員密碼驗證功能
 
+// 如果配置檔案未載入，使用預設配置
+if (typeof ADMIN_PASSWORD_CONFIG === 'undefined') {
+    console.warn('⚠️ admin-password-config.js 未載入，使用預設配置');
+    window.ADMIN_PASSWORD_CONFIG = {
+        password: 'doobee0312', // 預設密碼（用於 GitHub Pages 部署）
+        enabled: true
+    };
+}
+
 class AdminPasswordManager {
     constructor() {
         this.isAuthenticated = false;
@@ -7,8 +16,11 @@ class AdminPasswordManager {
     }
     
     init() {
+        // 確保使用全局配置（如果存在）
+        const config = window.ADMIN_PASSWORD_CONFIG || ADMIN_PASSWORD_CONFIG;
+        
         // 檢查是否啟用密碼保護
-        if (!ADMIN_PASSWORD_CONFIG.enabled) {
+        if (!config || !config.enabled) {
             // 未啟用密碼保護，直接顯示內容
             this.showContent();
             return;
@@ -45,10 +57,24 @@ class AdminPasswordManager {
         const passwordInput = document.getElementById('adminPasswordInput');
         const errorMsg = document.getElementById('passwordError');
         
-        if (!passwordInput) return;
+        if (!passwordInput) {
+            console.error('找不到密碼輸入框');
+            return;
+        }
+        
+        // 使用全局配置
+        const config = window.ADMIN_PASSWORD_CONFIG || ADMIN_PASSWORD_CONFIG;
+        if (!config) {
+            console.error('無法獲取密碼配置');
+            if (errorMsg) {
+                errorMsg.textContent = '配置錯誤：無法載入密碼配置';
+                errorMsg.style.display = 'block';
+            }
+            return;
+        }
         
         const enteredPassword = passwordInput.value.trim();
-        const correctPassword = ADMIN_PASSWORD_CONFIG.password;
+        const correctPassword = config.password;
         
         if (!correctPassword) {
             if (errorMsg) {
@@ -124,7 +150,17 @@ class AdminPasswordManager {
 }
 
 // 初始化密碼管理器
-document.addEventListener('DOMContentLoaded', () => {
+function initAdminPassword() {
+    // 確保配置已設定（如果配置檔案未載入，已在上方設定預設值）
+    const config = window.ADMIN_PASSWORD_CONFIG;
+    if (!config) {
+        console.warn('⚠️ 使用預設配置（配置檔案未載入）');
+        window.ADMIN_PASSWORD_CONFIG = {
+            password: 'admin',
+            enabled: true
+        };
+    }
+    
     window.adminPasswordManager = new AdminPasswordManager();
     
     // 監聽語言切換
@@ -138,5 +174,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 100);
         });
     });
-});
+}
+
+// 如果 DOM 已準備好，直接初始化；否則等待 DOMContentLoaded
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAdminPassword);
+} else {
+    // DOM 已準備好，但可能腳本還在載入，稍等一下
+    setTimeout(initAdminPassword, 50);
+}
 
