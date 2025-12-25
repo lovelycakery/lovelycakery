@@ -2,12 +2,12 @@
   "events": [
     {
       "date": "2025-12-02",
-      "description": "",
+      "description": "testtest",
       "status": "available"
     },
     {
       "date": "2025-12-15",
-      "description": "testtest",
+      "description": "",
       "status": "unavailable"
     },
     {
