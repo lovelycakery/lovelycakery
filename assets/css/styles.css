@@ -567,29 +567,67 @@ body {
    日曆頁面樣式
    ============================================ */
 
+/* 日曆頁面專用樣式 */
+.calendar-page {
+    padding: 20px 0 !important;
+    min-height: calc(100vh - 100px) !important;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.calendar-page .container {
+    max-width: 1600px;
+    padding: 0 20px;
+    width: 100%;
+}
+
 .calendar-wrapper {
     width: 100%;
-    margin: 40px 0;
+    max-width: 900px;
+    margin: 30px auto 0;
     display: flex;
     justify-content: center;
+    overflow: visible;
+    transform: scale(0.67);
+    transform-origin: top center;
 }
 
 .calendar-iframe {
     width: 100%;
-    min-height: 800px;
+    min-height: 780px;
     border: none;
     background: transparent;
+    display: block;
+}
+
+.calendar-hint {
+    font-size: 0.7em;
+    text-align: center;
+    margin-top: 0.5rem;
+    margin-bottom: 0;
+    color: #666;
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
 }
 
 @media (max-width: 968px) {
-    .calendar-iframe {
-        min-height: 700px;
+    .calendar-page {
+        padding: 15px 0 !important;
+    }
+    
+    .calendar-page .container {
+        padding: 0 15px;
     }
 }
 
 @media (max-width: 640px) {
-    .calendar-iframe {
-        min-height: 600px;
+    .calendar-page {
+        padding: 10px 0 !important;
+    }
+    
+    .calendar-page .container {
+        padding: 0 10px;
     }
 }
 

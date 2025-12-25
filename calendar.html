@@ -50,13 +50,8 @@
         </div>
     </header>
 
-    <main class="main-content">
+    <main class="main-content calendar-page">
         <div class="container">
-            <div class="page-header">
-                <h1 class="page-title" data-en="Calendar" data-zh="日曆">日曆</h1>
-                <p class="page-subtitle" data-en="Click on any date to view event details. Available dates are marked in green." data-zh="點擊任何日期即可查看事件詳情。可預訂日期以綠色標記。">點擊任何日期即可查看事件詳情。可預訂日期以綠色標記。</p>
-            </div>
-
             <!-- 嵌入只讀日曆組件 -->
             <div class="calendar-wrapper">
                 <iframe 
@@ -71,6 +66,54 @@
     </main>
     
     <script src="assets/js/script.js"></script>
+    <script>
+        // 自動調整 iframe 高度以適應內容
+        function resizeIframe() {
+            const iframe = document.querySelector('.calendar-iframe');
+            if (!iframe) return;
+            
+            try {
+                const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+                if (iframeDocument && iframeDocument.body) {
+                    // 獲取內容的實際高度，包括所有元素
+                    const bodyHeight = iframeDocument.body.scrollHeight || iframeDocument.body.offsetHeight;
+                    const docHeight = iframeDocument.documentElement.scrollHeight || iframeDocument.documentElement.offsetHeight;
+                    const clientHeight = iframeDocument.documentElement.clientHeight;
+                    const height = Math.max(bodyHeight, docHeight, clientHeight);
+                    
+                    if (height > 0) {
+                        // 增加更多額外空間確保完整顯示（包括底部邊距和可能的滾動條）
+                        iframe.style.height = (height + 120) + 'px';
+                    }
+                }
+            } catch (e) {
+                // 跨域限制時，保持 min-height
+                console.log('無法獲取 iframe 內容高度:', e);
+            }
+        }
+
+        // 頁面加載完成後調整
+        window.addEventListener('load', function() {
+            resizeIframe();
+            setTimeout(resizeIframe, 300);
+            setTimeout(resizeIframe, 600);
+            setTimeout(resizeIframe, 1000);
+            setTimeout(resizeIframe, 1500);
+            setTimeout(resizeIframe, 2000);
+        });
+
+        // 監聽 iframe 加載完成
+        const iframe = document.querySelector('.calendar-iframe');
+        if (iframe) {
+            iframe.addEventListener('load', function() {
+                setTimeout(resizeIframe, 200);
+                setTimeout(resizeIframe, 500);
+                setTimeout(resizeIframe, 1000);
+                setTimeout(resizeIframe, 1500);
+                setTimeout(resizeIframe, 2000);
+            });
+        }
+    </script>
 </body>
 </html>
 
