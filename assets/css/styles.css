@@ -575,12 +575,13 @@ body.calendar-page-body {
 
 /* 日曆頁面專用樣式 */
 .calendar-page {
-    padding: 20px 0 !important;
-    height: calc(100vh - 100px);
+    padding: 40px 0 !important;
+    min-height: calc(100vh - 100px);
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .calendar-page .container {
@@ -595,14 +596,16 @@ body.calendar-page-body {
     margin: 0 auto;
     display: flex;
     justify-content: center;
-    overflow: hidden;
+    align-items: flex-start;
+    overflow: visible;
     transform: scale(0.67);
-    transform-origin: center center;
+    transform-origin: top center;
 }
 
 .calendar-iframe {
     width: 100%;
-    height: 100%;
+    min-height: 600px;
+    height: auto;
     border: none;
     background: transparent;
     display: block;
