@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>日曆 - Lovely Cakery</title>
-    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/styles.css?v=20251225-1">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
@@ -54,19 +54,90 @@
         <div class="container">
             <!-- 嵌入只讀日曆組件 -->
             <div class="calendar-wrapper">
-                <iframe 
-                    src="calendar-widget-readonly.html" 
-                    class="calendar-iframe"
-                    title="Calendar Widget"
-                    frameborder="0"
-                    scrolling="no">
-                </iframe>
+                <div class="calendar-scale">
+                    <div class="calendar-scale-inner">
+                        <iframe 
+                            src="calendar-widget-readonly.html?v=20251225-1" 
+                            class="calendar-iframe"
+                            title="Calendar Widget"
+                            frameborder="0"
+                            scrolling="no">
+                        </iframe>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
     
     <script src="assets/js/script.js"></script>
     <script>
+        function updateCalendarScale() {
+            const header = document.querySelector('.header');
+            const page = document.querySelector('.calendar-page');
+            const container = page ? page.querySelector('.container') : null;
+            const scaleBox = document.querySelector('.calendar-scale');
+            const inner = document.querySelector('.calendar-scale-inner');
+            const iframe = document.querySelector('.calendar-iframe');
+            if (!page || !iframe) return;
+
+            const headerH = header ? header.offsetHeight : 100;
+            document.documentElement.style.setProperty('--header-h', headerH + 'px');
+
+            // 以日曆頁可用區域為準（扣掉 header 後就是這塊）
+            // 寬度要以 container 為準（container 有左右 padding，否則會算太寬導致右邊被裁）
+            let availW = (container ? container.clientWidth : page.clientWidth);
+            if (container) {
+                const cs = getComputedStyle(container);
+                const padL = parseFloat(cs.paddingLeft) || 0;
+                const padR = parseFloat(cs.paddingRight) || 0;
+                // 子元素實際可用的是 content box（clientWidth 會把 padding 算進去）
+                availW = Math.max(0, availW - padL - padR);
+            }
+            const availH = page.clientHeight;
+
+            // 日曆設計寬度（與 calendar-widget.css 的 max-width 對齊）
+            const contentW = 900;
+            // 內容高度以 iframe 真實高度為準（未縮放）
+            const contentH = Math.max(1, iframe.offsetHeight);
+
+            // 讓 CSS 能計算縮放後的「佔位」寬高，避免裁切
+            document.documentElement.style.setProperty('--cal-content-w', contentW + 'px');
+            document.documentElement.style.setProperty('--cal-content-h', contentH + 'px');
+
+            // 給 box-shadow 的安全 padding（calendar-scale 會有 padding）
+            let shadowPad = 24;
+            if (scaleBox) {
+                const sb = getComputedStyle(scaleBox);
+                shadowPad = parseFloat(sb.paddingLeft) || shadowPad;
+            }
+
+            // 偏上位移會吃掉上方空間，縮放計算要把它算進去，避免頂端被裁
+            const shiftRaw = getComputedStyle(document.documentElement).getPropertyValue('--cal-shift').trim();
+            const shiftPx = shiftRaw.endsWith('px') ? parseFloat(shiftRaw) : 0;
+            const extraTop = Math.max(0, -shiftPx);
+            const extraBottom = Math.max(0, shiftPx);
+
+            const padding = 16; // 留白，避免貼邊
+            // 需要把 shadowPad 也算進去，否則縮放後會剛好貼邊導致陰影/邊框被裁
+            const scaleW = (availW - padding * 2 - shadowPad * 2) / contentW;
+            const scaleH = (availH - padding * 2 - shadowPad * 2 - extraTop - extraBottom) / contentH;
+            // 留一點安全係數避免次像素 rounding 造成右邊被裁切
+            const scale = Math.min(1, scaleW, scaleH) * 0.995;
+
+            document.documentElement.style.setProperty('--cal-scale', String(scale));
+
+            // 把「縮放後佔位」直接寫到外層盒子，避免 transform 不影響佔位造成裁切
+            if (scaleBox) {
+                // 加 2px buffer，避免小數 rounding 剪到邊
+                scaleBox.style.width = (Math.ceil(contentW * scale) + shadowPad * 2 + 2) + 'px';
+                scaleBox.style.height = (Math.ceil(contentH * scale) + shadowPad * 2 + 2) + 'px';
+            }
+            if (inner) {
+                inner.style.width = contentW + 'px';
+                inner.style.height = contentH + 'px';
+            }
+        }
+
         // 自動調整 iframe 高度以適應內容
         function resizeIframe() {
             const iframe = document.querySelector('.calendar-iframe');
@@ -84,6 +155,7 @@
                     if (height > 0) {
                         // 增加更多額外空間確保完整顯示（包括底部邊距和可能的滾動條）
                         iframe.style.height = (height + 120) + 'px';
+                        updateCalendarScale();
                     }
                 }
             } catch (e) {
@@ -95,6 +167,7 @@
         // 頁面加載完成後調整
         window.addEventListener('load', function() {
             resizeIframe();
+            updateCalendarScale();
             setTimeout(resizeIframe, 300);
             setTimeout(resizeIframe, 600);
             setTimeout(resizeIframe, 1000);
@@ -124,8 +197,15 @@
                     // 注意：不使用 scale 調整高度，因為 transform scale 只影響視覺
                     iframe.style.height = event.data.height + 'px';
                     iframe.style.minHeight = event.data.height + 'px';
+                    updateCalendarScale();
                 }
             }
+        });
+
+        // 視窗大小改變時，重新計算縮放（避免手機地址列、桌面縮放影響）
+        window.addEventListener('resize', function() {
+            // 等下一幀再算，避免 layout 還沒更新
+            window.requestAnimationFrame(updateCalendarScale);
         });
     </script>
 </body>
