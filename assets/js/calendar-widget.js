@@ -136,44 +136,55 @@ class CalendarWidget {
         localStorage.setItem('calendarEvents', JSON.stringify(data));
         localStorage.setItem('calendarEventsUnsynced', 'true');
         
-        // 檢查是否啟用 GitHub API
-        if (typeof checkGitHubConfig !== 'undefined') {
+        // 檢查並準備 GitHub 配置（支援配置文件或預設配置）
+        let githubConfig = null;
+        if (typeof GITHUB_CONFIG !== 'undefined' && typeof checkGitHubConfig !== 'undefined') {
             const configCheck = checkGitHubConfig();
             if (configCheck.valid) {
-                // 使用 GitHub API 自動更新
-                const success = await this.updateGitHubFile(data);
-                if (success) {
-                    // 成功更新，清除未同步標記
-                    localStorage.removeItem('calendarEventsUnsynced');
-                    return; // 成功更新，不需要下載檔案
-                } else {
-                    // GitHub API 更新失敗，保留未同步標記
-                    console.warn('GitHub API 更新失敗，資料保留在 localStorage 中');
-                    alert('⚠️ 更新失敗\n\n資料已儲存在瀏覽器中，但尚未同步到 GitHub。\n\n請檢查網路連接或稍後再試。');
-                }
-            } else {
-                // GitHub API 未配置，提供下載方式
-                console.warn('GitHub API 未啟用:', configCheck.reason);
-                localStorage.setItem('calendarEventsUnsynced', 'true');
+                githubConfig = GITHUB_CONFIG;
             }
-        } else {
-            localStorage.setItem('calendarEventsUnsynced', 'true');
         }
         
-        // 如果 GitHub API 未啟用或更新失敗，提供下載 JSON 檔案的功能
-        this.downloadJSON(data, true); // silent = true，因為已經顯示過錯誤訊息
+        // 如果配置文件未載入，無法使用 GitHub API
+        if (!githubConfig) {
+            console.warn('⚠️ github-config.js 未載入，無法自動更新到 GitHub');
+            alert('⚠️ 無法自動更新\n\nGitHub 配置檔案未載入。\n\n請確保 github-config.js 檔案存在且配置正確。\n\n資料已儲存在瀏覽器中，請使用本地版本進行更新。');
+            return; // 無法更新，直接返回
+        }
+        
+        // 嘗試使用 GitHub API 更新
+        if (githubConfig && githubConfig.enabled) {
+            const success = await this.updateGitHubFileWithConfig(data, githubConfig);
+            if (success) {
+                // 成功更新，清除未同步標記
+                localStorage.removeItem('calendarEventsUnsynced');
+                // 立即更新日曆顯示（不等待重新載入）
+                this.renderCalendar();
+                return; // 成功更新，不需要下載檔案
+            } else {
+                // GitHub API 更新失敗，保留未同步標記
+                console.warn('GitHub API 更新失敗，資料保留在 localStorage 中');
+                alert('⚠️ 更新失敗\n\n資料已儲存在瀏覽器中，但尚未同步到 GitHub。\n\n請檢查網路連接或稍後再試。\n\n詳細錯誤請查看瀏覽器控制台。');
+                // 即使更新失敗，也要更新日曆顯示（使用本地資料）
+                this.renderCalendar();
+                return; // 更新失敗，但不提供下載（網頁版無法下載到用戶電腦）
+            }
+        }
+        
+        // GitHub API 未啟用或配置無效
+        console.warn('GitHub API 未啟用，無法自動更新');
+        alert('⚠️ 無法自動更新\n\nGitHub 配置未啟用。資料已儲存在瀏覽器中。\n\n請檢查配置或使用本地版本進行更新。');
     }
     
-    // 使用 GitHub API 更新檔案
-    async updateGitHubFile(data) {
+    // 使用 GitHub API 更新檔案（使用提供的配置）
+    async updateGitHubFileWithConfig(data, config) {
         try {
-            const configCheck = checkGitHubConfig();
-            if (!configCheck.valid) {
-                console.warn('GitHub 配置檢查失敗:', configCheck.reason);
+            if (!config || !config.enabled || !config.token) {
+                console.warn('GitHub 配置無效');
                 return false;
             }
             
-            const { token, owner, repo, filePath } = GITHUB_CONFIG;
+            const { token, owner, repo, filePath } = config;
             const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`;
             
             // 1. 獲取檔案當前的 SHA（GitHub 需要這個來更新檔案）
@@ -228,13 +239,17 @@ class CalendarWidget {
                 // 清除未同步標記
                 localStorage.removeItem('calendarEventsUnsynced');
                 
+                // 立即更新日曆顯示（使用剛剛保存的資料）
+                // 注意：這裡使用 this.events，因為它已經包含最新的資料
+                this.renderCalendar();
+                
                 // 等待一小段時間讓 GitHub 更新完成，然後重新載入資料確認
                 setTimeout(async () => {
                     await this.loadEvents();
                     console.log('已重新載入資料確認更新');
                 }, 2000);
                 
-                alert('✅ 日曆資料已成功更新到 GitHub！\n\n請等待 2-3 秒後刷新頁面以確認更新。\n\n訪客重新整理頁面即可看到更新。');
+                alert('✅ 日曆資料已成功更新到 GitHub！\n\n頁面已自動更新顯示。\n\n訪客重新整理頁面即可看到更新。');
                 return true;
             } else {
                 const errorText = await updateResponse.text();
@@ -264,6 +279,21 @@ class CalendarWidget {
             // 保留 localStorage 中的資料，因為更新失敗
             return false;
         }
+    }
+    
+    // 使用 GitHub API 更新檔案（保持向後兼容）
+    async updateGitHubFile(data) {
+        // 檢查是否有配置
+        if (typeof GITHUB_CONFIG !== 'undefined' && typeof checkGitHubConfig !== 'undefined') {
+            const configCheck = checkGitHubConfig();
+            if (configCheck.valid) {
+                return await this.updateGitHubFileWithConfig(data, GITHUB_CONFIG);
+            }
+        }
+        
+        // 沒有配置，無法更新
+        console.error('GitHub 配置未載入，無法更新');
+        return false;
     }
     
     // 下載 JSON 檔案（備用方案或同步到本地）
