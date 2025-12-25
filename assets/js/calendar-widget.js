@@ -5,7 +5,14 @@ class CalendarWidget {
         this.currentDate = new Date();
         this.events = {};
         this.selectedDate = null;
-        this.dataFile = 'assets/data/calendar-data.json';
+        // 如果是本地文件模式，從 GitHub 載入數據；否則從本地載入
+        const isLocalFile = window.location.protocol === 'file:';
+        if (isLocalFile) {
+            // 本地文件模式：從 GitHub 載入最新數據
+            this.dataFile = 'https://raw.githubusercontent.com/lovelycakery/lovelycakery/main/assets/data/calendar-data.json';
+        } else {
+            this.dataFile = 'assets/data/calendar-data.json';
+        }
         
         this.init();
     }
@@ -145,11 +152,13 @@ class CalendarWidget {
             }
         }
         
-        // 如果配置文件未載入，無法使用 GitHub API
+        // 如果配置文件未載入（通常是網頁版），無法使用 GitHub API
         if (!githubConfig) {
             console.warn('⚠️ github-config.js 未載入，無法自動更新到 GitHub');
-            alert('⚠️ 無法自動更新\n\nGitHub 配置檔案未載入。\n\n請確保 github-config.js 檔案存在且配置正確。\n\n資料已儲存在瀏覽器中，請使用本地版本進行更新。');
-            return; // 無法更新，直接返回
+            // 資料已保存到 localStorage，提供下載功能讓用戶手動更新 GitHub
+            this.downloadJSON(data, false); // 提供下載，讓用戶可以手動上傳到 GitHub
+            alert('⚠️ 無法自動更新到 GitHub\n\n由於安全原因，GitHub 配置檔案不會上傳到公開倉庫。\n\n資料已儲存在瀏覽器中，並已下載 JSON 檔案。\n\n請手動將 calendar-data.json 上傳到 GitHub 的 assets/data/ 目錄。');
+            return; // 無法自動更新，但已提供下載
         }
         
         // 嘗試使用 GitHub API 更新

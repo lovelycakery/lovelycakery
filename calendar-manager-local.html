@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日曆管理工具 - Lovely Cakery</title>
+    <link rel="stylesheet" href="assets/css/calendar-widget.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #faf8f5;
+            color: #3d2817;
+        }
+        .manager-header {
+            max-width: 1200px;
+            margin: 0 auto 30px;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(61, 40, 23, 0.1);
+        }
+        .manager-header h1 {
+            margin: 0 0 10px;
+            font-size: 28px;
+            color: #3d2817;
+        }
+        .manager-header p {
+            margin: 0;
+            color: #6b5d4f;
+            font-size: 14px;
+        }
+        .calendar-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .status-message {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 12px 20px;
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #856404;
+        }
+        .status-message.success {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        .status-message.error {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="manager-header">
+        <h1 data-en="Calendar Management Tool" data-zh="日曆管理工具">日曆管理工具</h1>
+        <p data-en="Edit calendar events and save to GitHub. Changes will be visible on the website immediately." data-zh="編輯日曆事件並儲存到 GitHub。更改將立即在網站上顯示。">編輯日曆事件並儲存到 GitHub。更改將立即在網站上顯示。</p>
+    </div>
+
+    <div id="statusMessage" class="status-message" style="display: none;"></div>
+
+    <div class="calendar-container">
+        <div class="calendar-header">
+            <button class="calendar-nav-btn" id="prevMonth" aria-label="上一個月">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M15 18l-6-6 6-6"/>
+                </svg>
+            </button>
+            <h2 class="calendar-month-year" id="monthYear"></h2>
+            <button class="calendar-nav-btn" id="nextMonth" aria-label="下一個月">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6"/>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="calendar-weekdays">
+            <div class="weekday" data-en="Sun" data-zh="日">日</div>
+            <div class="weekday" data-en="Mon" data-zh="一">一</div>
+            <div class="weekday" data-en="Tue" data-zh="二">二</div>
+            <div class="weekday" data-en="Wed" data-zh="三">三</div>
+            <div class="weekday" data-en="Thu" data-zh="四">四</div>
+            <div class="weekday" data-en="Fri" data-zh="五">五</div>
+            <div class="weekday" data-en="Sat" data-zh="六">六</div>
+        </div>
+        
+        <div class="calendar-grid" id="calendarGrid"></div>
+        
+        <div class="calendar-legend">
+            <div class="legend-item">
+                <span class="legend-dot available"></span>
+                <span class="legend-text" data-en="Available" data-zh="可預訂">可預訂</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-dot unavailable"></span>
+                <span class="legend-text" data-en="Unavailable" data-zh="不可預訂">不可預訂</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-dot closed"></span>
+                <span class="legend-text" data-en="Closed" data-zh="休息">休息</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 編輯事件模態框 -->
+    <div class="modal-overlay" id="eventModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span id="eventDateDisplay" class="form-date-display"></span>
+                <button class="modal-close" id="closeModal" aria-label="關閉">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label" data-en="Description" data-zh="說明">說明</label>
+                    <textarea id="eventDescription" class="form-textarea" rows="5" placeholder="輸入事件說明（選填）"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" data-en="Status" data-zh="狀態">狀態</label>
+                    <select id="eventStatus" class="form-select">
+                        <option value="available" data-en="Available" data-zh="可預訂">可預訂</option>
+                        <option value="unavailable" data-en="Unavailable" data-zh="不可預訂">不可預訂</option>
+                        <option value="closed" data-en="Closed" data-zh="休息">休息</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="deleteEvent" data-en="Delete" data-zh="刪除">刪除</button>
+                <button class="btn btn-cancel" id="cancelEvent" data-en="Cancel" data-zh="取消">取消</button>
+                <button class="btn btn-primary" id="saveEvent" data-en="Save" data-zh="儲存">儲存</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="assets/js/github-config.js"></script>
+    <script src="assets/js/calendar-widget.js"></script>
+    <script>
+        // 顯示狀態訊息
+        function showStatus(message, type = 'info') {
+            const statusEl = document.getElementById('statusMessage');
+            if (statusEl) {
+                statusEl.textContent = message;
+                statusEl.className = 'status-message ' + type;
+                statusEl.style.display = 'block';
+                setTimeout(() => {
+                    statusEl.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        // 監聽保存成功事件
+        document.addEventListener('DOMContentLoaded', () => {
+            // 檢查是否為本地文件模式
+            const isLocalFile = window.location.protocol === 'file:';
+            if (isLocalFile) {
+                showStatus('💡 本地文件模式：請確保已配置 github-config.js 才能自動更新到 GitHub', 'info');
+            }
+
+            // 監聽日曆初始化完成
+            if (window.calendarWidget) {
+                // 攔截保存事件，顯示狀態
+                const originalSaveEvents = window.calendarWidget.saveEvents;
+                window.calendarWidget.saveEvents = async function() {
+                    try {
+                        await originalSaveEvents.call(this);
+                        // 如果成功，會由 updateGitHubFile 顯示成功訊息
+                    } catch (error) {
+                        showStatus('❌ 保存失敗：' + error.message, 'error');
+                    }
+                };
+            }
+        });
+
+        // 更新語言（如果需要）
+        function updateLanguage() {
+            const currentLang = localStorage.getItem('language') || 'zh';
+            const elements = document.querySelectorAll('[data-en][data-zh]');
+            elements.forEach(element => {
+                if (currentLang === 'en') {
+                    element.textContent = element.getAttribute('data-en');
+                } else {
+                    element.textContent = element.getAttribute('data-zh');
+                }
+            });
+        }
+
+        // 初始化語言
+        updateLanguage();
+    </script>
+</body>
+</html>
+
