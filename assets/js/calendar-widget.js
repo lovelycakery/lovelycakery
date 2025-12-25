@@ -53,16 +53,101 @@ class CalendarWidget {
         
         const data = { events: eventsArray };
         
-        // 注意：由於瀏覽器安全限制，無法直接寫入檔案
-        // 這裡我們使用 localStorage 作為備份，並提供下載功能
+        // 使用 localStorage 作為備份
         localStorage.setItem('calendarEvents', JSON.stringify(data));
         
-        // 提供下載 JSON 檔案的功能
+        // 檢查是否啟用 GitHub API
+        if (typeof checkGitHubConfig !== 'undefined') {
+            const configCheck = checkGitHubConfig();
+            if (configCheck.valid) {
+                // 使用 GitHub API 自動更新
+                const success = await this.updateGitHubFile(data);
+                if (success) {
+                    return; // 成功更新，不需要下載檔案
+                } else {
+                    // GitHub API 更新失敗，回退到下載方式
+                    console.warn('GitHub API 更新失敗，改用下載方式');
+                }
+            }
+        }
+        
+        // 如果 GitHub API 未啟用或更新失敗，提供下載 JSON 檔案的功能
         this.downloadJSON(data);
     }
     
-    // 下載 JSON 檔案
-    downloadJSON(data) {
+    // 使用 GitHub API 更新檔案
+    async updateGitHubFile(data) {
+        try {
+            const configCheck = checkGitHubConfig();
+            if (!configCheck.valid) {
+                console.warn('GitHub 配置檢查失敗:', configCheck.reason);
+                return false;
+            }
+            
+            const { token, owner, repo, filePath } = GITHUB_CONFIG;
+            const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`;
+            
+            // 1. 獲取檔案當前的 SHA（GitHub 需要這個來更新檔案）
+            const getFileResponse = await fetch(apiUrl, {
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'User-Agent': 'LovelyCakery-Calendar'
+                }
+            });
+            
+            if (!getFileResponse.ok && getFileResponse.status !== 404) {
+                throw new Error(`無法取得檔案資訊: ${getFileResponse.status}`);
+            }
+            
+            let currentSha = null;
+            if (getFileResponse.ok) {
+                const fileData = await getFileResponse.json();
+                currentSha = fileData.sha;
+            }
+            
+            // 2. 準備更新資料
+            const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2)))); // Base64 編碼
+            
+            const updateData = {
+                message: '更新日曆資料',
+                content: content
+            };
+            
+            if (currentSha) {
+                updateData.sha = currentSha; // 更新現有檔案需要 SHA
+            }
+            
+            // 3. 更新檔案
+            const updateResponse = await fetch(apiUrl, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json',
+                    'User-Agent': 'LovelyCakery-Calendar'
+                },
+                body: JSON.stringify(updateData)
+            });
+            
+            if (updateResponse.ok) {
+                const result = await updateResponse.json();
+                alert('✅ 日曆資料已成功更新到 GitHub！\n\n訪客重新整理頁面即可看到更新。');
+                console.log('GitHub 更新成功:', result);
+                return true;
+            } else {
+                const errorData = await updateResponse.json();
+                throw new Error(errorData.message || `更新失敗: ${updateResponse.status}`);
+            }
+        } catch (error) {
+            console.error('GitHub API 更新錯誤:', error);
+            alert(`❌ 更新失敗：${error.message}\n\n將改用下載方式。`);
+            return false;
+        }
+    }
+    
+    // 下載 JSON 檔案（備用方案或同步到本地）
+    downloadJSON(data, silent = false) {
         const dataStr = JSON.stringify(data, null, 2);
         const dataBlob = new Blob([dataStr], { type: 'application/json' });
         const url = URL.createObjectURL(dataBlob);
@@ -75,7 +160,11 @@ class CalendarWidget {
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
         
-        console.log('日曆資料已下載，請將檔案放到 assets/data/calendar-data.json');
+        if (!silent) {
+            alert('📥 日曆資料已下載\n\n請將檔案放到 assets/data/calendar-data.json 並上傳到 GitHub。');
+        } else {
+            console.log('📥 日曆資料已下載，請將檔案放到 assets/data/calendar-data.json 以同步本地檔案。');
+        }
     }
     
     // 渲染日曆
@@ -165,12 +254,7 @@ class CalendarWidget {
             indicator.className = `event-indicator ${event.status}`;
             dayEl.appendChild(indicator);
             
-            if (event.title) {
-                const title = document.createElement('div');
-                title.className = 'event-title';
-                title.textContent = event.title;
-                dayEl.appendChild(title);
-            }
+            // 不再顯示標題
         }
         
         dayEl.addEventListener('click', () => this.openEventModal(dateKey));
@@ -188,16 +272,14 @@ class CalendarWidget {
         this.selectedDate = dateKey;
         const modal = document.getElementById('eventModal');
         const dateInput = document.getElementById('eventDate');
-        const titleInput = document.getElementById('eventTitle');
         const descInput = document.getElementById('eventDescription');
         const statusInput = document.getElementById('eventStatus');
         
         if (dateInput) dateInput.value = dateKey;
         
         const events = this.events[dateKey] || [];
-        const event = events[0] || { title: '', description: '', status: 'available' };
+        const event = events[0] || { description: '', status: 'available' };
         
-        if (titleInput) titleInput.value = event.title || '';
         if (descInput) descInput.value = event.description || '';
         if (statusInput) statusInput.value = event.status || 'available';
         
@@ -215,25 +297,22 @@ class CalendarWidget {
     saveEvent() {
         if (!this.selectedDate) return;
         
-        const titleInput = document.getElementById('eventTitle');
         const descInput = document.getElementById('eventDescription');
         const statusInput = document.getElementById('eventStatus');
         
-        const title = titleInput ? titleInput.value.trim() : '';
         const description = descInput ? descInput.value.trim() : '';
         const status = statusInput ? statusInput.value : 'available';
         
-        if (!title && !description) {
-            // 如果標題和說明都為空，刪除事件
+        if (!description) {
+            // 如果說明為空，刪除事件
             delete this.events[this.selectedDate];
         } else {
-            // 儲存事件
+            // 儲存事件（不包含標題）
             if (!this.events[this.selectedDate]) {
                 this.events[this.selectedDate] = [];
             }
             this.events[this.selectedDate] = [{
                 date: this.selectedDate,
-                title: title,
                 description: description,
                 status: status
             }];

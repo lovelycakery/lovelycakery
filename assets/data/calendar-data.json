@@ -2,19 +2,16 @@
   "events": [
     {
       "date": "2025-01-15",
-      "title": "草莓千層蛋糕",
       "description": "可預訂，請提前三天預約",
       "status": "available"
     },
     {
       "date": "2025-01-20",
-      "title": "休息日",
       "description": "本日不提供服務",
       "status": "closed"
     },
     {
       "date": "2025-01-25",
-      "title": "抹茶千層蛋糕",
       "description": "已滿額，無法預訂",
       "status": "unavailable"
     }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>日曆 - Lovely Cakery</title>
+    <title>日曆管理 - Lovely Cakery</title>
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -52,24 +52,52 @@
 
     <main class="main-content">
         <div class="container">
-            <div class="page-header">
-                <h1 class="page-title" data-en="Calendar" data-zh="日曆">日曆</h1>
-                <p class="page-subtitle" data-en="Click on any date to view event details. Available dates are marked in green." data-zh="點擊任何日期即可查看事件詳情。可預訂日期以綠色標記。">點擊任何日期即可查看事件詳情。可預訂日期以綠色標記。</p>
+            <!-- 密碼驗證介面 -->
+            <div id="passwordModal" class="password-modal">
+                <div class="password-modal-content">
+                    <div class="password-modal-header">
+                        <h2 class="password-modal-title" data-en="Admin Access" data-zh="管理員登入">管理員登入</h2>
+                    </div>
+                    <div class="password-modal-body">
+                        <p class="password-modal-description" data-en="Please enter the administrator password to access the calendar management." data-zh="請輸入管理員密碼以存取日曆管理功能。">請輸入管理員密碼以存取日曆管理功能。</p>
+                        <div class="password-input-group">
+                            <input 
+                                type="password" 
+                                id="adminPasswordInput" 
+                                class="password-input" 
+                                placeholder="輸入密碼"
+                                autocomplete="off"
+                                autofocus>
+                            <button id="passwordSubmitBtn" class="password-submit-btn" data-en="Login" data-zh="登入">登入</button>
+                        </div>
+                        <p id="passwordError" class="password-error" style="display: none;"></p>
+                    </div>
+                </div>
             </div>
 
-            <!-- 嵌入只讀日曆組件 -->
-            <div class="calendar-wrapper">
-                <iframe 
-                    src="calendar-widget-readonly.html" 
-                    class="calendar-iframe"
-                    title="Calendar Widget"
-                    frameborder="0"
-                    scrolling="no">
-                </iframe>
+            <!-- 日曆內容（驗證後顯示） -->
+            <div id="calendarContent" style="display: none;">
+                <div class="page-header">
+                    <h1 class="page-title" data-en="Calendar Management" data-zh="日曆管理">日曆管理</h1>
+                    <p class="page-subtitle" data-en="Click on any date to view or edit events. Available dates are marked in green." data-zh="點擊任何日期即可查看或編輯事件。可預訂日期以綠色標記。">點擊任何日期即可查看或編輯事件。可預訂日期以綠色標記。</p>
+                </div>
+
+                <!-- 嵌入可編輯日曆組件 -->
+                <div class="calendar-wrapper">
+                    <iframe 
+                        src="calendar-widget.html" 
+                        class="calendar-iframe"
+                        title="Calendar Widget"
+                        frameborder="0"
+                        scrolling="no">
+                    </iframe>
+                </div>
             </div>
         </div>
     </main>
     
+    <script src="assets/js/admin-password-config.js"></script>
+    <script src="assets/js/admin-password.js"></script>
     <script src="assets/js/script.js"></script>
 </body>
 </html>

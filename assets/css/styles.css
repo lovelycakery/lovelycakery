@@ -440,6 +440,130 @@ body {
 }
 
 /* ============================================
+   管理員密碼驗證樣式
+   ============================================ */
+
+.password-modal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    padding: 40px 20px;
+}
+
+.password-modal-content {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 50px 40px;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 8px 32px rgba(61, 40, 23, 0.15);
+    text-align: center;
+}
+
+.password-modal-header {
+    margin-bottom: 30px;
+}
+
+.password-modal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: #3d2817;
+    margin: 0;
+}
+
+.password-modal-description {
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    color: #3d2817;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.password-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.password-input {
+    width: 100%;
+    padding: 16px 20px;
+    border: 2px solid #f5f3f0;
+    border-radius: 10px;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    color: #3d2817;
+    background: #ffffff;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.password-input:focus {
+    outline: none;
+    border-color: #d4a574;
+    box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.1);
+}
+
+.password-input-error {
+    border-color: #f44336;
+    animation: shake 0.5s;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+.password-submit-btn {
+    width: 100%;
+    padding: 16px;
+    background-color: #d4a574;
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.password-submit-btn:hover {
+    background-color: #c49564;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(212, 165, 116, 0.3);
+}
+
+.password-submit-btn:active {
+    transform: translateY(0);
+}
+
+.password-error {
+    color: #f44336;
+    font-size: 14px;
+    margin-top: 10px;
+    text-align: center;
+}
+
+@media (max-width: 640px) {
+    .password-modal-content {
+        padding: 40px 30px;
+    }
+    
+    .password-modal-title {
+        font-size: 28px;
+    }
+    
+    .password-modal-description {
+        font-size: 15px;
+    }
+}
+
+/* ============================================
    日曆頁面樣式
    ============================================ */
 

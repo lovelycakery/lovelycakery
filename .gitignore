@@ -13,3 +13,11 @@ Thumbs.db
 *.log
 *.tmp
 
+# GitHub 配置檔案（包含敏感資訊）
+# ⚠️ 絕對不要提交包含 Token 的配置檔案！
+assets/js/github-config.js
+
+# 管理員密碼配置檔案（包含敏感資訊）
+# ⚠️ 絕對不要提交包含密碼的配置檔案！
+assets/js/admin-password-config.js
+

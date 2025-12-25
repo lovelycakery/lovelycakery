@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日曆組件（只讀）</title>
+    <link rel="stylesheet" href="assets/css/calendar-widget.css">
+</head>
+<body>
+    <div class="calendar-container">
+        <div class="calendar-header">
+            <button class="calendar-nav-btn" id="prevMonth" aria-label="上一個月">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M15 18l-6-6 6-6"/>
+                </svg>
+            </button>
+            <h2 class="calendar-month-year" id="monthYear"></h2>
+            <button class="calendar-nav-btn" id="nextMonth" aria-label="下一個月">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6"/>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="calendar-weekdays">
+            <div class="weekday" data-en="Sun" data-zh="日">日</div>
+            <div class="weekday" data-en="Mon" data-zh="一">一</div>
+            <div class="weekday" data-en="Tue" data-zh="二">二</div>
+            <div class="weekday" data-en="Wed" data-zh="三">三</div>
+            <div class="weekday" data-en="Thu" data-zh="四">四</div>
+            <div class="weekday" data-en="Fri" data-zh="五">五</div>
+            <div class="weekday" data-en="Sat" data-zh="六">六</div>
+        </div>
+        
+        <div class="calendar-grid" id="calendarGrid"></div>
+        
+        <div class="calendar-legend">
+            <div class="legend-item">
+                <span class="legend-dot available"></span>
+                <span class="legend-text" data-en="Available" data-zh="可預訂">可預訂</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-dot unavailable"></span>
+                <span class="legend-text" data-en="Unavailable" data-zh="不可預訂">不可預訂</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-dot closed"></span>
+                <span class="legend-text" data-en="Closed" data-zh="休息">休息</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 不再需要模態框，改用滑鼠懸停提示 -->
+    
+    <script>
+        // 確保只載入只讀版本的 JavaScript
+        if (typeof CalendarWidget !== 'undefined') {
+            console.warn('檢測到可編輯版本的日曆組件，這不應該在只讀頁面中出現');
+        }
+    </script>
+    <script src="assets/js/calendar-widget-readonly.js"></script>
+</body>
+</html>
+
