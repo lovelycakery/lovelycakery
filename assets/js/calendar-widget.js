@@ -41,9 +41,36 @@ class CalendarWidget {
         const localData = localStorage.getItem('calendarEvents');
         const hasUnsynced = localStorage.getItem('calendarEventsUnsynced') === 'true';
         
-        // 優先從檔案載入資料（無論是從 GitHub 還是本地）
         // 檢查是否在本地環境（file://）或網頁環境（http/https）
         const isLocalFile = window.location.protocol === 'file:';
+        
+        // 在本地文件模式下，如果 localStorage 中有已同步的資料（沒有未同步標記），優先使用
+        // 因為 GitHub CDN 可能有緩存延遲
+        if (isLocalFile && localData && !hasUnsynced) {
+            try {
+                const data = JSON.parse(localData);
+                this.events = {};
+                if (data.events && Array.isArray(data.events)) {
+                    data.events.forEach(event => {
+                        const dateKey = event.date;
+                        if (!this.events[dateKey]) {
+                            this.events[dateKey] = [];
+                        }
+                        this.events[dateKey].push(event);
+                    });
+                }
+                console.log('從 localStorage 載入已同步的資料（本地文件模式）');
+                
+                // 在後台嘗試從 GitHub 載入最新資料以確認（但不阻塞顯示）
+                this.loadFromGitHubInBackground();
+                return; // 已從 localStorage 載入，直接返回
+            } catch (error) {
+                console.error('載入 localStorage 資料失敗:', error);
+                // 繼續執行後續的載入邏輯
+            }
+        }
+        
+        // 優先從檔案載入資料（無論是從 GitHub 還是本地）
         let loadSuccess = false;
         
         try {
@@ -61,7 +88,7 @@ class CalendarWidget {
                         this.events[dateKey].push(event);
                     });
                 }
-                console.log(isLocalFile ? '從本地檔案載入日曆資料' : '從 GitHub 載入日曆資料');
+                console.log(isLocalFile ? '從 GitHub 載入日曆資料' : '從本地檔案載入日曆資料');
                 
                 // 同步到 localStorage（作為備份）
                 localStorage.setItem('calendarEvents', JSON.stringify(data));
@@ -126,6 +153,31 @@ class CalendarWidget {
             }
         }
         // 不在這裡調用 renderCalendar，由 init() 統一調用
+    }
+    
+    // 在後台從 GitHub 載入資料以確認（不阻塞顯示）
+    async loadFromGitHubInBackground() {
+        try {
+            const response = await fetch(this.dataFile + '?t=' + Date.now());
+            if (response.ok) {
+                const data = await response.json();
+                const localData = localStorage.getItem('calendarEvents');
+                if (localData) {
+                    const localDataObj = JSON.parse(localData);
+                    const localStr = JSON.stringify(localDataObj.events?.sort((a, b) => a.date.localeCompare(b.date)) || []);
+                    const fileStr = JSON.stringify(data.events?.sort((a, b) => a.date.localeCompare(b.date)) || []);
+                    
+                    if (localStr !== fileStr) {
+                        console.log('檢測到 GitHub 資料已更新，更新 localStorage');
+                        localStorage.setItem('calendarEvents', JSON.stringify(data));
+                        // 如果資料不同，可以選擇重新載入或提示用戶
+                    }
+                }
+            }
+        } catch (error) {
+            // 後台載入失敗不影響顯示，靜默失敗
+            console.log('後台載入 GitHub 資料失敗（不影響顯示）:', error);
+        }
     }
     
     // 儲存事件資料
@@ -252,11 +304,9 @@ class CalendarWidget {
                 // 注意：這裡使用 this.events，因為它已經包含最新的資料
                 this.renderCalendar();
                 
-                // 等待一小段時間讓 GitHub 更新完成，然後重新載入資料確認
-                setTimeout(async () => {
-                    await this.loadEvents();
-                    console.log('已重新載入資料確認更新');
-                }, 2000);
+                // 不需要重新載入資料，因為 this.events 已經包含最新的資料
+                // 重新載入可能會因為 CDN 緩存而載入到舊資料
+                console.log('日曆顯示已更新為最新資料');
                 
                 alert('✅ 日曆資料已成功更新到 GitHub！\n\n頁面已自動更新顯示。\n\n訪客重新整理頁面即可看到更新。');
                 return true;
@@ -415,6 +465,14 @@ class CalendarWidget {
             const indicator = document.createElement('div');
             indicator.className = `event-indicator ${event.status}`;
             dayEl.appendChild(indicator);
+            
+            // 如果事件有說明，添加說明指示器（星形）
+            if (event.description && event.description.trim()) {
+                const descIndicator = document.createElement('div');
+                descIndicator.className = 'event-description-indicator';
+                descIndicator.innerHTML = '★';
+                dayEl.appendChild(descIndicator);
+            }
             
             // 不再顯示標題
         }

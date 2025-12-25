@@ -10,7 +10,14 @@ class CalendarWidgetReadonly {
         this.currentDate = new Date();
         this.events = {};
         this.selectedDate = null;
-        this.dataFile = 'assets/data/calendar-data.json';
+        // 如果是本地文件模式，從 GitHub 載入數據；否則從本地載入
+        const isLocalFile = window.location.protocol === 'file:';
+        if (isLocalFile) {
+            // 本地文件模式：從 GitHub 載入最新數據
+            this.dataFile = 'https://raw.githubusercontent.com/lovelycakery/lovelycakery/main/assets/data/calendar-data.json';
+        } else {
+            this.dataFile = 'assets/data/calendar-data.json';
+        }
         this.isReadonly = true; // 標記為只讀模式
         
         this.init();
@@ -51,27 +58,32 @@ class CalendarWidgetReadonly {
     
     // 載入事件資料
     async loadEvents() {
+        const isLocalFile = window.location.protocol === 'file:';
         try {
-            const response = await fetch(this.dataFile);
+            // 添加時間戳避免緩存
+            const response = await fetch(this.dataFile + '?t=' + Date.now());
             if (response.ok) {
                 const data = await response.json();
                 this.events = {};
-                data.events.forEach(event => {
-                    const dateKey = event.date;
-                    if (!this.events[dateKey]) {
-                        this.events[dateKey] = [];
-                    }
-                    this.events[dateKey].push(event);
-                });
+                if (data.events && Array.isArray(data.events)) {
+                    data.events.forEach(event => {
+                        const dateKey = event.date;
+                        if (!this.events[dateKey]) {
+                            this.events[dateKey] = [];
+                        }
+                        this.events[dateKey].push(event);
+                    });
+                }
+                console.log(isLocalFile ? '從 GitHub 載入日曆資料' : '從本地檔案載入日曆資料');
             } else {
-                console.log('日曆資料檔案不存在');
+                console.warn('⚠️ 無法載入日曆資料檔案');
                 this.events = {};
             }
         } catch (error) {
-            console.log('載入日曆資料時發生錯誤:', error);
+            console.error('載入日曆資料時發生錯誤:', error);
             this.events = {};
         }
-        this.renderCalendar();
+        // 不在這裡調用 renderCalendar，由 init() 統一調用
     }
     
     // 渲染日曆
@@ -164,6 +176,14 @@ class CalendarWidgetReadonly {
             indicator.className = `event-indicator ${event.status}`;
             dayEl.appendChild(indicator);
             
+            // 如果事件有說明，添加說明指示器（星形）
+            if (event.description && event.description.trim()) {
+                const descIndicator = document.createElement('div');
+                descIndicator.className = 'event-description-indicator';
+                descIndicator.innerHTML = '★';
+                dayEl.appendChild(descIndicator);
+            }
+            
             // 只讀模式：滑鼠懸停顯示提示
             dayEl.addEventListener('mouseenter', (e) => this.showTooltip(e, event, dateKey));
             dayEl.addEventListener('mouseleave', () => this.hideTooltip());
@@ -182,26 +202,15 @@ class CalendarWidgetReadonly {
         // 移除現有的 tooltip
         this.hideTooltip();
         
-        // 狀態文字
-        const statusText = {
-            'available': '可預訂',
-            'unavailable': '不可預訂',
-            'closed': '休息'
-        };
-        const statusTextEn = {
-            'available': 'Available',
-            'unavailable': 'Unavailable',
-            'closed': 'Closed'
-        };
-        const currentLang = localStorage.getItem('language') || 'zh';
-        const statusLabel = currentLang === 'en' 
-            ? statusTextEn[eventData.status] || eventData.status
-            : statusText[eventData.status] || eventData.status;
-        
-        // 建立 tooltip 內容
-        let tooltipContent = statusLabel;
+        // 建立 tooltip 內容（只顯示描述，不顯示狀態文字）
+        let tooltipContent = '';
         if (eventData.description && eventData.description.trim()) {
-            tooltipContent += '<br>' + eventData.description.trim();
+            tooltipContent = eventData.description.trim();
+        }
+        
+        // 如果沒有描述內容，不顯示 tooltip
+        if (!tooltipContent) {
+            return;
         }
         
         // 建立 tooltip 元素
@@ -210,22 +219,26 @@ class CalendarWidgetReadonly {
         tooltip.innerHTML = tooltipContent;
         document.body.appendChild(tooltip);
         
-        // 計算位置（在日期框上方）
+        // 計算位置（在日期框右上角）
         const rect = event.currentTarget.getBoundingClientRect();
         const tooltipRect = tooltip.getBoundingClientRect();
         
-        let left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
-        let top = rect.top - tooltipRect.height - 10;
+        // 顯示在右上角，tooltip 的右邊緣對齊日期格子的右邊緣
+        let left = rect.right - tooltipRect.width;
+        let top = rect.top - tooltipRect.height - 12;
         let showBelow = false;
         
-        // 確保 tooltip 不會超出視窗
-        if (left < 10) left = 10;
+        // 確保 tooltip 不會超出視窗左側
+        if (left < 10) {
+            left = 10;
+        }
+        // 確保 tooltip 不會超出視窗右側
         if (left + tooltipRect.width > window.innerWidth - 10) {
             left = window.innerWidth - tooltipRect.width - 10;
         }
+        // 如果上方空間不足，顯示在下方
         if (top < 10) {
-            // 如果上方空間不足，顯示在下方
-            top = rect.bottom + 10;
+            top = rect.bottom + 12;
             showBelow = true;
             tooltip.classList.add('tooltip-below');
         }
