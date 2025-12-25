@@ -630,7 +630,7 @@ body.calendar-page-body {
 
     /* 只做「偏上」，不要跟縮放混在一起 */
     /* 往下微調（正值 = 往下） */
-    transform: translateY(var(--cal-shift, 12px));
+    transform: translateY(var(--cal-shift, 24px));
 }
 
 .calendar-scale {

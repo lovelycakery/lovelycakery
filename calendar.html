@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>日曆 - Lovely Cakery</title>
-    <link rel="stylesheet" href="assets/css/styles.css?v=20251225-1">
+    <link rel="stylesheet" href="assets/css/styles.css?v=20251225-2">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
@@ -57,7 +57,7 @@
                 <div class="calendar-scale">
                     <div class="calendar-scale-inner">
                         <iframe 
-                            src="calendar-widget-readonly.html?v=20251225-1" 
+                            src="calendar-widget-readonly.html?v=20251225-2" 
                             class="calendar-iframe"
                             title="Calendar Widget"
                             frameborder="0"
@@ -117,12 +117,12 @@
             const extraTop = Math.max(0, -shiftPx);
             const extraBottom = Math.max(0, shiftPx);
 
-            const padding = 16; // 留白，避免貼邊
+            const padding = 12; // 留白（縮小一點，讓整體放大一些）
             // 需要把 shadowPad 也算進去，否則縮放後會剛好貼邊導致陰影/邊框被裁
             const scaleW = (availW - padding * 2 - shadowPad * 2) / contentW;
             const scaleH = (availH - padding * 2 - shadowPad * 2 - extraTop - extraBottom) / contentH;
-            // 留一點安全係數避免次像素 rounding 造成右邊被裁切
-            const scale = Math.min(1, scaleW, scaleH) * 0.995;
+            // 直接用可用寬高計算的最大縮放（佔位已加 buffer，避免裁切）
+            const scale = Math.min(1, scaleW, scaleH);
 
             document.documentElement.style.setProperty('--cal-scale', String(scale));
 
