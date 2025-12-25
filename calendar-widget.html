@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日曆組件</title>
+    <link rel="stylesheet" href="assets/css/calendar-widget.css">
+</head>
+<body>
+    <div class="calendar-container">
+        <div class="calendar-header">
+            <button class="calendar-nav-btn" id="prevMonth" aria-label="上一個月">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M15 18l-6-6 6-6"/>
+                </svg>
+            </button>
+            <h2 class="calendar-month-year" id="monthYear"></h2>
+            <button class="calendar-nav-btn" id="nextMonth" aria-label="下一個月">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6"/>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="calendar-weekdays">
+            <div class="weekday" data-en="Sun" data-zh="日">日</div>
+            <div class="weekday" data-en="Mon" data-zh="一">一</div>
+            <div class="weekday" data-en="Tue" data-zh="二">二</div>
+            <div class="weekday" data-en="Wed" data-zh="三">三</div>
+            <div class="weekday" data-en="Thu" data-zh="四">四</div>
+            <div class="weekday" data-en="Fri" data-zh="五">五</div>
+            <div class="weekday" data-en="Sat" data-zh="六">六</div>
+        </div>
+        
+        <div class="calendar-grid" id="calendarGrid"></div>
+        
+        <div class="calendar-legend">
+            <div class="legend-item">
+                <span class="legend-dot available"></span>
+                <span class="legend-text" data-en="Available" data-zh="可預訂">可預訂</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-dot unavailable"></span>
+                <span class="legend-text" data-en="Unavailable" data-zh="不可預訂">不可預訂</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-dot closed"></span>
+                <span class="legend-text" data-en="Closed" data-zh="休息">休息</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 編輯事件模態框 -->
+    <div class="modal-overlay" id="eventModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" data-en="Edit Event" data-zh="編輯事件">編輯事件</h3>
+                <button class="modal-close" id="closeModal" aria-label="關閉">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label" data-en="Date" data-zh="日期">日期</label>
+                    <input type="date" id="eventDate" class="form-input" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" data-en="Title" data-zh="標題">標題</label>
+                    <input type="text" id="eventTitle" class="form-input" placeholder="輸入事件標題">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" data-en="Description" data-zh="說明">說明</label>
+                    <textarea id="eventDescription" class="form-textarea" rows="3" placeholder="輸入事件說明"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" data-en="Status" data-zh="狀態">狀態</label>
+                    <select id="eventStatus" class="form-select">
+                        <option value="available" data-en="Available" data-zh="可預訂">可預訂</option>
+                        <option value="unavailable" data-en="Unavailable" data-zh="不可預訂">不可預訂</option>
+                        <option value="closed" data-en="Closed" data-zh="休息">休息</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="deleteEvent" data-en="Delete" data-zh="刪除">刪除</button>
+                <div class="btn-group">
+                    <button class="btn btn-cancel" id="cancelEvent" data-en="Cancel" data-zh="取消">取消</button>
+                    <button class="btn btn-primary" id="saveEvent" data-en="Save" data-zh="儲存">儲存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="assets/js/calendar-widget.js"></script>
+</body>
+</html>
+

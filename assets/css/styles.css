@@ -440,6 +440,36 @@ body {
 }
 
 /* ============================================
+   日曆頁面樣式
+   ============================================ */
+
+.calendar-wrapper {
+    width: 100%;
+    margin: 40px 0;
+    display: flex;
+    justify-content: center;
+}
+
+.calendar-iframe {
+    width: 100%;
+    min-height: 800px;
+    border: none;
+    background: transparent;
+}
+
+@media (max-width: 968px) {
+    .calendar-iframe {
+        min-height: 700px;
+    }
+}
+
+@media (max-width: 640px) {
+    .calendar-iframe {
+        min-height: 600px;
+    }
+}
+
+/* ============================================
    訂購方式頁面樣式
    ============================================ */
 

@@ -1,0 +1,428 @@
+/* ============================================
+   日曆組件樣式
+   ============================================ */
+
+body {
+    margin: 0;
+    padding: 20px;
+    background: transparent;
+    font-family: 'Inter', sans-serif;
+}
+
+.calendar-container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 4px 20px rgba(61, 40, 23, 0.08);
+}
+
+/* 日曆標題區域 */
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #f5f3f0;
+}
+
+.calendar-month-year {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #3d2817;
+    margin: 0;
+}
+
+.calendar-nav-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 8px;
+    color: #3d2817;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.calendar-nav-btn:hover {
+    background-color: #f5f3f0;
+    transform: scale(1.1);
+}
+
+.calendar-nav-btn:active {
+    transform: scale(0.95);
+}
+
+/* 星期標題 */
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.weekday {
+    text-align: center;
+    font-weight: 500;
+    color: #3d2817;
+    padding: 12px 0;
+    font-size: 14px;
+}
+
+/* 日曆網格 */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+}
+
+.calendar-day {
+    aspect-ratio: 1;
+    min-height: 80px;
+    background: #ffffff;
+    border: 2px solid #f5f3f0;
+    border-radius: 8px;
+    padding: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.calendar-day:hover {
+    border-color: #d4a574;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(61, 40, 23, 0.1);
+}
+
+.calendar-day.other-month {
+    opacity: 0.3;
+    background: #fafafa;
+}
+
+.calendar-day.today {
+    border-color: #d4a574;
+    background: #fef9f5;
+}
+
+.calendar-day-number {
+    font-weight: 500;
+    color: #3d2817;
+    font-size: 16px;
+    margin-bottom: 4px;
+}
+
+.calendar-day.has-event {
+    border-color: #d4a574;
+}
+
+/* 事件狀態指示器 */
+.event-indicator {
+    width: 100%;
+    height: 4px;
+    border-radius: 2px;
+    margin-top: auto;
+}
+
+.event-indicator.available {
+    background-color: #8bc34a;
+}
+
+.event-indicator.unavailable {
+    background-color: #ff9800;
+}
+
+.event-indicator.closed {
+    background-color: #f44336;
+}
+
+/* 事件標題（小字） */
+.event-title {
+    font-size: 11px;
+    color: #3d2817;
+    margin-top: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* 圖例 */
+.calendar-legend {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px solid #f5f3f0;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+}
+
+.legend-dot.available {
+    background-color: #8bc34a;
+}
+
+.legend-dot.unavailable {
+    background-color: #ff9800;
+}
+
+.legend-dot.closed {
+    background-color: #f44336;
+}
+
+.legend-text {
+    font-size: 14px;
+    color: #3d2817;
+}
+
+/* 模態框樣式 */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(61, 40, 23, 0.6);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-content {
+    background: #ffffff;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 32px rgba(61, 40, 23, 0.2);
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 24px 0;
+    border-bottom: 2px solid #f5f3f0;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+}
+
+.modal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: #3d2817;
+    margin: 0;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    color: #3d2817;
+    transition: all 0.3s ease;
+    border-radius: 4px;
+}
+
+.modal-close:hover {
+    background-color: #f5f3f0;
+    transform: rotate(90deg);
+}
+
+.modal-body {
+    padding: 0 24px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    font-weight: 500;
+    color: #3d2817;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.form-input,
+.form-textarea,
+.form-select {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #f5f3f0;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: #3d2817;
+    background: #ffffff;
+    transition: all 0.3s ease;
+}
+
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
+    outline: none;
+    border-color: #d4a574;
+    box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.1);
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px;
+    border-top: 2px solid #f5f3f0;
+    margin-top: 24px;
+}
+
+.btn-group {
+    display: flex;
+    gap: 12px;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background-color: #d4a574;
+    color: #ffffff;
+}
+
+.btn-primary:hover {
+    background-color: #c49564;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(212, 165, 116, 0.3);
+}
+
+.btn-secondary {
+    background-color: #f5f3f0;
+    color: #3d2817;
+}
+
+.btn-secondary:hover {
+    background-color: #e8e5e0;
+}
+
+.btn-cancel {
+    background-color: transparent;
+    color: #3d2817;
+    border: 2px solid #f5f3f0;
+}
+
+.btn-cancel:hover {
+    border-color: #d4a574;
+    color: #d4a574;
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+    .calendar-container {
+        padding: 20px;
+    }
+    
+    .calendar-month-year {
+        font-size: 22px;
+    }
+    
+    .calendar-day {
+        min-height: 60px;
+        padding: 6px;
+    }
+    
+    .calendar-day-number {
+        font-size: 14px;
+    }
+    
+    .event-title {
+        font-size: 10px;
+    }
+    
+    .calendar-legend {
+        gap: 16px;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 20px;
+    }
+    
+    .modal-footer {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .btn-group {
+        width: 100%;
+    }
+    
+    .btn {
+        flex: 1;
+    }
+}
+
+@media (max-width: 480px) {
+    .calendar-day {
+        min-height: 50px;
+        padding: 4px;
+    }
+    
+    .calendar-day-number {
+        font-size: 12px;
+    }
+    
+    .event-title {
+        display: none;
+    }
+}
+
