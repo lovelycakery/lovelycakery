@@ -291,10 +291,14 @@ body {
     border-radius: 12px;
     width: 90%;
     max-width: 500px;
-    max-height: 90vh;
+    max-height: 95vh;
     overflow-y: auto;
     box-shadow: 0 8px 32px rgba(61, 40, 23, 0.2);
     animation: modalSlideIn 0.3s ease;
+    box-sizing: border-box;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 @keyframes modalSlideIn {
@@ -312,18 +316,13 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 24px 24px 0;
+    padding: 16px 24px;
     border-bottom: 2px solid #f5f3f0;
-    margin-bottom: 24px;
-    padding-bottom: 20px;
+    margin-bottom: 0;
 }
 
 .modal-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 24px;
-    font-weight: 700;
-    color: #3d2817;
-    margin: 0;
+    display: none; /* 隱藏標題 */
 }
 
 .modal-close {
@@ -342,11 +341,18 @@ body {
 }
 
 .modal-body {
-    padding: 0 24px;
+    padding: 20px 24px;
+    box-sizing: border-box;
+    flex: 1;
+    overflow-y: auto;
 }
 
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 18px;
+}
+
+.form-group:last-child {
+    margin-bottom: 0;
 }
 
 .form-label {
@@ -369,6 +375,31 @@ body {
     color: #3d2817;
     background: #ffffff;
     transition: all 0.3s ease;
+    box-sizing: border-box;
+    max-width: 100%;
+}
+
+/* 日期顯示在同一行 */
+.form-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.form-label-inline {
+    font-weight: 500;
+    color: #3d2817;
+    font-size: 14px;
+    margin: 0;
+}
+
+.form-date-display {
+    font-size: 14px;
+    color: #3d2817;
+    font-weight: 500;
+    display: block;
+    margin: 0;
 }
 
 .form-input:focus,
@@ -389,16 +420,21 @@ body {
 
 .form-textarea {
     resize: vertical;
-    min-height: 80px;
+    min-height: 120px;
 }
 
 .modal-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 24px;
+    padding: 20px 24px;
     border-top: 2px solid #f5f3f0;
-    margin-top: 24px;
+    margin-top: 16px;
+    gap: 12px;
+}
+
+.modal-footer .btn {
+    flex: 1;
 }
 
 .btn-group {
@@ -489,20 +525,30 @@ body {
     
     .modal-content {
         width: 95%;
-        margin: 20px;
+        margin: 10px;
+        max-height: 95vh;
+    }
+    
+    .modal-body {
+        padding: 20px;
     }
     
     .modal-footer {
-        flex-direction: column;
-        gap: 12px;
+        flex-direction: row;
+        gap: 8px;
+        padding: 20px;
     }
     
-    .btn-group {
-        width: 100%;
-    }
-    
-    .btn {
+    .modal-footer .btn {
         flex: 1;
+        font-size: 13px;
+        padding: 10px 16px;
+    }
+    
+    .form-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
     }
 }
 
@@ -535,6 +581,25 @@ body {
     
     .event-title {
         display: none;
+    }
+    
+    .modal-content {
+        width: 98%;
+        margin: 5px;
+    }
+    
+    .modal-body {
+        padding: 16px;
+    }
+    
+    .modal-footer {
+        flex-direction: column;
+        gap: 10px;
+        padding: 16px;
+    }
+    
+    .modal-footer .btn {
+        width: 100%;
     }
 }
 

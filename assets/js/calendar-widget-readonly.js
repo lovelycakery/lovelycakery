@@ -26,23 +26,27 @@ class CalendarWidgetReadonly {
     // 載入事件資料
     async loadEvents() {
         try {
-            const response = await fetch(this.dataFile);
+            // 添加時間戳避免緩存問題，確保載入最新資料
+            const response = await fetch(this.dataFile + '?t=' + Date.now());
             if (response.ok) {
                 const data = await response.json();
                 this.events = {};
-                data.events.forEach(event => {
-                    const dateKey = event.date;
-                    if (!this.events[dateKey]) {
-                        this.events[dateKey] = [];
-                    }
-                    this.events[dateKey].push(event);
-                });
+                if (data.events && Array.isArray(data.events)) {
+                    data.events.forEach(event => {
+                        const dateKey = event.date;
+                        if (!this.events[dateKey]) {
+                            this.events[dateKey] = [];
+                        }
+                        this.events[dateKey].push(event);
+                    });
+                }
+                console.log('從 GitHub 載入日曆資料（只讀版本）');
             } else {
                 console.log('日曆資料檔案不存在');
                 this.events = {};
             }
         } catch (error) {
-            console.log('載入日曆資料時發生錯誤:', error);
+            console.error('載入日曆資料時發生錯誤:', error);
             this.events = {};
         }
         this.renderCalendar();

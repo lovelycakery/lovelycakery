@@ -19,25 +19,101 @@ class CalendarWidget {
     
     // 載入事件資料
     async loadEvents() {
+        // 檢查 localStorage 是否有未同步的資料
+        const hasUnsynced = localStorage.getItem('calendarEventsUnsynced') === 'true';
+        const localData = localStorage.getItem('calendarEvents');
+        
+        // 如果有未同步的本地資料，優先使用它
+        if (hasUnsynced && localData) {
+            try {
+                const data = JSON.parse(localData);
+                this.events = {};
+                if (data.events && Array.isArray(data.events)) {
+                    data.events.forEach(event => {
+                        const dateKey = event.date;
+                        if (!this.events[dateKey]) {
+                            this.events[dateKey] = [];
+                        }
+                        this.events[dateKey].push(event);
+                    });
+                }
+                console.log('從 localStorage 載入未同步的日曆資料');
+                this.renderCalendar();
+                return;
+            } catch (error) {
+                console.error('解析 localStorage 資料時發生錯誤:', error);
+                // 繼續嘗試從 GitHub 載入
+            }
+        }
+        
+        // 從 GitHub 載入最新的資料
         try {
-            const response = await fetch(this.dataFile);
+            const response = await fetch(this.dataFile + '?t=' + Date.now()); // 添加時間戳避免緩存
             if (response.ok) {
                 const data = await response.json();
                 this.events = {};
-                data.events.forEach(event => {
-                    const dateKey = event.date;
-                    if (!this.events[dateKey]) {
-                        this.events[dateKey] = [];
-                    }
-                    this.events[dateKey].push(event);
-                });
+                if (data.events && Array.isArray(data.events)) {
+                    data.events.forEach(event => {
+                        const dateKey = event.date;
+                        if (!this.events[dateKey]) {
+                            this.events[dateKey] = [];
+                        }
+                        this.events[dateKey].push(event);
+                    });
+                }
+                console.log('從 GitHub 載入日曆資料');
+                // 同步到 localStorage（作為備份）
+                localStorage.setItem('calendarEvents', JSON.stringify(data));
+                localStorage.removeItem('calendarEventsUnsynced');
             } else {
-                console.log('日曆資料檔案不存在，將使用空資料');
-                this.events = {};
+                console.log('日曆資料檔案不存在，使用 localStorage 或空資料');
+                // 如果 GitHub 載入失敗但有 localStorage，嘗試使用它
+                if (localData) {
+                    try {
+                        const data = JSON.parse(localData);
+                        this.events = {};
+                        if (data.events && Array.isArray(data.events)) {
+                            data.events.forEach(event => {
+                                const dateKey = event.date;
+                                if (!this.events[dateKey]) {
+                                    this.events[dateKey] = [];
+                                }
+                                this.events[dateKey].push(event);
+                            });
+                        }
+                        console.log('從 localStorage 載入備份資料');
+                    } catch (error) {
+                        console.error('載入備份資料失敗:', error);
+                        this.events = {};
+                    }
+                } else {
+                    this.events = {};
+                }
             }
         } catch (error) {
-            console.log('載入日曆資料時發生錯誤:', error);
-            this.events = {};
+            console.error('載入日曆資料時發生錯誤:', error);
+            // 如果 GitHub 載入失敗但有 localStorage，嘗試使用它
+            if (localData) {
+                try {
+                    const data = JSON.parse(localData);
+                    this.events = {};
+                    if (data.events && Array.isArray(data.events)) {
+                        data.events.forEach(event => {
+                            const dateKey = event.date;
+                            if (!this.events[dateKey]) {
+                                this.events[dateKey] = [];
+                            }
+                            this.events[dateKey].push(event);
+                        });
+                    }
+                    console.log('從 localStorage 載入備份資料');
+                } catch (parseError) {
+                    console.error('載入備份資料失敗:', parseError);
+                    this.events = {};
+                }
+            } else {
+                this.events = {};
+            }
         }
         this.renderCalendar();
     }
@@ -53,8 +129,9 @@ class CalendarWidget {
         
         const data = { events: eventsArray };
         
-        // 使用 localStorage 作為備份
+        // 先保存到 localStorage（標記為未同步）
         localStorage.setItem('calendarEvents', JSON.stringify(data));
+        localStorage.setItem('calendarEventsUnsynced', 'true');
         
         // 檢查是否啟用 GitHub API
         if (typeof checkGitHubConfig !== 'undefined') {
@@ -63,16 +140,25 @@ class CalendarWidget {
                 // 使用 GitHub API 自動更新
                 const success = await this.updateGitHubFile(data);
                 if (success) {
+                    // 成功更新，清除未同步標記
+                    localStorage.removeItem('calendarEventsUnsynced');
                     return; // 成功更新，不需要下載檔案
                 } else {
-                    // GitHub API 更新失敗，回退到下載方式
-                    console.warn('GitHub API 更新失敗，改用下載方式');
+                    // GitHub API 更新失敗，保留未同步標記
+                    console.warn('GitHub API 更新失敗，資料保留在 localStorage 中');
+                    alert('⚠️ 更新失敗\n\n資料已儲存在瀏覽器中，但尚未同步到 GitHub。\n\n請檢查網路連接或稍後再試。');
                 }
+            } else {
+                // GitHub API 未配置，提供下載方式
+                console.warn('GitHub API 未啟用:', configCheck.reason);
+                localStorage.setItem('calendarEventsUnsynced', 'true');
             }
+        } else {
+            localStorage.setItem('calendarEventsUnsynced', 'true');
         }
         
         // 如果 GitHub API 未啟用或更新失敗，提供下載 JSON 檔案的功能
-        this.downloadJSON(data);
+        this.downloadJSON(data, true); // silent = true，因為已經顯示過錯誤訊息
     }
     
     // 使用 GitHub API 更新檔案
@@ -132,16 +218,47 @@ class CalendarWidget {
             
             if (updateResponse.ok) {
                 const result = await updateResponse.json();
-                alert('✅ 日曆資料已成功更新到 GitHub！\n\n訪客重新整理頁面即可看到更新。');
                 console.log('GitHub 更新成功:', result);
+                
+                // 清除未同步標記
+                localStorage.removeItem('calendarEventsUnsynced');
+                
+                // 等待一小段時間讓 GitHub 更新完成，然後重新載入資料確認
+                setTimeout(async () => {
+                    // 清除 localStorage 中的舊資料，強制從 GitHub 重新載入
+                    localStorage.removeItem('calendarEvents');
+                    await this.loadEvents();
+                    console.log('已重新載入資料確認更新');
+                }, 1500);
+                
+                alert('✅ 日曆資料已成功更新到 GitHub！\n\n請等待 1-2 秒後刷新頁面以確認更新。\n\n訪客重新整理頁面即可看到更新。');
                 return true;
             } else {
-                const errorData = await updateResponse.json();
-                throw new Error(errorData.message || `更新失敗: ${updateResponse.status}`);
+                const errorText = await updateResponse.text();
+                let errorMessage = `HTTP ${updateResponse.status}`;
+                try {
+                    const errorData = JSON.parse(errorText);
+                    errorMessage = errorData.message || errorMessage;
+                    if (errorData.errors) {
+                        errorMessage += '\n' + JSON.stringify(errorData.errors);
+                    }
+                } catch (e) {
+                    if (errorText) {
+                        errorMessage = errorText.substring(0, 200);
+                    }
+                }
+                console.error('GitHub API 錯誤詳情:', {
+                    status: updateResponse.status,
+                    statusText: updateResponse.statusText,
+                    error: errorMessage
+                });
+                throw new Error(errorMessage);
             }
         } catch (error) {
             console.error('GitHub API 更新錯誤:', error);
-            alert(`❌ 更新失敗：${error.message}\n\n將改用下載方式。`);
+            const errorMsg = error.message || '未知錯誤';
+            alert(`❌ GitHub 更新失敗：${errorMsg}\n\n資料已儲存在瀏覽器中，請稍後再試或使用下載方式。\n\n詳細錯誤請查看瀏覽器控制台。`);
+            // 保留 localStorage 中的資料，因為更新失敗
             return false;
         }
     }
@@ -271,11 +388,24 @@ class CalendarWidget {
     openEventModal(dateKey) {
         this.selectedDate = dateKey;
         const modal = document.getElementById('eventModal');
-        const dateInput = document.getElementById('eventDate');
+        const dateDisplay = document.getElementById('eventDateDisplay');
         const descInput = document.getElementById('eventDescription');
         const statusInput = document.getElementById('eventStatus');
         
-        if (dateInput) dateInput.value = dateKey;
+        // 格式化日期顯示
+        if (dateDisplay) {
+            const date = new Date(dateKey);
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const currentLang = localStorage.getItem('language') || 'zh';
+            if (currentLang === 'en') {
+                const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                dateDisplay.textContent = `${monthNames[date.getMonth()]} ${day}, ${year}`;
+            } else {
+                dateDisplay.textContent = `${year}年 ${month}月 ${day}日`;
+            }
+        }
         
         const events = this.events[dateKey] || [];
         const event = events[0] || { description: '', status: 'available' };
@@ -303,11 +433,12 @@ class CalendarWidget {
         const description = descInput ? descInput.value.trim() : '';
         const status = statusInput ? statusInput.value : 'available';
         
-        if (!description) {
-            // 如果說明為空，刪除事件
+        // 修改：只要有狀態就保存，即使說明為空
+        if (!description && !status) {
+            // 如果說明和狀態都為空，刪除事件
             delete this.events[this.selectedDate];
         } else {
-            // 儲存事件（不包含標題）
+            // 儲存事件（只要有狀態就保存）
             if (!this.events[this.selectedDate]) {
                 this.events[this.selectedDate] = [];
             }
@@ -405,6 +536,24 @@ class CalendarWidget {
                 element.textContent = element.getAttribute('data-zh');
             }
         });
+        
+        // 更新日期顯示（如果模態框已打開）
+        if (this.selectedDate) {
+            const dateDisplay = document.getElementById('eventDateDisplay');
+            if (dateDisplay) {
+                const date = new Date(this.selectedDate);
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                if (currentLang === 'en') {
+                    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                    dateDisplay.textContent = `${monthNames[date.getMonth()]} ${day}, ${year}`;
+                } else {
+                    dateDisplay.textContent = `${year}年 ${month}月 ${day}日`;
+                }
+            }
+        }
+        
         // 重新渲染日曆以更新月份名稱
         this.renderCalendar();
     }
