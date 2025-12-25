@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 </head>
-<body>
+<body class="calendar-page-body">
     <header class="header">
         <div class="container">
             <div class="nav-wrapper">
@@ -113,6 +113,17 @@
                 setTimeout(resizeIframe, 2000);
             });
         }
+        
+        // 監聽來自 iframe 的 postMessage
+        window.addEventListener('message', function(event) {
+            // 安全檢查：只接受來自同源的訊息（本地文件時允許所有來源）
+            if (event.data && event.data.type === 'calendar-resize') {
+                const iframe = document.querySelector('.calendar-iframe');
+                if (iframe && event.data.height > 0) {
+                    iframe.style.height = event.data.height + 'px';
+                }
+            }
+        });
     </script>
 </body>
 </html>

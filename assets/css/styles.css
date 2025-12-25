@@ -16,6 +16,12 @@ body {
     scroll-behavior: smooth;  /* 平滑滾動 */
 }
 
+/* 日曆頁面專用：禁用滾動 */
+body.calendar-page-body {
+    height: 100vh;
+    overflow: hidden;
+}
+
 /* 容器：限制最大寬度並置中 */
 .container {
     max-width: 1200px;
@@ -570,10 +576,11 @@ body {
 /* 日曆頁面專用樣式 */
 .calendar-page {
     padding: 20px 0 !important;
-    min-height: calc(100vh - 100px) !important;
+    height: calc(100vh - 100px);
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: center;
+    overflow: hidden;
 }
 
 .calendar-page .container {
@@ -585,20 +592,21 @@ body {
 .calendar-wrapper {
     width: 100%;
     max-width: 900px;
-    margin: 30px auto 0;
+    margin: 0 auto;
     display: flex;
     justify-content: center;
-    overflow: visible;
+    overflow: hidden;
     transform: scale(0.67);
-    transform-origin: top center;
+    transform-origin: center center;
 }
 
 .calendar-iframe {
     width: 100%;
-    min-height: 780px;
+    height: 100%;
     border: none;
     background: transparent;
     display: block;
+    overflow: hidden;
 }
 
 .calendar-hint {

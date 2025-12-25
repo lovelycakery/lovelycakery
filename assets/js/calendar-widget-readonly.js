@@ -21,6 +21,32 @@ class CalendarWidgetReadonly {
         this.updateLanguage();
         this.renderCalendar();
         this.attachEventListeners();
+        // 通知父窗口調整高度
+        this.notifyParentHeight();
+    }
+    
+    // 通知父窗口調整 iframe 高度
+    notifyParentHeight() {
+        try {
+            // 延遲一下確保內容已完全渲染
+            setTimeout(() => {
+                const height = Math.max(
+                    document.body.scrollHeight,
+                    document.body.offsetHeight,
+                    document.documentElement.clientHeight,
+                    document.documentElement.scrollHeight,
+                    document.documentElement.offsetHeight
+                );
+                if (height > 0 && window.parent && window.parent !== window) {
+                    window.parent.postMessage({
+                        type: 'calendar-resize',
+                        height: height + 50
+                    }, '*');
+                }
+            }, 500);
+        } catch (e) {
+            // 跨域時忽略錯誤
+        }
     }
     
     // 載入事件資料
@@ -107,6 +133,9 @@ class CalendarWidgetReadonly {
             const dateKey = this.formatDateKey(year, month + 1, day);
             this.createDayElement(grid, day, true, dateKey);
         }
+        
+        // 渲染完成後通知父窗口調整高度
+        this.notifyParentHeight();
     }
     
     // 創建日期元素（只讀模式）
