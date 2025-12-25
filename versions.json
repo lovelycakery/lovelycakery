@@ -1,0 +1,17 @@
+{
+  "versions": [
+    {
+      "version": "v1.0",
+      "description": "初始版本",
+      "git_commit": "d9cabc25f1d56bb7b040c502206d8a466a097ede",
+      "git_commit_short": "d9cabc2",
+      "git_tag": "v1.0",
+      "created_at": "2025-12-25",
+      "created_by": "chiamin",
+      "files_changed": []
+    }
+  ],
+  "current_version": "v1.0",
+  "created_at": "2025-12-25"
+}
+
