@@ -638,11 +638,12 @@ body.calendar-page-body {
       佔位寬高由 JS 直接設 style.width/style.height
       但日曆卡片有 box-shadow，必須留 padding，且不能用 overflow: hidden 去裁掉
     */
-    --cal-pad: 24px;
+    --cal-pad: 18px;
     padding: var(--cal-pad);
     overflow: visible;
     display: block;
     box-sizing: content-box;
+    visibility: hidden; /* 避免一開始先大後縮小的閃動 */
 }
 
 .calendar-scale-inner {

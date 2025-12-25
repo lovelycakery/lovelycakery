@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>日曆 - Lovely Cakery</title>
-    <link rel="stylesheet" href="assets/css/styles.css?v=20251225-2">
+    <link rel="stylesheet" href="assets/css/styles.css?v=20251225-3">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
@@ -57,7 +57,7 @@
                 <div class="calendar-scale">
                     <div class="calendar-scale-inner">
                         <iframe 
-                            src="calendar-widget-readonly.html?v=20251225-2" 
+                            src="calendar-widget-readonly.html?v=20251225-3" 
                             class="calendar-iframe"
                             title="Calendar Widget"
                             frameborder="0"
@@ -117,7 +117,7 @@
             const extraTop = Math.max(0, -shiftPx);
             const extraBottom = Math.max(0, shiftPx);
 
-            const padding = 12; // 留白（縮小一點，讓整體放大一些）
+            const padding = 8; // 留白（再縮小一些，讓整體接近 +20%）
             // 需要把 shadowPad 也算進去，否則縮放後會剛好貼邊導致陰影/邊框被裁
             const scaleW = (availW - padding * 2 - shadowPad * 2) / contentW;
             const scaleH = (availH - padding * 2 - shadowPad * 2 - extraTop - extraBottom) / contentH;
@@ -131,6 +131,7 @@
                 // 加 2px buffer，避免小數 rounding 剪到邊
                 scaleBox.style.width = (Math.ceil(contentW * scale) + shadowPad * 2 + 2) + 'px';
                 scaleBox.style.height = (Math.ceil(contentH * scale) + shadowPad * 2 + 2) + 'px';
+                scaleBox.style.visibility = 'visible';
             }
             if (inner) {
                 inner.style.width = contentW + 'px';
@@ -154,7 +155,8 @@
                     
                     if (height > 0) {
                         // 增加更多額外空間確保完整顯示（包括底部邊距和可能的滾動條）
-                        iframe.style.height = (height + 120) + 'px';
+                        // 小 buffer 即可，避免把 iframe 撐太高導致整體縮放過小
+                        iframe.style.height = (height + 24) + 'px';
                         updateCalendarScale();
                     }
                 }

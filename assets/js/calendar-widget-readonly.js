@@ -48,7 +48,8 @@ class CalendarWidgetReadonly {
                 // 因為 transform 只影響視覺顯示，不影響實際空間佔用
                 window.parent.postMessage({
                     type: 'calendar-resize',
-                    height: height + 100  // 增加額外空間確保完整顯示
+                    // 只留少量 buffer，避免把 iframe 撐太高導致父頁縮放過小
+                    height: height + 24
                 }, '*');
             }
         } catch (e) {
