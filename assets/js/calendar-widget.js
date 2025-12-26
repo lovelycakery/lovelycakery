@@ -235,19 +235,14 @@ class CalendarWidget {
             }
         }
 
-        // 如果配置文件未載入，提供下載方式（由使用者手動上傳）
+        // 如果配置文件未載入：無法在公開網站安全地自動同步（不應自動下載造成干擾）
         if (!githubConfig) {
             console.warn('⚠️ github-config.local.js 未載入，無法自動更新到 GitHub');
-            try {
-                this.downloadJSON(data, true);
-            } catch (e) {
-                // ignore
-            }
-            const msg = 'github-config.local.js 未載入，已提供下載 calendar-data.json（請手動上傳到 GitHub）';
+            const msg = '無法自動同步：缺少 github-config.local.js（請在本機建立 Token 設定後再同步）';
             if (!silent) {
-                alert('⚠️ 無法自動同步到 GitHub\n\n由於安全原因，GitHub Token 不會提交到公開倉庫。\n\n已下載 calendar-data.json，請手動上傳到 assets/data/ 目錄。');
+                alert('⚠️ 無法自動同步到 GitHub\n\n原因：未載入 github-config.local.js（內含 Token，不能提交到公開倉庫）。\n\n請在本機建立設定後再同步。');
             }
-            return { ok: false, message: msg, mode: 'download' };
+            return { ok: false, message: msg, mode: 'config_missing' };
         }
 
         if (!(githubConfig && githubConfig.enabled)) {

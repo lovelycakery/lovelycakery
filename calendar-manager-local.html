@@ -189,17 +189,18 @@
                     showStatus('有未上傳變更', 'info', { sticky: true });
                 }
                 if (data.status === 'synced') {
-                    showStatus('✅ 已同步到 GitHub', 'success');
+                    // show as sticky so the user can confirm it really synced
+                    showStatus('✅ 已同步到 GitHub', 'success', { sticky: true });
                 }
             }
 
             if (data.type === 'calendar-sync-result') {
                 setSyncBtnLoading(false);
                 if (data.ok) {
-                    showStatus('✅ 已同步到 GitHub', 'success');
+                    showStatus('✅ 已同步到 GitHub', 'success', { sticky: true });
                 } else {
                     const msg = data.message ? String(data.message) : '同步失敗';
-                    showStatus('❌ 同步失敗：' + msg, 'error');
+                    showStatus('❌ 同步失敗：' + msg, 'error', { sticky: true });
                 }
             }
         });
