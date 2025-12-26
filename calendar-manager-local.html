@@ -8,7 +8,7 @@
     <style>
         body {
             margin: 0;
-            padding: 10px;
+            padding: 16px;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: #faf8f5;
             color: #3d2817;
@@ -31,6 +31,37 @@
             margin: 0;
             color: #6b5d4f;
             font-size: 12px;
+        }
+        .manager-actions {
+            max-width: 900px;
+            margin: 0 auto 10px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .btn {
+            border: none;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+        }
+        .btn:active {
+            transform: translateY(1px);
+        }
+        .btn-primary {
+            background: #d4a574;
+            color: #fff;
+            box-shadow: 0 3px 10px rgba(212, 165, 116, 0.25);
+        }
+        .btn-primary:hover {
+            opacity: 0.95;
+        }
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            box-shadow: none;
         }
         .calendar-container {
             max-width: 900px;
@@ -56,167 +87,37 @@
             border-color: #dc3545;
             color: #721c24;
         }
-        /* 縮小日曆容器 */
-        .calendar-container .calendar-container {
-            padding: 15px !important;
-            max-width: 100% !important;
-        }
-        /* 縮小日曆標題 */
-        .calendar-header {
-            margin-bottom: 12px !important;
-            padding-bottom: 10px !important;
-        }
-        .calendar-month-year {
-            font-size: 22px !important;
-        }
-        .calendar-nav-btn {
-            padding: 6px 8px !important;
-        }
-        .calendar-nav-btn svg {
-            width: 16px !important;
-            height: 16px !important;
-        }
-        /* 縮小星期標題 */
-        .calendar-weekdays {
-            margin-bottom: 6px !important;
-            gap: 3px !important;
-        }
-        .weekday {
-            padding: 6px 0 !important;
-            font-size: 13px !important;
-        }
-        /* 縮小日曆網格 */
-        .calendar-grid {
-            gap: 3px !important;
-        }
-        .calendar-day {
-            min-height: 45px !important;
-            padding: 3px !important;
-            border-width: 1px !important;
-            border-radius: 6px !important;
-        }
-        .calendar-day-number {
-            font-size: 13px !important;
-            margin-bottom: 2px !important;
-        }
-        .event-indicator {
-            width: 10px !important;
-            height: 10px !important;
-            border-radius: 50% !important;
-            margin-top: 0 !important;
-        }
-        /* 縮小圖例 */
-        .calendar-legend {
-            margin-top: 12px !important;
-            padding-top: 10px !important;
-            gap: 12px !important;
-        }
-        .legend-text {
-            font-size: 11px !important;
-        }
-        .legend-dot {
-            width: 8px !important;
-            height: 8px !important;
-            border-radius: 50% !important;
+        .calendar-iframe {
+            width: 100%;
+            border: none;
+            display: block;
+            background: transparent;
+            min-height: 980px;
         }
     </style>
 </head>
 <body>
     <div class="manager-header">
-        <h1 data-en="Calendar Management Tool" data-zh="日曆管理工具">日曆管理工具</h1>
-        <p data-en="Edit calendar events and save to GitHub. Changes will be visible on the website immediately." data-zh="編輯日曆事件並儲存到 GitHub。更改將立即在網站上顯示。">編輯日曆事件並儲存到 GitHub。更改將立即在網站上顯示。</p>
+        <h1>日曆管理工具</h1>
+        <p>在下方編輯日曆事件。按「儲存」只會先存本機；按「同步到 GitHub」確認後才會上傳。</p>
     </div>
 
     <div id="statusMessage" class="status-message" style="display: none;"></div>
 
+    <div class="manager-actions">
+        <button id="syncBtn" class="btn btn-primary">同步到 GitHub</button>
+    </div>
+
     <div class="calendar-container">
-        <div class="calendar-header">
-            <button class="calendar-nav-btn" id="prevMonth" aria-label="上一個月">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M15 18l-6-6 6-6"/>
-                </svg>
-            </button>
-            <h2 class="calendar-month-year" id="monthYear"></h2>
-            <button class="calendar-nav-btn" id="nextMonth" aria-label="下一個月">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M9 18l6-6-6-6"/>
-                </svg>
-            </button>
-        </div>
-        
-        <div class="calendar-weekdays">
-            <div class="weekday" data-en="Sun" data-zh="日">日</div>
-            <div class="weekday" data-en="Mon" data-zh="一">一</div>
-            <div class="weekday" data-en="Tue" data-zh="二">二</div>
-            <div class="weekday" data-en="Wed" data-zh="三">三</div>
-            <div class="weekday" data-en="Thu" data-zh="四">四</div>
-            <div class="weekday" data-en="Fri" data-zh="五">五</div>
-            <div class="weekday" data-en="Sat" data-zh="六">六</div>
-        </div>
-        
-        <div class="calendar-grid" id="calendarGrid"></div>
-        
-        <div class="calendar-legend">
-            <div class="legend-item">
-                <span class="legend-dot available"></span>
-                <span class="legend-text" data-en="Available" data-zh="可預訂">可預訂</span>
-            </div>
-            <div class="legend-item">
-                <span class="legend-dot unavailable"></span>
-                <span class="legend-text" data-en="Unavailable" data-zh="不可預訂">不可預訂</span>
-            </div>
-            <div class="legend-item">
-                <span class="legend-dot closed"></span>
-                <span class="legend-text" data-en="Closed" data-zh="休息">休息</span>
-            </div>
-        </div>
+        <iframe
+            id="calendarIframe"
+            class="calendar-iframe"
+            src="calendar-widget.html"
+            title="Calendar Manager"
+            scrolling="no"
+        ></iframe>
     </div>
     
-    <!-- 編輯事件模態框 -->
-    <div class="modal-overlay" id="eventModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <span id="eventDateDisplay" class="form-date-display"></span>
-                <button class="modal-close" id="closeModal" aria-label="關閉">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M18 6L6 18M6 6l12 12"/>
-                    </svg>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label class="form-label" data-en="Description" data-zh="說明">說明</label>
-                    <textarea id="eventDescription" class="form-textarea" rows="5" placeholder="輸入事件說明（選填）"></textarea>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" data-en="Status" data-zh="狀態">狀態</label>
-                    <select id="eventStatus" class="form-select">
-                        <option value="available" data-en="Available" data-zh="可預訂">可預訂</option>
-                        <option value="unavailable" data-en="Unavailable" data-zh="不可預訂">不可預訂</option>
-                        <option value="closed" data-en="Closed" data-zh="休息">休息</option>
-                    </select>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" id="deleteEvent" data-en="Delete" data-zh="刪除">刪除</button>
-                <button class="btn btn-cancel" id="cancelEvent" data-en="Cancel" data-zh="取消">取消</button>
-                <button class="btn btn-primary" id="saveEvent" data-en="Save" data-zh="儲存">儲存</button>
-            </div>
-        </div>
-    </div>
-    
-    <script src="assets/js/i18n.js"></script>
-    <script>
-        // Optional local GitHub config (not committed). If missing, calendar-widget.js will fall back to download mode.
-        (function () {
-            const s = document.createElement('script');
-            s.src = 'assets/js/github-config.local.js';
-            s.async = false;
-            s.onerror = () => console.warn('github-config.local.js not found; using download/manual upload mode.');
-            document.head.appendChild(s);
-        })();
-    </script>
-    <script src="assets/js/calendar-widget.js"></script>
     <script>
         // 顯示狀態訊息
         function showStatus(message, type = 'info') {
@@ -231,30 +132,66 @@
             }
         }
 
-        // 監聽保存成功事件
+        function getIframe() {
+            return document.getElementById('calendarIframe');
+        }
+
+        function setSyncBtnLoading(isLoading) {
+            const btn = document.getElementById('syncBtn');
+            if (!btn) return;
+            btn.disabled = !!isLoading;
+            btn.textContent = isLoading ? '同步中…' : '同步到 GitHub';
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
-            // 檢查是否為本地文件模式
-            const isLocalFile = window.location.protocol === 'file:';
-            if (isLocalFile) {
-                showStatus('💡 本地文件模式：請確保已配置 github-config.local.js 才能自動更新到 GitHub', 'info');
+            const btn = document.getElementById('syncBtn');
+            if (btn) {
+                btn.addEventListener('click', () => {
+                    const ok = confirm('確定要同步到 GitHub 嗎？\n\n同步後，訪客端重新整理頁面即可看到最新日曆。');
+                    if (!ok) return;
+                    const ifr = getIframe();
+                    if (!ifr || !ifr.contentWindow) return;
+                    setSyncBtnLoading(true);
+                    ifr.contentWindow.postMessage({ type: 'calendar-sync-request' }, '*');
+                });
             }
 
-            // 監聽日曆初始化完成
-            if (window.calendarWidget) {
-                // 攔截保存事件，顯示狀態
-                const originalSaveEvents = window.calendarWidget.saveEvents;
-                window.calendarWidget.saveEvents = async function() {
-                    try {
-                        await originalSaveEvents.call(this);
-                        // 如果成功，會由 updateGitHubFile 顯示成功訊息
-                    } catch (error) {
-                        showStatus('❌ 保存失敗：' + error.message, 'error');
-                    }
-                };
+            // 初次提示（本地檔案模式）
+            if (window.location.protocol === 'file:') {
+                showStatus('提示：若要同步到 GitHub，請先在本機建立 assets/js/github-config.local.js（含 Token）。', 'info');
             }
         });
 
-        // 語言初始化由 calendar-widget.js 在 init() 中處理，這裡不重複做
+        // 監聽 iframe 回報：高度/同步狀態/同步結果
+        window.addEventListener('message', (event) => {
+            const ifr = getIframe();
+            if (!ifr || event.source !== ifr.contentWindow) return;
+            const data = event.data || {};
+
+            if (data.type === 'calendar-resize' && data.height > 0) {
+                ifr.style.height = Math.ceil(Number(data.height)) + 'px';
+                ifr.style.minHeight = Math.ceil(Number(data.height)) + 'px';
+            }
+
+            if (data.type === 'calendar-sync-status') {
+                if (data.status === 'unsynced') {
+                    showStatus('有未上傳變更', 'info');
+                }
+                if (data.status === 'synced') {
+                    showStatus('✅ 已同步到 GitHub', 'success');
+                }
+            }
+
+            if (data.type === 'calendar-sync-result') {
+                setSyncBtnLoading(false);
+                if (data.ok) {
+                    showStatus('✅ 已同步到 GitHub', 'success');
+                } else {
+                    const msg = data.message ? String(data.message) : '同步失敗';
+                    showStatus('❌ 同步失敗：' + msg, 'error');
+                }
+            }
+        });
     </script>
 </body>
 </html>

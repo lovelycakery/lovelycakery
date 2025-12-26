@@ -10,6 +10,7 @@ class CalendarWidget {
         this.currentDate = new Date();
         this.events = {};
         this.selectedDate = null;
+        this._lastSyncStatus = null; // 'synced' | 'unsynced'
         // 如果是本地文件模式，從 GitHub 載入數據；否則從本地載入
         const isLocalFile = window.location.protocol === 'file:';
         if (isLocalFile) {
@@ -38,6 +39,19 @@ class CalendarWidget {
         if (hasUnsynced) {
             console.warn('⚠️ 發現未同步的資料。頁面已從 GitHub 載入最新資料。');
             // 可以在這裡添加視覺提示，比如在頁面上顯示一個警告訊息
+        }
+        this.postSyncStatus(hasUnsynced ? 'unsynced' : 'synced');
+    }
+
+    postSyncStatus(status) {
+        try {
+            if (this._lastSyncStatus === status) return;
+            this._lastSyncStatus = status;
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage({ type: 'calendar-sync-status', status }, '*');
+            }
+        } catch (e) {
+            // ignore
         }
     }
     
@@ -119,6 +133,7 @@ class CalendarWidget {
                     }
                 }
                 loadSuccess = true;
+                this.postSyncStatus('synced');
             } else {
                 // 載入失敗，使用 localStorage 備份（如果有的話）
                 console.warn('⚠️ 無法載入資料檔案，嘗試使用 localStorage 備份');
@@ -147,6 +162,7 @@ class CalendarWidget {
                     console.log('從 localStorage 載入備份資料');
                     if (hasUnsynced) {
                         console.warn('⚠️ 使用未同步的本地資料。請確保網路連接正常，並稍後重新整理以同步到 GitHub。');
+                        this.postSyncStatus('unsynced');
                     }
                 } catch (error) {
                     console.error('載入備份資料失敗:', error);
@@ -185,8 +201,8 @@ class CalendarWidget {
         }
     }
     
-    // 儲存事件資料
-    async saveEvents() {
+    // 將目前 events 序列化成 JSON 資料
+    buildData() {
         const eventsArray = [];
         Object.keys(this.events).forEach(date => {
             this.events[date].forEach(event => {
@@ -194,12 +210,22 @@ class CalendarWidget {
             });
         });
         
-        const data = { events: eventsArray };
-        
-        // 先保存到 localStorage（標記為未同步）
+        return { events: eventsArray };
+    }
+
+    // 儲存到本機（不自動上傳）
+    saveLocalOnly() {
+        const data = this.buildData();
         localStorage.setItem('calendarEvents', JSON.stringify(data));
         localStorage.setItem('calendarEventsUnsynced', 'true');
-        
+        this.postSyncStatus('unsynced');
+    }
+
+    // 由使用者明確觸發的同步（可由 manager shell 透過 postMessage 呼叫）
+    async syncToGitHub(options = {}) {
+        const silent = !!options.silent;
+        const data = this.buildData();
+
         // 檢查並準備 GitHub 配置（支援配置文件或預設配置）
         let githubConfig = null;
         if (typeof GITHUB_CONFIG !== 'undefined' && typeof checkGitHubConfig !== 'undefined') {
@@ -208,42 +234,44 @@ class CalendarWidget {
                 githubConfig = GITHUB_CONFIG;
             }
         }
-        
-        // 如果配置文件未載入（通常是網頁版），無法使用 GitHub API
+
+        // 如果配置文件未載入，提供下載方式（由使用者手動上傳）
         if (!githubConfig) {
             console.warn('⚠️ github-config.local.js 未載入，無法自動更新到 GitHub');
-            // 資料已保存到 localStorage，提供下載功能讓用戶手動更新 GitHub
-            this.downloadJSON(data, false); // 提供下載，讓用戶可以手動上傳到 GitHub
-            alert('⚠️ 無法自動更新到 GitHub\n\n由於安全原因，GitHub 配置檔案不會上傳到公開倉庫。\n\n資料已儲存在瀏覽器中，並已下載 JSON 檔案。\n\n請手動將 calendar-data.json 上傳到 GitHub 的 assets/data/ 目錄。');
-            return; // 無法自動更新，但已提供下載
-        }
-        
-        // 嘗試使用 GitHub API 更新
-        if (githubConfig && githubConfig.enabled) {
-            const success = await this.updateGitHubFileWithConfig(data, githubConfig);
-            if (success) {
-                // 成功更新，清除未同步標記
-                localStorage.removeItem('calendarEventsUnsynced');
-                // 立即更新日曆顯示（不等待重新載入）
-                this.renderCalendar();
-                return; // 成功更新，不需要下載檔案
-            } else {
-                // GitHub API 更新失敗，保留未同步標記
-                console.warn('GitHub API 更新失敗，資料保留在 localStorage 中');
-                alert('⚠️ 更新失敗\n\n資料已儲存在瀏覽器中，但尚未同步到 GitHub。\n\n請檢查網路連接或稍後再試。\n\n詳細錯誤請查看瀏覽器控制台。');
-                // 即使更新失敗，也要更新日曆顯示（使用本地資料）
-                this.renderCalendar();
-                return; // 更新失敗，但不提供下載（網頁版無法下載到用戶電腦）
+            try {
+                this.downloadJSON(data, true);
+            } catch (e) {
+                // ignore
             }
+            const msg = 'github-config.local.js 未載入，已提供下載 calendar-data.json（請手動上傳到 GitHub）';
+            if (!silent) {
+                alert('⚠️ 無法自動同步到 GitHub\n\n由於安全原因，GitHub Token 不會提交到公開倉庫。\n\n已下載 calendar-data.json，請手動上傳到 assets/data/ 目錄。');
+            }
+            return { ok: false, message: msg, mode: 'download' };
         }
-        
-        // GitHub API 未啟用或配置無效
-        console.warn('GitHub API 未啟用，無法自動更新');
-        alert('⚠️ 無法自動更新\n\nGitHub 配置未啟用。資料已儲存在瀏覽器中。\n\n請檢查配置或使用本地版本進行更新。');
+
+        if (!(githubConfig && githubConfig.enabled)) {
+            const msg = 'GitHub API 未啟用（github-config.local.js enabled=false）';
+            if (!silent) alert('⚠️ 無法同步\n\nGitHub API 未啟用，請檢查 github-config.local.js。');
+            return { ok: false, message: msg };
+        }
+
+        const success = await this.updateGitHubFileWithConfig(data, githubConfig, { silent });
+        if (success) {
+            localStorage.removeItem('calendarEventsUnsynced');
+            this.postSyncStatus('synced');
+            return { ok: true };
+        }
+
+        // 失敗：保留未同步標記
+        localStorage.setItem('calendarEventsUnsynced', 'true');
+        this.postSyncStatus('unsynced');
+        return { ok: false, message: 'GitHub API 更新失敗（詳情請查看 console）' };
     }
     
     // 使用 GitHub API 更新檔案（使用提供的配置）
-    async updateGitHubFileWithConfig(data, config) {
+    async updateGitHubFileWithConfig(data, config, options = {}) {
+        const silent = !!options.silent;
         try {
             if (!config || !config.enabled || !config.token) {
                 console.warn('GitHub 配置無效');
@@ -313,7 +341,9 @@ class CalendarWidget {
                 // 重新載入可能會因為 CDN 緩存而載入到舊資料
                 console.log('日曆顯示已更新為最新資料');
                 
-                alert('✅ 日曆資料已成功更新到 GitHub！\n\n頁面已自動更新顯示。\n\n訪客重新整理頁面即可看到更新。');
+                if (!silent) {
+                    alert('✅ 日曆資料已成功更新到 GitHub！\n\n頁面已自動更新顯示。\n\n訪客重新整理頁面即可看到更新。');
+                }
                 return true;
             } else {
                 const errorText = await updateResponse.text();
@@ -339,7 +369,9 @@ class CalendarWidget {
         } catch (error) {
             console.error('GitHub API 更新錯誤:', error);
             const errorMsg = error.message || '未知錯誤';
-            alert(`❌ GitHub 更新失敗：${errorMsg}\n\n資料已儲存在瀏覽器中，請稍後再試或使用下載方式。\n\n詳細錯誤請查看瀏覽器控制台。`);
+            if (!silent) {
+                alert(`❌ GitHub 更新失敗：${errorMsg}\n\n資料已儲存在瀏覽器中，請稍後再試或使用下載方式。\n\n詳細錯誤請查看瀏覽器控制台。`);
+            }
             // 保留 localStorage 中的資料，因為更新失敗
             return false;
         }
@@ -557,7 +589,7 @@ class CalendarWidget {
             }];
         }
         
-        this.saveEvents();
+        this.saveLocalOnly();
         this.renderCalendar();
         this.closeModal();
     }
@@ -568,7 +600,7 @@ class CalendarWidget {
         
         if (confirm('確定要刪除這個事件嗎？')) {
             delete this.events[this.selectedDate];
-            this.saveEvents();
+            this.saveLocalOnly();
             this.renderCalendar();
             this.closeModal();
         }
@@ -692,6 +724,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('language', e.data.lang);
             }
             window.calendarWidget.updateLanguage();
+        }
+
+        // Manager shell: explicit sync request (save stays local; sync only on request)
+        if (e && e.data && e.data.type === 'calendar-sync-request') {
+            (async () => {
+                try {
+                    const result = await window.calendarWidget.syncToGitHub({ silent: true });
+                    if (window.parent && window.parent !== window) {
+                        window.parent.postMessage({ type: 'calendar-sync-result', ok: !!result.ok, message: result.message || '' }, '*');
+                    }
+                } catch (err) {
+                    const msg = (err && err.message) ? err.message : '同步失敗';
+                    if (window.parent && window.parent !== window) {
+                        window.parent.postMessage({ type: 'calendar-sync-result', ok: false, message: msg }, '*');
+                    }
+                }
+            })();
         }
     });
 });
