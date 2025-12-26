@@ -23,13 +23,12 @@ html {
     overflow-x: hidden;
 }
 
-/* 日曆頁面專用：禁用滾動（確保單頁、無捲軸） */
+/* 日曆頁面專用：允許自然捲動（避免手機視口/縮放抖動與位置漂移） */
 body.calendar-page-body {
-    height: 100vh;  /* fallback */
-    height: 100dvh;
-    overflow: hidden;
+    height: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
     width: 100%;
-    /* 不使用 100vw：避免 scrollbar 寬度造成水平溢出 */
     max-width: none;
 }
 
@@ -460,148 +459,21 @@ body.calendar-page-body {
 }
 
 /* ============================================
-   管理員密碼驗證樣式
-   ============================================ */
-
-.password-modal {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 60vh;
-    padding: 40px 20px;
-}
-
-.password-modal-content {
-    background: #ffffff;
-    border-radius: 20px;
-    padding: 50px 40px;
-    max-width: 500px;
-    width: 100%;
-    box-shadow: 0 8px 32px rgba(61, 40, 23, 0.15);
-    text-align: center;
-}
-
-.password-modal-header {
-    margin-bottom: 30px;
-}
-
-.password-modal-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 32px;
-    font-weight: 700;
-    color: #3d2817;
-    margin: 0;
-}
-
-.password-modal-description {
-    font-family: 'Inter', sans-serif;
-    font-size: 16px;
-    color: #3d2817;
-    margin-bottom: 30px;
-    line-height: 1.6;
-}
-
-.password-input-group {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    margin-bottom: 20px;
-}
-
-.password-input {
-    width: 100%;
-    padding: 16px 20px;
-    border: 2px solid #f5f3f0;
-    border-radius: 10px;
-    font-family: 'Inter', sans-serif;
-    font-size: 16px;
-    color: #3d2817;
-    background: #ffffff;
-    transition: all 0.3s ease;
-    box-sizing: border-box;
-}
-
-.password-input:focus {
-    outline: none;
-    border-color: #d4a574;
-    box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.1);
-}
-
-.password-input-error {
-    border-color: #f44336;
-    animation: shake 0.5s;
-}
-
-@keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-10px); }
-    75% { transform: translateX(10px); }
-}
-
-.password-submit-btn {
-    width: 100%;
-    padding: 16px;
-    background-color: #d4a574;
-    color: #ffffff;
-    border: none;
-    border-radius: 10px;
-    font-family: 'Inter', sans-serif;
-    font-size: 16px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.password-submit-btn:hover {
-    background-color: #c49564;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(212, 165, 116, 0.3);
-}
-
-.password-submit-btn:active {
-    transform: translateY(0);
-}
-
-.password-error {
-    color: #f44336;
-    font-size: 14px;
-    margin-top: 10px;
-    text-align: center;
-}
-
-@media (max-width: 640px) {
-    .password-modal-content {
-        padding: 40px 30px;
-    }
-    
-    .password-modal-title {
-        font-size: 28px;
-    }
-    
-    .password-modal-description {
-        font-size: 15px;
-    }
-}
-
-/* ============================================
    日曆頁面樣式
    ============================================ */
 
-/* 日曆頁面專用樣式 */
+/* 日曆頁面專用樣式：不要鎖定一屏，不要縮放；維持水平置中、可清楚閱讀 */
 .calendar-page {
     padding: 0 !important;
     /* 由 JS 寫入 --header-h，以確保不同裝置/字型下準確扣掉 header 高度 */
     margin-top: var(--header-h, 100px) !important;
-    height: calc(100vh - var(--header-h, 100px)); /* fallback */
-    height: calc(100dvh - var(--header-h, 100px));
-    min-height: 0 !important; /* 覆蓋 .main-content 的 min-height，避免把畫面撐高 */
-    overflow: hidden;
+    min-height: auto !important; /* 覆蓋 .main-content 的 min-height */
+    height: auto;
+    overflow: visible;
     box-sizing: border-box;
     width: 100%;
 
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    display: block;
 }
 
 .calendar-page .container {
@@ -609,54 +481,29 @@ body.calendar-page-body {
     padding: 0 20px;
     width: 100%;
     margin: 0 auto;
-    height: 100%;
-    /* 不要裁切日曆本體/陰影，避免右側被切到 */
+    /* 不要裁切日曆本體/陰影 */
     overflow: visible;
     box-sizing: border-box;
 
-    /* 避免第二層再做垂直置中，基準會漂移 */
+    /* 水平置中，垂直從上往下排（需要時可捲動） */
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
 }
 
 .calendar-wrapper {
     width: 100%;
     max-width: 900px;
-    margin: 0 auto;
-    /* 不要裁切日曆本體/陰影，避免右側被切到 */
+    margin: 24px auto 60px;
+    /* 不要裁切日曆本體/陰影 */
     overflow: visible;
     box-sizing: border-box;
-
-    /* 只做「偏上」，不要跟縮放混在一起 */
-    /* 往下微調（正值 = 往下） */
-    transform: translateY(var(--cal-shift, 24px));
-}
-
-.calendar-scale {
-    /*
-      佔位寬高由 JS 直接設 style.width/style.height
-      但日曆卡片有 box-shadow，必須留 padding，且不能用 overflow: hidden 去裁掉
-    */
-    --cal-pad: 18px;
-    padding: var(--cal-pad);
-    overflow: visible;
-    display: block;
-    box-sizing: content-box;
-    visibility: hidden; /* 避免一開始先大後縮小的閃動 */
-}
-
-.calendar-scale-inner {
-    width: var(--cal-content-w, 900px);
-    height: var(--cal-content-h, 800px);
-    transform: scale(var(--cal-scale, 0.67));
-    transform-origin: center top;
+    transform: none;
 }
 
 .calendar-iframe {
     width: 100%;
-    min-height: 800px;
-    height: auto;
+    min-height: 900px; /* 初始高度，載入後由 postMessage 自動覆蓋 */
     border: none;
     background: transparent;
     display: block;

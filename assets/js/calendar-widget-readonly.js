@@ -1,4 +1,8 @@
-// 日曆組件 JavaScript（只讀版本）
+// 日曆組件 JavaScript（只讀版本 / 訪客端）
+// 維護重點：
+// - 不提供編輯（read-only），事件用 hover tooltip 顯示（有 description 才顯示）
+// - 透過 postMessage({type:'calendar-resize', height}) 通知父頁（calendar.html）調整 iframe 高度
+// - 語言：使用 localStorage.language，並支援接收 postMessage({type:'lovely-language', lang}) 即時更新
 
 // 防止載入錯誤的版本
 if (typeof CalendarWidget !== 'undefined') {
@@ -10,6 +14,11 @@ class CalendarWidgetReadonly {
         this.currentDate = new Date();
         this.events = {};
         this.selectedDate = null;
+        this._tooltipEls = [];
+        this._tooltipOpen = false;
+        this._tooltipAnchorEl = null;
+        this._resizeObserver = null;
+        this._resizeRaf = 0;
         // 如果是本地文件模式，從 GitHub 載入數據；否則從本地載入
         const isLocalFile = window.location.protocol === 'file:';
         if (isLocalFile) {
@@ -28,8 +37,10 @@ class CalendarWidgetReadonly {
         this.updateLanguage();
         this.renderCalendar();
         this.attachEventListeners();
-        // 通知父窗口調整高度
-        this.notifyParentHeight();
+        // 自動回報高度（ResizeObserver / 事件驅動）
+        this.setupAutoResize();
+        // 點空白關閉 tooltip（手機互動）
+        this.attachOutsideClickToClose();
     }
     
     // 通知父窗口調整 iframe 高度
@@ -44,17 +55,66 @@ class CalendarWidgetReadonly {
                 document.documentElement.offsetHeight
             );
             if (height > 0 && window.parent && window.parent !== window) {
-                // 考慮到 CSS transform scale(0.67)，但 iframe 高度應該使用原始高度
-                // 因為 transform 只影響視覺顯示，不影響實際空間佔用
                 window.parent.postMessage({
                     type: 'calendar-resize',
-                    // 只留少量 buffer，避免把 iframe 撐太高導致父頁縮放過小
+                    // 留少量 buffer
                     height: height + 24
                 }, '*');
             }
         } catch (e) {
             // 跨域時忽略錯誤
         }
+    }
+
+    setupAutoResize() {
+        // Initialize once
+        if (this._resizeObserver) return;
+
+        const target = document.querySelector('.calendar-container') || document.body;
+        const send = () => {
+            // throttle by rAF
+            if (this._resizeRaf) cancelAnimationFrame(this._resizeRaf);
+            this._resizeRaf = requestAnimationFrame(() => {
+                this._resizeRaf = 0;
+                this.notifyParentHeight();
+            });
+        };
+
+        try {
+            this._resizeObserver = new ResizeObserver(() => send());
+            this._resizeObserver.observe(target);
+        } catch (e) {
+            // ResizeObserver not available: fall back to a few scheduled sends
+            setTimeout(() => this.notifyParentHeight(), 100);
+            setTimeout(() => this.notifyParentHeight(), 500);
+            setTimeout(() => this.notifyParentHeight(), 1000);
+        }
+
+        window.addEventListener('load', () => send());
+        // initial
+        send();
+    }
+
+    attachOutsideClickToClose() {
+        if (this._outsideClickBound) return;
+        this._outsideClickBound = true;
+
+        document.addEventListener('click', (e) => {
+            if (!this._tooltipOpen) return;
+
+            // If clicking the same anchor day again, day handler will stopPropagation.
+            // Here: any other click should close.
+            const anchor = this._tooltipAnchorEl;
+            if (anchor && e && e.target && anchor.contains(e.target)) return;
+
+            this.hideTooltip();
+        });
+
+        // Close on escape for desktop users
+        document.addEventListener('keydown', (e) => {
+            if (!this._tooltipOpen) return;
+            if (e && e.key === 'Escape') this.hideTooltip();
+        });
     }
     
     // 載入事件資料
@@ -114,6 +174,8 @@ class CalendarWidgetReadonly {
         const grid = document.getElementById('calendarGrid');
         if (!grid) return;
         grid.innerHTML = '';
+        // 移除 tooltip（避免月份切換後 tooltip 漂在空中）
+        this.hideTooltip();
         
         // 獲取月份的第一天和最後一天
         const firstDay = new Date(year, month, 1);
@@ -147,10 +209,8 @@ class CalendarWidgetReadonly {
             this.createDayElement(grid, day, true, dateKey);
         }
         
-        // 渲染完成後通知父窗口調整高度（多次調用以確保高度正確）
-        setTimeout(() => this.notifyParentHeight(), 100);
-        setTimeout(() => this.notifyParentHeight(), 500);
-        setTimeout(() => this.notifyParentHeight(), 1000);
+        // 渲染完成後回報高度（由 ResizeObserver 觸發；這裡再送一次保險）
+        this.notifyParentHeight();
     }
     
     // 創建日期元素（只讀模式）
@@ -187,9 +247,20 @@ class CalendarWidgetReadonly {
                 dayEl.appendChild(descIndicator);
             }
             
-            // 只讀模式：滑鼠懸停顯示提示
-            dayEl.addEventListener('mouseenter', (e) => this.showTooltip(e, event, dateKey));
-            dayEl.addEventListener('mouseleave', () => this.hideTooltip());
+            const hasDesc = !!(event.description && event.description.trim());
+
+            // 桌機：保留 hover tooltip（有 description 才顯示）
+            if (hasDesc) {
+                dayEl.addEventListener('mouseenter', (e) => this.showTooltip(e, event));
+                dayEl.addEventListener('mouseleave', () => this.hideTooltip());
+            }
+
+            // 手機：點一下顯示、點空白關閉（只有有 description 才需要）
+            dayEl.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (!hasDesc) return;
+                this.toggleTooltip(dayEl, event);
+            });
         }
         container.appendChild(dayEl);
     }
@@ -200,8 +271,17 @@ class CalendarWidgetReadonly {
         return date.toISOString().split('T')[0];
     }
     
-    // 顯示提示框（滑鼠懸停）
-    showTooltip(event, eventData, dateKey) {
+    toggleTooltip(anchorEl, eventData) {
+        if (this._tooltipOpen && this._tooltipAnchorEl === anchorEl) {
+            this.hideTooltip();
+            return;
+        }
+        // Create a synthetic event-like object for positioning
+        this.showTooltip({ currentTarget: anchorEl }, eventData);
+    }
+
+    // 顯示提示框（hover / click）
+    showTooltip(event, eventData) {
         // 移除現有的 tooltip
         this.hideTooltip();
         
@@ -221,6 +301,9 @@ class CalendarWidgetReadonly {
         tooltip.className = 'event-tooltip';
         tooltip.innerHTML = tooltipContent;
         document.body.appendChild(tooltip);
+        this._tooltipOpen = true;
+        this._tooltipAnchorEl = event.currentTarget;
+        this._tooltipEls = [tooltip];
         
         // 計算位置（在日期框右上角）
         const rect = event.currentTarget.getBoundingClientRect();
@@ -266,6 +349,8 @@ class CalendarWidgetReadonly {
                 }
             }, 200);
         });
+        this._tooltipOpen = false;
+        this._tooltipAnchorEl = null;
     }
     
     // 附加事件監聽器
@@ -294,36 +379,36 @@ class CalendarWidgetReadonly {
     // 更新語言
     updateLanguage() {
         const currentLang = localStorage.getItem('language') || 'zh';
-        const elements = document.querySelectorAll('[data-en][data-zh]');
-        elements.forEach(element => {
-            if (currentLang === 'en') {
-                element.textContent = element.getAttribute('data-en');
-            } else {
-                element.textContent = element.getAttribute('data-zh');
-            }
-        });
+        if (window.LovelyI18n && typeof window.LovelyI18n.applyLanguage === 'function') {
+            window.LovelyI18n.applyLanguage(currentLang, document);
+        } else {
+            const elements = document.querySelectorAll('[data-en][data-zh]');
+            elements.forEach(element => {
+                if (currentLang === 'en') {
+                    element.textContent = element.getAttribute('data-en');
+                } else {
+                    element.textContent = element.getAttribute('data-zh');
+                }
+            });
+        }
         this.renderCalendar();
     }
 }
 
 // 初始化日曆
 document.addEventListener('DOMContentLoaded', () => {
+    // 防止被重複載入時重複初始化，造成事件監聽器/interval 疊加
+    if (window.calendarWidgetReadonly) return;
     window.calendarWidgetReadonly = new CalendarWidgetReadonly();
     
-    // 監聽父頁面的語言切換
-    window.addEventListener('storage', (e) => {
-        if (e.key === 'language') {
+    // 事件驅動：父頁語言切換時會 postMessage 通知（避免輪詢）
+    window.addEventListener('message', (e) => {
+        if (e && e.data && e.data.type === 'lovely-language') {
+            if (typeof e.data.lang === 'string') {
+                localStorage.setItem('language', e.data.lang);
+            }
             window.calendarWidgetReadonly.updateLanguage();
         }
     });
-    
-    let lastLang = localStorage.getItem('language') || 'zh';
-    setInterval(() => {
-        const currentLang = localStorage.getItem('language') || 'zh';
-        if (currentLang !== lastLang) {
-            lastLang = currentLang;
-            window.calendarWidgetReadonly.updateLanguage();
-        }
-    }, 500);
 });
 

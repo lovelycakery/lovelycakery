@@ -24,7 +24,7 @@
 
 ### 步驟 2：填入配置（約 1 分鐘）
 
-開啟 `assets/js/github-config.js`，修改：
+建立/開啟 `assets/js/github-config.local.js`（只放本機，不提交），修改：
 
 ```javascript
 const GITHUB_CONFIG = {
@@ -45,7 +45,7 @@ const GITHUB_CONFIG = {
 
 ## ⚠️ 重要安全提醒
 
-- **不要**將包含 Token 的 `github-config.js` 提交到 GitHub
+- **不要**將包含 Token 的 `github-config.local.js` 提交到 GitHub
 - 如果已經提交，立即撤銷 Token 並建立新的
 
 ## 📖 詳細說明

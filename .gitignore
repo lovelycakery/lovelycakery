@@ -15,9 +15,10 @@ Thumbs.db
 
 # GitHub 配置檔案（包含敏感資訊）
 # ⚠️ 絕對不要提交包含 Token 的配置檔案！
-assets/js/github-config.js
+#（新命名：用 .local.js 表示只放在本機）
+assets/js/github-config.local.js
 
 # 管理員密碼配置檔案（包含敏感資訊）
 # ⚠️ 絕對不要提交包含密碼的配置檔案！
-assets/js/admin-password-config.js
+assets/js/admin-password-config.local.js
 

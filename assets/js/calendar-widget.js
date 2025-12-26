@@ -1,4 +1,9 @@
-// 日曆組件 JavaScript
+// 日曆組件 JavaScript（可編輯 / 管理端）
+// 維護重點：
+// - 資料來源：assets/data/calendar-data.json（訪客端），本檔案負責載入/編輯/保存
+// - 保存策略：先寫 localStorage（calendarEvents + calendarEventsUnsynced），再嘗試 GitHub API
+// - GitHub API 設定：本機可放 assets/js/github-config.local.js（被 .gitignore 忽略）
+// - 語言：使用 localStorage.language（由 assets/js/i18n.js 管理），並支援 postMessage 事件驅動更新
 
 class CalendarWidget {
     constructor() {
@@ -206,7 +211,7 @@ class CalendarWidget {
         
         // 如果配置文件未載入（通常是網頁版），無法使用 GitHub API
         if (!githubConfig) {
-            console.warn('⚠️ github-config.js 未載入，無法自動更新到 GitHub');
+            console.warn('⚠️ github-config.local.js 未載入，無法自動更新到 GitHub');
             // 資料已保存到 localStorage，提供下載功能讓用戶手動更新 GitHub
             this.downloadJSON(data, false); // 提供下載，讓用戶可以手動上傳到 GitHub
             alert('⚠️ 無法自動更新到 GitHub\n\n由於安全原因，GitHub 配置檔案不會上傳到公開倉庫。\n\n資料已儲存在瀏覽器中，並已下載 JSON 檔案。\n\n請手動將 calendar-data.json 上傳到 GitHub 的 assets/data/ 目錄。');
@@ -631,14 +636,18 @@ class CalendarWidget {
     // 更新語言
     updateLanguage() {
         const currentLang = localStorage.getItem('language') || 'zh';
-        const elements = document.querySelectorAll('[data-en][data-zh]');
-        elements.forEach(element => {
-            if (currentLang === 'en') {
-                element.textContent = element.getAttribute('data-en');
-            } else {
-                element.textContent = element.getAttribute('data-zh');
-            }
-        });
+        if (window.LovelyI18n && typeof window.LovelyI18n.applyLanguage === 'function') {
+            window.LovelyI18n.applyLanguage(currentLang, document);
+        } else {
+            const elements = document.querySelectorAll('[data-en][data-zh]');
+            elements.forEach(element => {
+                if (currentLang === 'en') {
+                    element.textContent = element.getAttribute('data-en');
+                } else {
+                    element.textContent = element.getAttribute('data-zh');
+                }
+            });
+        }
         
         // 更新日期顯示（如果模態框已打開）
         if (this.selectedDate) {
@@ -664,6 +673,8 @@ class CalendarWidget {
 
 // 初始化日曆
 document.addEventListener('DOMContentLoaded', () => {
+    // 防止被重複載入時重複初始化，造成事件監聽器/interval 疊加
+    if (window.calendarWidget) return;
     window.calendarWidget = new CalendarWidget();
     
     // 監聽父頁面的語言切換（透過 storage 事件）
@@ -672,15 +683,16 @@ document.addEventListener('DOMContentLoaded', () => {
             window.calendarWidget.updateLanguage();
         }
     });
-    
-    // 定期檢查語言變更（因為同源 iframe 可能無法監聽 storage 事件）
-    let lastLang = localStorage.getItem('language') || 'zh';
-    setInterval(() => {
-        const currentLang = localStorage.getItem('language') || 'zh';
-        if (currentLang !== lastLang) {
-            lastLang = currentLang;
+
+    // 事件驅動：父頁語言切換時會 postMessage 通知（避免輪詢）
+    window.addEventListener('message', (e) => {
+        if (e && e.data && e.data.type === 'lovely-language') {
+            // 確保 localStorage 跟父頁一致（父頁已寫入，但這裡保險）
+            if (typeof e.data.lang === 'string') {
+                localStorage.setItem('language', e.data.lang);
+            }
             window.calendarWidget.updateLanguage();
         }
-    }, 500);
+    });
 });
 

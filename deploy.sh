@@ -20,6 +20,15 @@ if [ ! -d ".git" ]; then
     git branch -M main
 fi
 
+# 部署前檢查（避免缺檔、錯誤載入順序、誤提交私密設定等）
+if [ -f "./check.sh" ]; then
+    echo -e "${BLUE}🔎 執行部署前檢查（check.sh）...${NC}"
+    bash ./check.sh
+    echo
+else
+    echo -e "${YELLOW}⚠️  找不到 check.sh，將跳過檢查（不建議）${NC}\n"
+fi
+
 # 設定遠端倉庫（如果還沒設定）
 REMOTE_URL="git@github.com:lovelycakery/lovelycakery.git"
 CURRENT_REMOTE=$(git remote get-url origin 2>/dev/null || echo "")

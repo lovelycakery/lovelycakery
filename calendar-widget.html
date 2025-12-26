@@ -83,7 +83,17 @@
         </div>
     </div>
     
-    <script src="assets/js/github-config.js"></script>
+    <script src="assets/js/i18n.js"></script>
+    <script>
+        // Optional local GitHub config (not committed). If missing, calendar-widget.js will fall back to download mode.
+        (function () {
+            const s = document.createElement('script');
+            s.src = 'assets/js/github-config.local.js';
+            s.async = false;
+            s.onerror = () => console.warn('github-config.local.js not found; using download/manual upload mode.');
+            document.head.appendChild(s);
+        })();
+    </script>
     <script src="assets/js/calendar-widget.js"></script>
 </body>
 </html>

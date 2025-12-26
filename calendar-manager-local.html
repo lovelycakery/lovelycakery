@@ -205,7 +205,17 @@
         </div>
     </div>
     
-    <script src="assets/js/github-config.js"></script>
+    <script src="assets/js/i18n.js"></script>
+    <script>
+        // Optional local GitHub config (not committed). If missing, calendar-widget.js will fall back to download mode.
+        (function () {
+            const s = document.createElement('script');
+            s.src = 'assets/js/github-config.local.js';
+            s.async = false;
+            s.onerror = () => console.warn('github-config.local.js not found; using download/manual upload mode.');
+            document.head.appendChild(s);
+        })();
+    </script>
     <script src="assets/js/calendar-widget.js"></script>
     <script>
         // 顯示狀態訊息
@@ -226,7 +236,7 @@
             // 檢查是否為本地文件模式
             const isLocalFile = window.location.protocol === 'file:';
             if (isLocalFile) {
-                showStatus('💡 本地文件模式：請確保已配置 github-config.js 才能自動更新到 GitHub', 'info');
+                showStatus('💡 本地文件模式：請確保已配置 github-config.local.js 才能自動更新到 GitHub', 'info');
             }
 
             // 監聽日曆初始化完成
@@ -244,21 +254,7 @@
             }
         });
 
-        // 更新語言（如果需要）
-        function updateLanguage() {
-            const currentLang = localStorage.getItem('language') || 'zh';
-            const elements = document.querySelectorAll('[data-en][data-zh]');
-            elements.forEach(element => {
-                if (currentLang === 'en') {
-                    element.textContent = element.getAttribute('data-en');
-                } else {
-                    element.textContent = element.getAttribute('data-zh');
-                }
-            });
-        }
-
-        // 初始化語言
-        updateLanguage();
+        // 語言初始化由 calendar-widget.js 在 init() 中處理，這裡不重複做
     </script>
 </body>
 </html>

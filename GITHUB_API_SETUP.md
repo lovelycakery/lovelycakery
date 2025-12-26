@@ -58,7 +58,7 @@
 
 ### 2.1 編輯配置檔案
 
-開啟 `assets/js/github-config.js` 檔案，填入以下資訊：
+建立/開啟 `assets/js/github-config.local.js`（只放本機，不提交），填入以下資訊：
 
 ```javascript
 const GITHUB_CONFIG = {
@@ -84,7 +84,7 @@ const GITHUB_CONFIG = {
 
 ⚠️ **重要安全提醒**：
 
-- **絕對不要**將包含 Token 的 `github-config.js` 提交到 GitHub
+- **絕對不要**將包含 Token 的 `github-config.local.js` 提交到 GitHub
 - Token 一旦洩露，任何人都可以修改你的儲存庫
 
 ### 3.2 檢查 .gitignore
@@ -93,7 +93,7 @@ const GITHUB_CONFIG = {
 
 ```
 # GitHub 配置檔案（包含敏感資訊）
-# assets/js/github-config.js
+# assets/js/github-config.local.js
 ```
 
 ### 3.3 如果已經提交了 Token
@@ -110,7 +110,7 @@ const GITHUB_CONFIG = {
 3. **從 Git 歷史中移除**（進階）：
    ```bash
    git filter-branch --force --index-filter \
-     "git rm --cached --ignore-unmatch assets/js/github-config.js" \
+     "git rm --cached --ignore-unmatch assets/js/github-config.local.js" \
      --prune-empty --tag-name-filter cat -- --all
    ```
 
@@ -182,7 +182,7 @@ const GITHUB_CONFIG = {
 2. 找到洩露的 Token
 3. 點擊 **Revoke**（撤銷）
 4. 建立新的 Token
-5. 更新 `github-config.js` 中的 Token
+5. 更新 `github-config.local.js` 中的 Token
 
 ## 📝 注意事項
 
