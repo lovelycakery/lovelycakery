@@ -120,15 +120,25 @@
     
     <script>
         // 顯示狀態訊息
-        function showStatus(message, type = 'info') {
+        let _statusHideTimer = null;
+        function showStatus(message, type = 'info', options = {}) {
             const statusEl = document.getElementById('statusMessage');
             if (statusEl) {
+                if (_statusHideTimer) {
+                    clearTimeout(_statusHideTimer);
+                    _statusHideTimer = null;
+                }
                 statusEl.textContent = message;
                 statusEl.className = 'status-message ' + type;
                 statusEl.style.display = 'block';
-                setTimeout(() => {
-                    statusEl.style.display = 'none';
-                }, 5000);
+                const sticky = !!options.sticky;
+                const timeoutMs = typeof options.timeoutMs === 'number' ? options.timeoutMs : 5000;
+                if (!sticky) {
+                    _statusHideTimer = setTimeout(() => {
+                        statusEl.style.display = 'none';
+                        _statusHideTimer = null;
+                    }, timeoutMs);
+                }
             }
         }
 
@@ -175,7 +185,8 @@
 
             if (data.type === 'calendar-sync-status') {
                 if (data.status === 'unsynced') {
-                    showStatus('有未上傳變更', 'info');
+                    // keep showing until synced
+                    showStatus('有未上傳變更', 'info', { sticky: true });
                 }
                 if (data.status === 'synced') {
                     showStatus('✅ 已同步到 GitHub', 'success');
