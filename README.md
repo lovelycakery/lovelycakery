@@ -9,6 +9,8 @@
 - 語言切換 / 日曆 iframe / GitHub API 設定方式
 - 常見修改流程與踩雷清單
 - 快速檢查指令（避免缺檔、避免輪詢回歸）
+- 圖片最佳化與部署前檢查（避免上傳超大圖）
+- 避免 CLS（圖片加 width/height）
 
 ## 部署到 GitHub Pages
 
@@ -45,6 +47,21 @@
 
 > `deploy.sh` 會在 push 前自動執行 `./check.sh`（缺檔/載入順序/輪詢回歸/私密設定誤提交等檢查）。
 > 你也可以單獨先跑：`./check.sh`
+
+## 圖片最佳化（建議每次新增/替換圖片都做）
+
+這個專案已內建兩個腳本（並且 `check.sh` 會自動驗證）：
+
+```bash
+# 1) 先把 products/seasonal + 首頁 cakes.jpg 壓到適合網頁的尺寸/體積
+python3 scripts/optimize_images.py
+
+# 或只處理「本次 git 變更/新增」的圖片（更快，推薦日常使用）
+python3 scripts/optimize_images.py --only-changed
+
+# 2) 部署前檢查（deploy.sh 會自動跑 check.sh，check.sh 會跑這個）
+python3 scripts/verify_images.py
+```
 
 ### 手動部署
 

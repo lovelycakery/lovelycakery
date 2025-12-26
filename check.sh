@@ -88,6 +88,10 @@ print("OK: script load order looks good")
 PY
 pass "Script load order is correct"
 
+# 2.6) Verify product/seasonal images are optimized (size + dimensions)
+python3 scripts/verify_images.py
+pass "Product/seasonal images are optimized"
+
 # 2.5) Enforce calendar cache-busting (?v=...) when calendar-related assets change
 if [ -d ".git" ]; then
   # Detect calendar-related changes (staged/unstaged/untracked)

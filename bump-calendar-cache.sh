@@ -17,6 +17,7 @@ set -euo pipefail
 #   - assets/css/calendar-widget.css
 #   - assets/js/calendar-embed.js
 #   - assets/js/calendar-widget-readonly.js
+#   - assets/data/calendar-data.json
 #   - calendar.html
 #   - calendar-widget-readonly.html
 
@@ -40,7 +41,7 @@ collect_changed_files() {
 should_bump=0
 while IFS= read -r f; do
   case "$f" in
-    assets/css/styles.css|assets/css/calendar-widget.css|assets/js/calendar-embed.js|assets/js/calendar-widget-readonly.js|calendar.html|calendar-widget-readonly.html)
+    assets/css/styles.css|assets/css/calendar-widget.css|assets/js/calendar-embed.js|assets/js/calendar-widget-readonly.js|assets/data/calendar-data.json|calendar.html|calendar-widget-readonly.html)
       should_bump=1
       break
       ;;

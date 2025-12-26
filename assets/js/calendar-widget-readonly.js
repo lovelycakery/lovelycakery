@@ -27,6 +27,16 @@ class CalendarWidgetReadonly {
         } else {
             this.dataFile = 'assets/data/calendar-data.json';
         }
+        // Cache busting policy:
+        // - Default: allow browser/CDN caching for speed.
+        // - If the parent page provides a version (?v=...), reuse it to bust cache only when you deploy changes.
+        this.cacheVersion = (function () {
+            try {
+                return new URLSearchParams(window.location.search).get('v') || '';
+            } catch (e) {
+                return '';
+            }
+        })();
         this.isReadonly = true; // 標記為只讀模式
         
         this.init();
@@ -121,8 +131,8 @@ class CalendarWidgetReadonly {
     async loadEvents() {
         const isLocalFile = window.location.protocol === 'file:';
         try {
-            // 添加時間戳避免緩存
-            const response = await fetch(this.dataFile + '?t=' + Date.now());
+            const url = this.cacheVersion ? (this.dataFile + '?v=' + encodeURIComponent(this.cacheVersion)) : this.dataFile;
+            const response = await fetch(url);
             if (response.ok) {
                 const data = await response.json();
                 this.events = {};

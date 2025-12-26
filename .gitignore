@@ -22,3 +22,6 @@ assets/js/github-config.local.js
 # ⚠️ 絕對不要提交包含密碼的配置檔案！
 assets/js/admin-password-config.local.js
 
+# Original high-res images (backup only; do not deploy / do not commit by default)
+assets/images/_originals/
+

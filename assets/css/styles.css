@@ -415,6 +415,25 @@ body.calendar-page-body {
     display: block;
 }
 
+/* ============================================
+   全部品項（all-items）：圖片顯示縮小為原本 0.9 倍 + 版面微調（僅此頁）
+   ============================================ */
+.all-items-page .gallery-grid {
+    gap: 24px; /* 比預設 30px 稍緊湊，視覺更均衡 */
+}
+
+.all-items-page .gallery-image-wrapper {
+    /* 移除「框」感（陰影/外框），由圖片本身縮放來達到 0.8 倍與等距留白 */
+    box-shadow: none;
+    border-radius: 0;
+    overflow: visible;
+}
+
+.all-items-page .gallery-image {
+    transform: scale(0.8);
+    transform-origin: center;
+}
+
 /* 響應式：平板 - 分頁樣式 */
 @media (max-width: 968px) {
     .page-header {

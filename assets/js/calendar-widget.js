@@ -19,6 +19,16 @@ class CalendarWidget {
         } else {
             this.dataFile = 'assets/data/calendar-data.json';
         }
+        // Cache busting policy:
+        // - Default: allow browser/CDN caching for speed.
+        // - If the page provides a version (?v=...), reuse it to bust cache only when you deploy changes.
+        this.cacheVersion = (function () {
+            try {
+                return new URLSearchParams(window.location.search).get('v') || '';
+            } catch (e) {
+                return '';
+            }
+        })();
         
         this.init();
     }
@@ -94,7 +104,8 @@ class CalendarWidget {
         
         try {
             // 先嘗試載入資料（從 GitHub 或本地檔案）
-            const response = await fetch(this.dataFile + '?t=' + Date.now()); // 添加時間戳避免緩存
+            const url = this.cacheVersion ? (this.dataFile + '?v=' + encodeURIComponent(this.cacheVersion)) : this.dataFile;
+            const response = await fetch(url);
             if (response.ok) {
                 const data = await response.json();
                 this.events = {};
@@ -179,7 +190,8 @@ class CalendarWidget {
     // 在後台從 GitHub 載入資料以確認（不阻塞顯示）
     async loadFromGitHubInBackground() {
         try {
-            const response = await fetch(this.dataFile + '?t=' + Date.now());
+            const url = this.cacheVersion ? (this.dataFile + '?v=' + encodeURIComponent(this.cacheVersion)) : this.dataFile;
+            const response = await fetch(url);
             if (response.ok) {
                 const data = await response.json();
                 const localData = localStorage.getItem('calendarEvents');

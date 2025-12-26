@@ -20,6 +20,13 @@ if [ ! -d ".git" ]; then
     git branch -M main
 fi
 
+# 自動壓縮本次變更的商品/季節/首頁圖片（只處理 git 變更，避免每次全量重跑）
+if [ -f "./scripts/optimize_images.py" ]; then
+    echo -e "${BLUE}🖼️  自動壓縮本次變更的圖片（products/seasonal/hero）...${NC}"
+    python3 ./scripts/optimize_images.py --only-changed || true
+    echo
+fi
+
 # 自動更新日曆相關資源的快取版本號（只在有相關變更時才會更新）
 if [ -f "./bump-calendar-cache.sh" ]; then
     echo -e "${BLUE}🧹 自動更新日曆快取版本號（?v=...）...${NC}"

@@ -1,5 +1,15 @@
 # 🚀 GitHub API 自動更新 - 快速開始
 
+## ✅ 部署前小提醒（效能 / 圖片）
+
+新增或替換「全部品項 / 季節限定 / 首頁」圖片後，建議先跑：
+
+```bash
+python3 scripts/optimize_images.py
+```
+
+部署前 `./deploy.sh` 會自動跑 `./check.sh`，而 `check.sh` 會驗證圖片是否已符合大小/尺寸門檻（不符合會擋下部署）。
+
 ## 3 步驟快速設定
 
 ### 步驟 1：建立 GitHub Token（約 2 分鐘）

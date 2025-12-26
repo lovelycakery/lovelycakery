@@ -164,6 +164,59 @@ rg "setInterval\\(" assets/js
 
 ---
 
+## 效能優化與資產規範（2025-12）
+
+### 1) 圖片（products / seasonal / homepage hero）
+這個站點「體感慢」的最大來源通常是圖片體積。專案已內建 **圖片優化 + 部署前檢查**：
+
+- `scripts/optimize_images.py`
+  - 目標：`assets/images/products/*.jpg`、`assets/images/seasonal/*.jpg`、`assets/images/cakes.jpg`
+  - 預設策略：最大邊縮到 `1600px` + JPEG `quality=82` + progressive/optimize
+  - 用法：
+    ```bash
+    python3 scripts/optimize_images.py
+    ```
+  - 只處理「本次 git 變更/新增」的圖片（避免圖片變多後每次全量重跑很慢）：
+    ```bash
+    python3 scripts/optimize_images.py --only-changed
+    ```
+    若要略過首頁圖：
+    ```bash
+    python3 scripts/optimize_images.py --no-hero
+    ```
+
+- `scripts/verify_images.py`（部署前會由 `check.sh` 自動執行）
+  - 預設門檻：每張 `<= 1.2MB` 且最大邊 `<= 1600px`
+  - 用法：
+    ```bash
+    python3 scripts/verify_images.py
+    ```
+  - 若檢查失敗，通常先跑：
+    ```bash
+    python3 scripts/optimize_images.py
+    ```
+
+> 新增/替換商品或季節圖片時：**先跑 optimize，再 deploy**，避免把 5–7MB 的原圖推到線上。
+> `deploy.sh` 也會自動嘗試執行 `python3 scripts/optimize_images.py --only-changed`，通常不需要手動挑檔名。
+
+### 2) 避免 CLS（版面跳動）
+為了避免圖片載入時推擠文字/版面跳動（CLS），已採用：
+
+- 在 `index.html` / `all-items.html` / `seasonal.html` 的 `<img>` 補上 `width`/`height`
+- 相簿頁本身也用 `.gallery-image-wrapper { aspect-ratio: 1; }` 預留正方形版面
+
+新增圖片時，建議同步補上對應的 `width`/`height`（以圖片實際像素為準）。
+
+### 3) Google Fonts 非阻塞載入
+主站頁面已改用 `preload` + `media=print onload` 的方式載入 Google Fonts，避免阻塞首屏渲染。
+
+### 4) 日曆資料快取策略（避免每次都慢）
+日曆 widget 讀取 `assets/data/calendar-data.json` 時：
+- **預設允許快取**（速度更好）
+- 只有在頁面帶 `?v=...` 時才做版本式 cache-busting（配合 `bump-calendar-cache.sh`）
+
+---
+
 ## 新功能開發時的建議風格（讓我之後最好維護）
 
 - **小檔案 + 明確職責**（像 `i18n.js`、`calendar-embed.js`）
