@@ -9,9 +9,27 @@
       "created_at": "2025-12-25",
       "created_by": "chiamin",
       "files_changed": []
+    },
+    {
+      "version": "v1.1",
+      "description": "正式版 1.1：日曆顯示改為不縮放、管理工具極簡化、改為手動同步到 GitHub",
+      "git_commit": "ec68a829d4b08e5f626b9ddf57e890a679ac454d",
+      "git_commit_short": "ec68a82",
+      "git_tag": "v1.1",
+      "created_at": "2025-12-26",
+      "created_by": "chiamin",
+      "files_changed": [
+        "calendar.html",
+        "assets/css/styles.css",
+        "assets/js/calendar-embed.js",
+        "calendar-widget-readonly.html",
+        "assets/js/calendar-widget-readonly.js",
+        "calendar-manager-local.html",
+        "assets/js/calendar-widget.js"
+      ]
     }
   ],
-  "current_version": "v1.0",
+  "current_version": "v1.1",
   "created_at": "2025-12-25"
 }
 
