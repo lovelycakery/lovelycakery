@@ -55,7 +55,13 @@ html_files = list(root.glob('*.html'))
 src_re = re.compile(r'<script[^>]+src=["\']([^"\']+)["\']', re.I)
 
 def get_srcs(text):
-    return [m.group(1) for m in src_re.finditer(text)]
+    # Normalize by stripping query/hash so checks keep working with cache-busting (?v=...).
+    out = []
+    for m in src_re.finditer(text):
+        src = m.group(1)
+        src = src.split('?', 1)[0].split('#', 1)[0]
+        out.append(src)
+    return out
 
 errors = []
 for f in html_files:
@@ -81,6 +87,121 @@ if errors:
 print("OK: script load order looks good")
 PY
 pass "Script load order is correct"
+
+# 2.5) Enforce calendar cache-busting (?v=...) when calendar-related assets change
+if [ -d ".git" ]; then
+  # Detect calendar-related changes (staged/unstaged/untracked)
+  changed_files="$(
+    {
+      git diff --name-only
+      git diff --cached --name-only
+      git ls-files --others --exclude-standard
+    } | sed '/^\s*$/d' | sort -u
+  )"
+
+  needs_bump=0
+  while IFS= read -r f; do
+    case "$f" in
+      assets/css/styles.css|assets/css/calendar-widget.css|assets/js/calendar-embed.js|assets/js/calendar-widget-readonly.js|calendar.html|calendar-widget-readonly.html)
+        needs_bump=1
+        break
+        ;;
+    esac
+  done <<< "$changed_files"
+
+  # Always validate version consistency if versions exist.
+  python3 - <<'PY'
+import re, sys
+from pathlib import Path
+
+targets = [Path("calendar.html"), Path("calendar-widget-readonly.html")]
+pat = re.compile(r"\?v=([0-9]{8}-[0-9]+)")
+
+versions = []
+details = {}
+for p in targets:
+    if not p.exists():
+        continue
+    text = p.read_text(encoding="utf-8", errors="ignore")
+    vs = pat.findall(text)
+    details[p.name] = vs
+    versions.extend(vs)
+
+uniq = sorted(set(versions))
+if not uniq:
+    # Project can work without v=, but we strongly prefer it for deployed sites.
+    # Keep as warning-level by default.
+    print("WARN: no ?v=... found in calendar pages")
+    raise SystemExit(0)
+
+if len(uniq) != 1:
+    print("CACHE VERSION MISMATCH:")
+    for name, vs in details.items():
+        print(f"  {name}: {vs}")
+    sys.exit(1)
+
+print(f"OK: calendar cache version is consistent: {uniq[0]}")
+PY
+
+  if [ "$needs_bump" -eq 1 ]; then
+    # If calendar-related assets changed, the cache version must change compared to HEAD.
+    python3 - <<'PY'
+import re, subprocess, sys
+from pathlib import Path
+
+targets = ["calendar.html", "calendar-widget-readonly.html"]
+pat = re.compile(r"\?v=([0-9]{8}-[0-9]+)")
+
+def extract_from_text(text: str) -> str | None:
+    m = pat.search(text or "")
+    return m.group(1) if m else None
+
+def read_head(path: str) -> str | None:
+    try:
+        out = subprocess.check_output(["git", "show", f"HEAD:{path}"], stderr=subprocess.DEVNULL)
+        return out.decode("utf-8", errors="ignore")
+    except Exception:
+        return None
+
+def read_worktree(path: str) -> str | None:
+    p = Path(path)
+    if not p.exists():
+        return None
+    return p.read_text(encoding="utf-8", errors="ignore")
+
+work_versions = {}
+head_versions = {}
+for t in targets:
+    work_versions[t] = extract_from_text(read_worktree(t) or "")
+    head_versions[t] = extract_from_text(read_head(t) or "")
+
+work_set = {v for v in work_versions.values() if v}
+head_set = {v for v in head_versions.values() if v}
+
+# If HEAD had no versions (first time introducing v=), require that worktree has one.
+if not head_set:
+    if not work_set:
+        print("ERROR: calendar pages have no ?v=... and calendar-related assets changed.")
+        sys.exit(1)
+    print("OK: introduced calendar cache version (?v=...)")
+    raise SystemExit(0)
+
+# Normal case: require the version to differ from HEAD.
+if work_set == head_set:
+    print("ERROR: calendar-related assets changed but cache version (?v=...) did not change.")
+    print("HEAD versions:", head_versions)
+    print("WORK versions:", work_versions)
+    sys.exit(1)
+
+print("OK: calendar cache version changed:", {"head": sorted(head_set), "work": sorted(work_set)})
+PY
+    pass "Calendar cache-busting version bumped for calendar-related changes"
+  else
+    pass "Calendar cache-busting check skipped (no calendar-related changes)"
+  fi
+else
+  warn "No .git directory found; skipping calendar cache-busting checks."
+fi
 
 # 3) Architecture guardrails: avoid reintroducing polling loops in assets/js
 if grep -R --line-number --fixed-string "setInterval(" assets/js >/dev/null 2>&1; then

@@ -20,6 +20,13 @@ if [ ! -d ".git" ]; then
     git branch -M main
 fi
 
+# 自動更新日曆相關資源的快取版本號（只在有相關變更時才會更新）
+if [ -f "./bump-calendar-cache.sh" ]; then
+    echo -e "${BLUE}🧹 自動更新日曆快取版本號（?v=...）...${NC}"
+    bash ./bump-calendar-cache.sh
+    echo
+fi
+
 # 部署前檢查（避免缺檔、錯誤載入順序、誤提交私密設定等）
 if [ -f "./check.sh" ]; then
     echo -e "${BLUE}🔎 執行部署前檢查（check.sh）...${NC}"
