@@ -46,9 +46,23 @@
         "check.sh",
         "deploy.sh"
       ]
+    },
+    {
+      "version": "v1.1.2",
+      "description": "正式版 1.1.2：日曆改版為精品甜點風格（奶油白＋金棕點綴），調整字級階層、邊框/陰影、hover 動效、狀態指示與 tooltip 質感",
+      "git_commit": "acb14b4e8b368280b2be6872d60dfa37ccd41079",
+      "git_commit_short": "acb14b4",
+      "git_tag": "v1.1.2",
+      "created_at": "2025-12-27",
+      "created_by": "chiamin",
+      "files_changed": [
+        "assets/css/calendar-widget.css",
+        "calendar-widget-readonly.html",
+        "calendar.html"
+      ]
     }
   ],
-  "current_version": "v1.1.1",
+  "current_version": "v1.1.2",
   "created_at": "2025-12-25"
 }
 
