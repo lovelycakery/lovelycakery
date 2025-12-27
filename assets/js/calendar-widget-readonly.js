@@ -43,14 +43,18 @@ class CalendarWidgetReadonly {
     }
     
     async init() {
-        await this.loadEvents();
-        this.updateLanguage();
+        // Render immediately so the user sees the full calendar grid without waiting for data fetch.
+        // We'll load events in the background and re-render once ready.
         this.renderCalendar();
         this.attachEventListeners();
         // 自動回報高度（ResizeObserver / 事件驅動）
         this.setupAutoResize();
         // 點空白關閉 tooltip（手機互動）
         this.attachOutsideClickToClose();
+
+        // Load events after initial paint; then apply language + re-render with indicators.
+        await this.loadEvents();
+        this.updateLanguage();
     }
     
     // 通知父窗口調整 iframe 高度
@@ -439,7 +443,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         // Parent handshake: request the widget to resend its height
         if (e && e.data && e.data.type === 'calendar-request-resize') {
-            window.calendarWidgetReadonly.notifyParentHeight();
+            // Wait for next paint so measurements reflect the final layout (fonts/images/etc).
+            requestAnimationFrame(() => window.calendarWidgetReadonly.notifyParentHeight());
         }
     });
 });

@@ -10,7 +10,8 @@
 
 :root {
   /* Default (A-scheme) frame art */
-  --lovely-calendar-frame-art: url("../images/calendar/frames/frame-christmas.png");
+  /* Single stable entry: swap this file monthly, no code changes needed */
+  --lovely-calendar-frame-art: url("../images/calendar/frames/frame-current.png");
 }
 
 /* Slightly smaller overall calendar area (no transform scale; keeps text crisp) */
@@ -54,6 +55,11 @@ body.calendar-page-body .calendar-frame::before {
   pointer-events: none;
   z-index: 4;
   opacity: 0.98;
+}
+
+/* One-line switch: set <body data-frame="off"> to disable the overlay without touching CSS. */
+body.calendar-page-body[data-frame="off"] .calendar-frame::before {
+  content: none;
 }
 
 body.calendar-page-body .calendar-frame__inner {

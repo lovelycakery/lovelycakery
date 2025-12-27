@@ -101,6 +101,20 @@ function checkGitHubConfig() { /* calendar-widget.js 會呼叫 */ }
 - 管理端：改 `calendar-widget.html` / `calendar-manager-local.html` / `assets/js/calendar-widget.js`
 - **不要**把主站 `styles.css` 拿去改日曆格子的樣式（日曆在 iframe 內）
 
+### C.1) 日曆外框（可每月更換、可一鍵關閉）
+日曆外框是 **可插拔模組**，設計目標是「換框/關框不影響日曆本體與載入邏輯」。
+
+- **外框樣式模組**：`assets/css/calendar-frame.css`
+- **外框圖片入口（固定檔名，最容易維護）**：`assets/images/calendar/frames/frame-current.png`
+  - 每月更換外框：只要替換這張圖片內容（檔名不變），不用改任何 HTML/CSS/JS
+  - 圖片建議：PNG/WebP（需保留透明中心），尺寸建議 1024px 左右即可
+- **外框開關（只改一行）**：在 `calendar.html` 的 `<body>`：
+  - 開啟：`data-frame="on"`
+  - 關閉：`data-frame="off"`
+
+> 備註：外框會以 overlay 方式疊在 iframe 上方，且 `pointer-events: none` 不會擋日曆操作。
+> 由於外框是圖片資源，建議在部署前跑圖片壓縮（見下方效能章節）。
+
 ### D) 語言切換相關需求
 只改 `assets/js/i18n.js`（不要在各頁重複寫切換程式）
 
@@ -198,6 +212,9 @@ rg "setInterval\\(" assets/js
 
 > 新增/替換商品或季節圖片時：**先跑 optimize，再 deploy**，避免把 5–7MB 的原圖推到線上。
 > `deploy.sh` 也會自動嘗試執行 `python3 scripts/optimize_images.py --only-changed`，通常不需要手動挑檔名。
+
+（補充）日曆外框圖片也屬於「每次進日曆頁都會下載」的資產，建議同樣跑：
+`python3 scripts/optimize_images.py --only-changed`
 
 ### 2) 避免 CLS（版面跳動）
 為了避免圖片載入時推擠文字/版面跳動（CLS），已採用：
