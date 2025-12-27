@@ -147,6 +147,7 @@ body.calendar-page-body {
     display: flex;
     align-items: center;
     gap: 8px;
+    white-space: nowrap;
 }
 
 /* 語言切換按鈕 */
@@ -306,8 +307,16 @@ body.calendar-page-body {
     }
 
     .nav-right {
-        flex-direction: column;
-        gap: 16px;
+        /* 手機/平板：nav 先占一整行；社群 + 語言放同一行 */
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 12px 16px;
+    }
+
+    .nav {
+        flex-basis: 100%;
+        justify-content: center;
     }
 
     .social-links {
