@@ -147,7 +147,6 @@ body.calendar-page-body {
     display: flex;
     align-items: center;
     gap: 8px;
-    white-space: nowrap;
 }
 
 /* 語言切換按鈕 */
@@ -183,7 +182,8 @@ body.calendar-page-body {
    主內容區域（米色背景）
    ============================================ */
 .main-content {
-    margin-top: 100px;  /* 補償固定導覽列的高度 */
+    /* 補償固定導覽列的高度（由 JS 寫入 --header-h，以因應手機多行 header） */
+    margin-top: var(--header-h, 100px);
     padding: 60px 0;
     min-height: calc(100vh - 200px);
     display: flex;
@@ -284,7 +284,7 @@ body.calendar-page-body {
     }
 
     .main-content {
-        margin-top: 120px;  /* 平板上的補償高度 */
+        margin-top: var(--header-h, 120px);
     }
 
     .content-grid {
@@ -307,16 +307,8 @@ body.calendar-page-body {
     }
 
     .nav-right {
-        /* 手機/平板：nav 先占一整行；社群 + 語言放同一行 */
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 12px 16px;
-    }
-
-    .nav {
-        flex-basis: 100%;
-        justify-content: center;
+        flex-direction: column;
+        gap: 16px;
     }
 
     .social-links {
@@ -332,11 +324,11 @@ body.calendar-page-body {
 /* 手機尺寸（640px 以下）：進一步縮小字型 */
 @media (max-width: 640px) {
     .header {
-        padding: 15px 0;
+        padding: 10px 0;
     }
 
     .main-content {
-        margin-top: 140px;  /* 手機上的補償高度 */
+        margin-top: var(--header-h, 140px);
         padding: 40px 0;
     }
 
@@ -358,6 +350,52 @@ body.calendar-page-body {
 
     .nav-link {
         font-size: 12px;  /* 手機上的導覽連結字型大小 */
+    }
+
+    /* 手機版 header：更緊湊，且把社群 icon + 語言切換放同一行 */
+    .nav-wrapper {
+        gap: 12px;
+    }
+
+    .nav-right {
+        display: grid;
+        grid-template-columns: auto auto;
+        grid-template-areas:
+            "nav nav"
+            "social language";
+        justify-content: center;
+        align-items: center;
+        column-gap: 18px;
+        row-gap: 10px;
+    }
+
+    .nav-right .nav {
+        grid-area: nav;
+        justify-content: center;
+    }
+
+    .nav-right .social-links {
+        grid-area: social;
+        justify-content: center;
+    }
+
+    .nav-right .language-switcher {
+        grid-area: language;
+        justify-content: center;
+    }
+
+    .social-link {
+        width: 28px;
+        height: 28px;
+    }
+
+    .social-icon {
+        width: 16px;
+        height: 16px;
+    }
+
+    .lang-btn {
+        padding: 2px 6px;
     }
 }
 

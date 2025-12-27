@@ -12,6 +12,31 @@
 (function () {
   if (window.LovelyI18n) return;
 
+  // --- fixed header height -> CSS var --header-h (used by .main-content margin-top) ---
+  function setHeaderHeightVar() {
+    try {
+      const header = document.querySelector('.header');
+      const h = header ? header.offsetHeight : 0;
+      document.documentElement.style.setProperty('--header-h', (h || 0) + 'px');
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  let __lovelyHeaderRAF = 0;
+  function scheduleHeaderMeasure() {
+    try {
+      if (__lovelyHeaderRAF) cancelAnimationFrame(__lovelyHeaderRAF);
+      __lovelyHeaderRAF = requestAnimationFrame(function () {
+        __lovelyHeaderRAF = 0;
+        setHeaderHeightVar();
+      });
+    } catch (e) {
+      // Fallback: best-effort
+      setHeaderHeightVar();
+    }
+  }
+
   function normalizeLang(lang) {
     return lang === 'en' ? 'en' : 'zh';
   }
@@ -38,13 +63,23 @@
     window.__lovelyLangInit = true;
 
     document.addEventListener('DOMContentLoaded', function () {
+      // Measure header as early as possible (before/after fonts/lang can change layout)
+      scheduleHeaderMeasure();
+
       const langButtons = document.querySelectorAll('.lang-btn');
       // No language switcher on this page (e.g., iframe widgets) — do nothing.
-      if (!langButtons || langButtons.length === 0) return;
+      if (!langButtons || langButtons.length === 0) {
+        // Still keep header height var updated for pages that have a fixed header but no switcher.
+        // (e.g., future minimal pages)
+        scheduleHeaderMeasure();
+        return;
+      }
       const currentLang = localStorage.getItem('language') || 'zh';
 
       // Initialize language
       applyLanguage(currentLang, document);
+      // Language swap can change header height (text length/line wrap)
+      scheduleHeaderMeasure();
 
       // Update button active state
       langButtons.forEach((btn) => {
@@ -56,6 +91,7 @@
           const lang = normalizeLang(this.getAttribute('data-lang'));
           localStorage.setItem('language', lang);
           applyLanguage(lang, document);
+          scheduleHeaderMeasure();
 
           langButtons.forEach((btn) => {
             btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
@@ -88,6 +124,27 @@
   // (Safe for iframe widgets because they don't include .lang-btn)
   try {
     initLanguageSwitcher();
+  } catch (e) {
+    // ignore
+  }
+
+  // Keep header height in sync with viewport changes and late font loads.
+  try {
+    window.addEventListener('load', scheduleHeaderMeasure);
+    window.addEventListener('resize', scheduleHeaderMeasure);
+    window.addEventListener('orientationchange', scheduleHeaderMeasure);
+  } catch (e) {
+    // ignore
+  }
+
+  try {
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(function () {
+        scheduleHeaderMeasure();
+        // One extra tick after fonts apply to catch reflow
+        setTimeout(scheduleHeaderMeasure, 50);
+      });
+    }
   } catch (e) {
     // ignore
   }
