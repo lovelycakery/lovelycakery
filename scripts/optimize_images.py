@@ -7,6 +7,7 @@ Default targets:
   - assets/images/seasonal/*.jpg
   - assets/images/cakes.jpg (homepage hero)
   - assets/images/calendar/frames/*.(png)  (decorative frame images; preserves alpha)
+  - assets/images/logo/*.(png)  (site logo; preserves alpha)
 
 What it does:
   - Downscale to a max edge (default 1600px) to match web usage
@@ -48,6 +49,7 @@ def iter_targets(root: Path, include_hero: bool) -> list[Path]:
     targets += sorted((root / "assets/images/products").glob("*.jpg"))
     targets += sorted((root / "assets/images/seasonal").glob("*.jpg"))
     targets += sorted((root / "assets/images/calendar/frames").glob("*.png"))
+    targets += sorted((root / "assets/images/logo").glob("*.png"))
     if include_hero:
         hero = root / "assets/images/cakes.jpg"
         if hero.exists():
@@ -85,7 +87,7 @@ def iter_changed_targets(root: Path, include_hero: bool) -> list[Path]:
     if not git_dir.exists():
         raise RuntimeError("No .git directory found; --only-changed requires a git repository.")
 
-    allowed_prefixes = ("assets/images/products/", "assets/images/seasonal/", "assets/images/calendar/frames/")
+    allowed_prefixes = ("assets/images/products/", "assets/images/seasonal/", "assets/images/calendar/frames/", "assets/images/logo/")
     allowed_exact = {"assets/images/cakes.jpg"} if include_hero else set()
 
     out: list[Path] = []
