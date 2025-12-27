@@ -12,6 +12,9 @@ Thumbs.db
 # 臨時檔案
 *.log
 *.tmp
+/.tmp-*.png
+/.tmp-*.webp
+/.tmp-*.jpg
 
 # GitHub 配置檔案（包含敏感資訊）
 # ⚠️ 絕對不要提交包含 Token 的配置檔案！
