@@ -11,24 +11,10 @@ class CalendarWidget {
         this.events = {};
         this.selectedDate = null;
         this._lastSyncStatus = null; // 'synced' | 'unsynced'
-        // 如果是本地文件模式，從 GitHub 載入數據；否則從本地載入
-        const isLocalFile = window.location.protocol === 'file:';
-        if (isLocalFile) {
-            // 本地文件模式：從 GitHub 載入最新數據
-            this.dataFile = 'https://raw.githubusercontent.com/lovelycakery/lovelycakery/main/assets/data/calendar-data.json';
-        } else {
-            this.dataFile = 'assets/data/calendar-data.json';
-        }
-        // Cache busting policy:
-        // - Default: allow browser/CDN caching for speed.
-        // - If the page provides a version (?v=...), reuse it to bust cache only when you deploy changes.
-        this.cacheVersion = (function () {
-            try {
-                return new URLSearchParams(window.location.search).get('v') || '';
-            } catch (e) {
-                return '';
-            }
-        })();
+        // Shared config (dataFile + cacheVersion)
+        const shared = window.LovelyCalendarShared;
+        this.dataFile = shared ? shared.getDefaultDataFile() : 'assets/data/calendar-data.json';
+        this.cacheVersion = shared ? shared.getCacheVersion() : '';
         
         this.init();
     }
@@ -78,16 +64,10 @@ class CalendarWidget {
         if (isLocalFile && localData && !hasUnsynced) {
             try {
                 const data = JSON.parse(localData);
-                this.events = {};
-                if (data.events && Array.isArray(data.events)) {
-                    data.events.forEach(event => {
-                        const dateKey = event.date;
-                        if (!this.events[dateKey]) {
-                            this.events[dateKey] = [];
-                        }
-                        this.events[dateKey].push(event);
-                    });
-                }
+                const shared = window.LovelyCalendarShared;
+                this.events = (shared && typeof shared.eventsArrayToMap === 'function')
+                    ? shared.eventsArrayToMap(data)
+                    : {};
                 console.log('從 localStorage 載入已同步的資料（本地文件模式）');
                 
                 // 在後台嘗試從 GitHub 載入最新資料以確認（但不阻塞顯示）
@@ -104,20 +84,14 @@ class CalendarWidget {
         
         try {
             // 先嘗試載入資料（從 GitHub 或本地檔案）
-            const url = this.cacheVersion ? (this.dataFile + '?v=' + encodeURIComponent(this.cacheVersion)) : this.dataFile;
+            const shared = window.LovelyCalendarShared;
+            const url = shared ? shared.withCacheVersion(this.dataFile, this.cacheVersion) : (this.cacheVersion ? (this.dataFile + '?v=' + encodeURIComponent(this.cacheVersion)) : this.dataFile);
             const response = await fetch(url);
             if (response.ok) {
                 const data = await response.json();
-                this.events = {};
-                if (data.events && Array.isArray(data.events)) {
-                    data.events.forEach(event => {
-                        const dateKey = event.date;
-                        if (!this.events[dateKey]) {
-                            this.events[dateKey] = [];
-                        }
-                        this.events[dateKey].push(event);
-                    });
-                }
+                this.events = (shared && typeof shared.eventsArrayToMap === 'function')
+                    ? shared.eventsArrayToMap(data)
+                    : {};
                 console.log(isLocalFile ? '從 GitHub 載入日曆資料' : '從本地檔案載入日曆資料');
                 
                 // 同步到 localStorage（作為備份）
@@ -160,16 +134,10 @@ class CalendarWidget {
             if (localData) {
                 try {
                     const data = JSON.parse(localData);
-                    this.events = {};
-                    if (data.events && Array.isArray(data.events)) {
-                        data.events.forEach(event => {
-                            const dateKey = event.date;
-                            if (!this.events[dateKey]) {
-                                this.events[dateKey] = [];
-                            }
-                            this.events[dateKey].push(event);
-                        });
-                    }
+                    const shared = window.LovelyCalendarShared;
+                    this.events = (shared && typeof shared.eventsArrayToMap === 'function')
+                        ? shared.eventsArrayToMap(data)
+                        : {};
                     console.log('從 localStorage 載入備份資料');
                     if (hasUnsynced) {
                         console.warn('⚠️ 使用未同步的本地資料。請確保網路連接正常，並稍後重新整理以同步到 GitHub。');
@@ -190,7 +158,8 @@ class CalendarWidget {
     // 在後台從 GitHub 載入資料以確認（不阻塞顯示）
     async loadFromGitHubInBackground() {
         try {
-            const url = this.cacheVersion ? (this.dataFile + '?v=' + encodeURIComponent(this.cacheVersion)) : this.dataFile;
+            const shared = window.LovelyCalendarShared;
+            const url = shared ? shared.withCacheVersion(this.dataFile, this.cacheVersion) : (this.cacheVersion ? (this.dataFile + '?v=' + encodeURIComponent(this.cacheVersion)) : this.dataFile);
             const response = await fetch(url);
             if (response.ok) {
                 const data = await response.json();
@@ -426,21 +395,13 @@ class CalendarWidget {
         const month = this.currentDate.getMonth();
         
         // 更新月份標題
-        const monthNames = [
-            '一月', '二月', '三月', '四月', '五月', '六月',
-            '七月', '八月', '九月', '十月', '十一月', '十二月'
-        ];
-        const monthNamesEn = [
-            'January', 'February', 'March', 'April', 'May', 'June',
-            'July', 'August', 'September', 'October', 'November', 'December'
-        ];
-        
         const currentLang = localStorage.getItem('language') || 'zh';
         const monthYearEl = document.getElementById('monthYear');
         if (monthYearEl) {
-            monthYearEl.textContent = currentLang === 'en' 
-                ? `${monthNamesEn[month]} ${year}`
-                : `${year}年 ${monthNames[month]}`;
+            const shared = window.LovelyCalendarShared;
+            monthYearEl.textContent = shared
+                ? shared.getMonthYearLabel(this.currentDate, currentLang)
+                : monthYearEl.textContent;
         }
         
         // 清空日曆網格
@@ -527,8 +488,8 @@ class CalendarWidget {
     
     // 格式化日期鍵
     formatDateKey(year, month, day) {
-        const date = new Date(year, month, day);
-        return date.toISOString().split('T')[0];
+        const shared = window.LovelyCalendarShared;
+        return shared ? shared.formatDateKey(year, month, day) : (new Date(year, month, day)).toISOString().split('T')[0];
     }
     
     // 打開事件編輯模態框
@@ -675,17 +636,11 @@ class CalendarWidget {
     // 更新語言
     updateLanguage() {
         const currentLang = localStorage.getItem('language') || 'zh';
-        if (window.LovelyI18n && typeof window.LovelyI18n.applyLanguage === 'function') {
+        const shared = window.LovelyCalendarShared;
+        if (shared && typeof shared.applyLanguageToDocument === 'function') {
+            shared.applyLanguageToDocument(currentLang);
+        } else if (window.LovelyI18n && typeof window.LovelyI18n.applyLanguage === 'function') {
             window.LovelyI18n.applyLanguage(currentLang, document);
-        } else {
-            const elements = document.querySelectorAll('[data-en][data-zh]');
-            elements.forEach(element => {
-                if (currentLang === 'en') {
-                    element.textContent = element.getAttribute('data-en');
-                } else {
-                    element.textContent = element.getAttribute('data-zh');
-                }
-            });
         }
         
         // 更新日期顯示（如果模態框已打開）

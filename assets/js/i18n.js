@@ -39,6 +39,8 @@
 
     document.addEventListener('DOMContentLoaded', function () {
       const langButtons = document.querySelectorAll('.lang-btn');
+      // No language switcher on this page (e.g., iframe widgets) — do nothing.
+      if (!langButtons || langButtons.length === 0) return;
       const currentLang = localStorage.getItem('language') || 'zh';
 
       // Initialize language
@@ -80,6 +82,15 @@
     applyLanguage,
     initLanguageSwitcher,
   };
+
+  // Auto-init on pages that have language switcher buttons.
+  // This lets normal pages include only i18n.js without an extra "bootstrap" script.
+  // (Safe for iframe widgets because they don't include .lang-btn)
+  try {
+    initLanguageSwitcher();
+  } catch (e) {
+    // ignore
+  }
 })();
 
 

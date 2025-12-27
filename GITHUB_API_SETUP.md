@@ -118,7 +118,7 @@ const GITHUB_CONFIG = {
 
 ### 4.1 測試自動更新
 
-1. 開啟 `calendar-admin.html`（管理員版日曆）
+1. 開啟 `calendar-manager-local.html`（管理工具頁）
 2. 點擊任何日期進行編輯
 3. 修改內容後點擊「儲存」
 4. 如果設定正確，應該會看到：

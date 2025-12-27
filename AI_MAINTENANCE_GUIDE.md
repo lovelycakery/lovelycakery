@@ -7,7 +7,7 @@
 
 1. **主站頁面**：`index.html`, `calendar.html`, `seasonal.html`, `all-items.html`, `order.html`, `contact.html`
 2. **共用語言切換**：`assets/js/i18n.js`（唯一語言模組）
-3. **主站啟動腳本**：`assets/js/script.js`（只做：啟動 i18n）
+3. **i18n 自動初始化**：`i18n.js` 會在頁面存在 `.lang-btn` 時自動 init（不需要額外入口腳本）
 4. **日曆採 iframe 隔離**：`calendar.html` 內嵌 `calendar-widget-readonly.html`
 5. **日曆資料來源**：`assets/data/calendar-data.json`（訪客端讀）、管理端可寫入（可選 GitHub API 或下載 JSON）
 
@@ -32,10 +32,11 @@
   - 機制：
     - 讀寫 `localStorage.language`（值：`zh` / `en`）
     - `applyLanguage()`：把所有 `[data-en][data-zh]` 的文字替換
-    - `initLanguageSwitcher()`：綁 `.lang-btn` 點擊事件
+  - `initLanguageSwitcher()`：綁 `.lang-btn` 點擊事件（若頁面有 `.lang-btn` 會自動 init）
     - 切換時會 **postMessage** 給所有 iframe：`{type:'lovely-language', lang}`
-- `assets/js/script.js`
-  - 主站入口，只呼叫：`LovelyI18n.initLanguageSwitcher()`
+- `assets/js/calendar-shared.js`
+  - 日曆共用工具（避免 readonly / editable 兩份重複邏輯）
+  - 負責：dataFile/cacheVersion、events array → map、月份標題、日期 key、語言套用 helper
 - `assets/js/calendar-embed.js`
   - `calendar.html` 專用：負責 iframe 高度 + 縮放計算
   - 監聽 iframe `postMessage({type:'calendar-resize', height})`
@@ -79,9 +80,8 @@ function checkGitHubConfig() { /* calendar-widget.js 會呼叫 */ }
 
 ### A) 新增一個「主站分頁」
 1. 複製任一頁（例如 `seasonal.html`）
-2. **保留**底部兩行 script 引用（順序不能錯）：
-   - `assets/js/i18n.js`
-   - `assets/js/script.js`
+2. **保留**底部 `i18n.js`（即可）：
+   - `assets/js/i18n.js`（會在頁面有 `.lang-btn` 時自動初始化）
 3. 文案要支援雙語：用 `data-en` / `data-zh`
 
 ### B) 修改導覽列（header/nav）
@@ -123,8 +123,9 @@ function checkGitHubConfig() { /* calendar-widget.js 會呼叫 */ }
 ## 容易踩雷的點（請新的對話特別注意）
 
 - **script 載入順序**
-  - 主站頁：必須先 `i18n.js` 再 `script.js`
+  - 主站頁：只需要 `i18n.js`
   - 日曆嵌入頁 `calendar.html`：再加上 `calendar-embed.js`
+  - 日曆 widget 頁：`i18n.js` + `calendar-shared.js` 再載入各自的 widget 腳本
 - **不要重新加回 setInterval 輪詢語言**
   - 目前語言同步用 postMessage（事件驅動），更不容易出 bug
 - **GitHub Token**

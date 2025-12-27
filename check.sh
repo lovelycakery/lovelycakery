@@ -47,7 +47,9 @@ print("OK: all referenced local assets exist")
 PY
 pass "HTML asset references are valid"
 
-# 2) Enforce script load order (i18n.js before script.js on pages that use script.js)
+# 2) Enforce script requirements / order
+# - Main pages with language switcher must include i18n.js (it auto-inits when .lang-btn exists)
+# - Calendar pages must include the right embed/widget scripts
 python3 - <<'PY'
 import pathlib, re, sys
 root = pathlib.Path('.')
@@ -67,17 +69,43 @@ errors = []
 for f in html_files:
     text = f.read_text(encoding='utf-8', errors='ignore')
     srcs = get_srcs(text)
-    if 'assets/js/script.js' in srcs:
-        try:
-            if srcs.index('assets/js/i18n.js') > srcs.index('assets/js/script.js'):
-                errors.append(f"{f}: assets/js/i18n.js must be before assets/js/script.js")
-        except ValueError:
-            errors.append(f"{f}: missing assets/js/i18n.js (required before assets/js/script.js)")
+    # If language switcher exists on the page, i18n.js must be present.
+    if 'class="lang-btn' in text or "class='lang-btn" in text or 'lang-btn' in text:
+        # Heuristic: only enforce on main pages, not widget pages (they don't include lang buttons anyway).
+        if f.name in ('index.html', 'calendar.html', 'seasonal.html', 'all-items.html', 'order.html', 'contact.html'):
+            if 'assets/js/i18n.js' not in srcs:
+                errors.append(f"{f}: missing assets/js/i18n.js (required for language switcher)")
 
     if f.name == 'calendar.html':
         # calendar embed controller should be present
         if 'assets/js/calendar-embed.js' not in srcs:
             errors.append("calendar.html: missing assets/js/calendar-embed.js")
+        if 'assets/js/i18n.js' not in srcs:
+            errors.append("calendar.html: missing assets/js/i18n.js")
+
+    if f.name == 'calendar-widget-readonly.html':
+        # widget scripts
+        required = ['assets/js/i18n.js', 'assets/js/calendar-shared.js', 'assets/js/calendar-widget-readonly.js']
+        for r in required:
+            if r not in srcs:
+                errors.append(f"calendar-widget-readonly.html: missing {r}")
+        # order: shared before widget
+        try:
+            if srcs.index('assets/js/calendar-shared.js') > srcs.index('assets/js/calendar-widget-readonly.js'):
+                errors.append("calendar-widget-readonly.html: calendar-shared.js must be before calendar-widget-readonly.js")
+        except ValueError:
+            pass
+
+    if f.name == 'calendar-widget.html':
+        required = ['assets/js/i18n.js', 'assets/js/calendar-shared.js', 'assets/js/calendar-widget.js']
+        for r in required:
+            if r not in srcs:
+                errors.append(f"calendar-widget.html: missing {r}")
+        try:
+            if srcs.index('assets/js/calendar-shared.js') > srcs.index('assets/js/calendar-widget.js'):
+                errors.append("calendar-widget.html: calendar-shared.js must be before calendar-widget.js")
+        except ValueError:
+            pass
 
 if errors:
     print("SCRIPT ORDER ERRORS:")
@@ -106,7 +134,7 @@ if [ -d ".git" ]; then
   needs_bump=0
   while IFS= read -r f; do
     case "$f" in
-      assets/css/styles.css|assets/css/calendar-widget.css|assets/js/calendar-embed.js|assets/js/calendar-widget-readonly.js|calendar.html|calendar-widget-readonly.html)
+      assets/css/styles.css|assets/css/calendar-widget.css|assets/css/calendar-frame.css|assets/js/i18n.js|assets/js/calendar-embed.js|assets/js/calendar-shared.js|assets/js/calendar-widget.js|assets/js/calendar-widget-readonly.js|calendar.html|calendar-widget.html|calendar-widget-readonly.html)
         needs_bump=1
         break
         ;;

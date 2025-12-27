@@ -88,7 +88,11 @@ Cursor/
     ├── css/
     │   └── styles.css
     ├── js/
-    │   └── script.js
+    │   ├── i18n.js                 # 語言切換（頁面有 .lang-btn 時自動 init）
+    │   ├── calendar-embed.js        # calendar.html 專用：iframe 高度控制
+    │   ├── calendar-shared.js       # 日曆共用工具（readonly/editable 共用）
+    │   ├── calendar-widget-readonly.js
+    │   └── calendar-widget.js
     └── images/
         ├── cakes.jpg           # 首頁圖片
         ├── calendar/           # 日曆頁面圖片

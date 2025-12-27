@@ -48,7 +48,7 @@ const GITHUB_CONFIG = {
 
 ### 步驟 3：測試（約 30 秒）
 
-1. 開啟 `calendar-admin.html`
+1. 開啟 `calendar-manager-local.html`
 2. 編輯任何日期的事件
 3. 點擊「儲存」
 4. 應該看到：✅「日曆資料已成功更新到 GitHub！」
@@ -61,4 +61,6 @@ const GITHUB_CONFIG = {
 ## 📖 詳細說明
 
 查看 `GITHUB_API_SETUP.md` 獲取完整設定指南和故障排除。
+
+> 註：管理工具頁面是 `calendar-manager-local.html`（會內嵌 `calendar-widget.html`）。
 
