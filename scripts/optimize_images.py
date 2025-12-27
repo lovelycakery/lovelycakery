@@ -6,11 +6,13 @@ Default targets:
   - assets/images/products/*.jpg
   - assets/images/seasonal/*.jpg
   - assets/images/cakes.jpg (homepage hero)
+  - assets/images/calendar/frames/*.(png)  (decorative frame images; preserves alpha)
 
 What it does:
   - Downscale to a max edge (default 1600px) to match web usage
   - Re-encode as progressive optimized JPEG (default quality 82)
   - Overwrite only if the result is smaller (or if --force)
+  - For PNG frames: quantize/optimize while preserving transparency (center alpha)
 
 Usage examples:
   python3 scripts/optimize_images.py
@@ -45,6 +47,7 @@ def iter_targets(root: Path, include_hero: bool) -> list[Path]:
     targets: list[Path] = []
     targets += sorted((root / "assets/images/products").glob("*.jpg"))
     targets += sorted((root / "assets/images/seasonal").glob("*.jpg"))
+    targets += sorted((root / "assets/images/calendar/frames").glob("*.png"))
     if include_hero:
         hero = root / "assets/images/cakes.jpg"
         if hero.exists():
@@ -82,12 +85,12 @@ def iter_changed_targets(root: Path, include_hero: bool) -> list[Path]:
     if not git_dir.exists():
         raise RuntimeError("No .git directory found; --only-changed requires a git repository.")
 
-    allowed_prefixes = ("assets/images/products/", "assets/images/seasonal/")
+    allowed_prefixes = ("assets/images/products/", "assets/images/seasonal/", "assets/images/calendar/frames/")
     allowed_exact = {"assets/images/cakes.jpg"} if include_hero else set()
 
     out: list[Path] = []
     for rel in _git_changed_files(root):
-        if not rel.lower().endswith(".jpg"):
+        if not (rel.lower().endswith(".jpg") or rel.lower().endswith(".png")):
             continue
         if rel in allowed_exact or rel.startswith(allowed_prefixes):
             p = root / rel
@@ -109,29 +112,71 @@ def downscale(im: Image.Image, max_edge: int) -> Image.Image:
 
 def optimize_one(path: Path, max_edge: int, quality: int, force: bool) -> Result:
     before_bytes = path.stat().st_size
-    with Image.open(path) as im0:
-        im = im0.convert("RGB")  # ensure consistent JPEG encoding
-        before_size = im.size
-        im = downscale(im, max_edge=max_edge)
-        after_size = im.size
+    suffix = path.suffix.lower()
+    if suffix == ".jpg" or suffix == ".jpeg":
+        with Image.open(path) as im0:
+            im = im0.convert("RGB")  # ensure consistent JPEG encoding
+            before_size = im.size
+            im = downscale(im, max_edge=max_edge)
+            after_size = im.size
 
-        # Write to temp file first for safety
-        with tempfile.NamedTemporaryFile(prefix="lovely-opt-", suffix=".jpg", delete=False) as tmp:
+            # Write to temp file first for safety
+            with tempfile.NamedTemporaryFile(prefix="lovely-opt-", suffix=".jpg", delete=False) as tmp:
+                tmp_path = Path(tmp.name)
+            try:
+                im.save(
+                    tmp_path,
+                    format="JPEG",
+                    quality=quality,
+                    optimize=True,
+                    progressive=True,
+                    subsampling="4:2:0",
+                )
+                after_bytes = tmp_path.stat().st_size
+                changed = force or (after_bytes < before_bytes)
+                if changed:
+                    shutil.move(str(tmp_path), str(path))
+                    after_bytes_final = path.stat().st_size
+                    return Result(
+                        path=path,
+                        before_bytes=before_bytes,
+                        after_bytes=after_bytes_final,
+                        before_size=before_size,
+                        after_size=after_size,
+                        changed=True,
+                    )
+                else:
+                    tmp_path.unlink(missing_ok=True)
+                    return Result(
+                        path=path,
+                        before_bytes=before_bytes,
+                        after_bytes=before_bytes,
+                        before_size=before_size,
+                        after_size=before_size,
+                        changed=False,
+                    )
+            finally:
+                if tmp_path.exists():
+                    tmp_path.unlink(missing_ok=True)
+
+    if suffix == ".png":
+        # PNG frames: preserve alpha, quantize to reduce size (great for flat illustrations)
+        with Image.open(path) as im0:
+            im_rgba = im0.convert("RGBA")
+            before_size = im_rgba.size
+            im_rgba = downscale(im_rgba, max_edge=max_edge)
+            after_size = im_rgba.size
+            # Quantize (keeps transparency via palette index)
+            q = im_rgba.quantize(colors=256, method=Image.Quantize.FASTOCTREE, dither=Image.Dither.NONE)
+
+        with tempfile.NamedTemporaryFile(prefix="lovely-opt-", suffix=".png", delete=False) as tmp:
             tmp_path = Path(tmp.name)
         try:
-            im.save(
-                tmp_path,
-                format="JPEG",
-                quality=quality,
-                optimize=True,
-                progressive=True,
-                subsampling="4:2:0",
-            )
+            q.save(tmp_path, format="PNG", optimize=True)
             after_bytes = tmp_path.stat().st_size
             changed = force or (after_bytes < before_bytes)
             if changed:
                 shutil.move(str(tmp_path), str(path))
-                # preserve original mtime-ish is not needed; overwrite is fine
                 after_bytes_final = path.stat().st_size
                 return Result(
                     path=path,
@@ -141,19 +186,30 @@ def optimize_one(path: Path, max_edge: int, quality: int, force: bool) -> Result
                     after_size=after_size,
                     changed=True,
                 )
-            else:
-                tmp_path.unlink(missing_ok=True)
-                return Result(
-                    path=path,
-                    before_bytes=before_bytes,
-                    after_bytes=before_bytes,
-                    before_size=before_size,
-                    after_size=before_size,
-                    changed=False,
-                )
+            tmp_path.unlink(missing_ok=True)
+            return Result(
+                path=path,
+                before_bytes=before_bytes,
+                after_bytes=before_bytes,
+                before_size=before_size,
+                after_size=before_size,
+                changed=False,
+            )
         finally:
             if tmp_path.exists():
                 tmp_path.unlink(missing_ok=True)
+
+    # Unknown type: do nothing
+    with Image.open(path) as im0:
+        before_size = im0.size
+    return Result(
+        path=path,
+        before_bytes=before_bytes,
+        after_bytes=before_bytes,
+        before_size=before_size,
+        after_size=before_size,
+        changed=False,
+    )
 
 
 def main(argv: list[str]) -> int:

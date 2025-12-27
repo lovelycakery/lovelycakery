@@ -7,6 +7,7 @@ Default rules (tunable via flags):
       assets/images/products/*.jpg
       assets/images/seasonal/*.jpg
       assets/images/cakes.jpg
+      assets/images/calendar/frames/*.(png)
   - Max file size: 1.2 MB per image
   - Max edge: 1600 px (max(width,height))
 
@@ -26,6 +27,7 @@ def iter_targets(root: Path) -> list[Path]:
     out: list[Path] = []
     out += sorted((root / "assets/images/products").glob("*.jpg"))
     out += sorted((root / "assets/images/seasonal").glob("*.jpg"))
+    out += sorted((root / "assets/images/calendar/frames").glob("*.png"))
     hero = root / "assets/images/cakes.jpg"
     if hero.exists():
         out.append(hero)

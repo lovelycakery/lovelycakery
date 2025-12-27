@@ -1,0 +1,103 @@
+/* ============================================
+   Calendar decorative frame (Modular)
+   --------------------------------------------
+   Goal:
+   - Keep the calendar widget (iframe content) untouched.
+   - Put all "frame" styling in this standalone file for easy monthly swaps.
+   - A-scheme: swap ONLY the SVG file below to change the monthly frame.
+     assets/images/calendar/frames/frame-current.svg
+   ============================================ */
+
+:root {
+  /* Default (A-scheme) frame art */
+  --lovely-calendar-frame-art: url("../images/calendar/frames/frame-christmas.png");
+}
+
+/* Slightly smaller overall calendar area (no transform scale; keeps text crisp) */
+body.calendar-page-body .calendar-wrapper {
+  max-width: 740px;
+}
+
+/* Frame container lives outside iframe */
+body.calendar-page-body .calendar-frame {
+  --frame-pad: 22px; /* thickness of the frame around the widget */
+  --frame-radius: 28px;
+  --inner-radius: 18px;
+  --frame-line: rgba(47, 31, 20, 0.10);
+  --frame-gold: rgba(185, 146, 59, 0.72);
+  --frame-decor: var(--lovely-calendar-frame-art);
+  --decor-inset: -22px; /* allow decorations to sit around the border (outside/inside) */
+
+  width: 100%;
+  margin: 0 auto;
+  position: relative;
+  padding: var(--frame-pad);
+  border-radius: var(--frame-radius);
+  box-sizing: border-box;
+  /* Border-only frame: keep container itself neutral/transparent */
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+/* Decorative overlay layer (SVG)
+   - Keep the center visually "empty"; decorations should wrap the border.
+   - Must not block interactions. */
+body.calendar-page-body .calendar-frame::before {
+  content: "";
+  position: absolute;
+  inset: var(--decor-inset);
+  background-image: var(--frame-decor);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+  pointer-events: none;
+  z-index: 4;
+  opacity: 0.98;
+}
+
+body.calendar-page-body .calendar-frame__inner {
+  position: relative;
+  z-index: 1; /* iframe stays below the frame overlay */
+  border-radius: var(--inner-radius);
+  overflow: visible; /* do not clip iframe shadows */
+}
+
+/* Border overlay (pure CSS) — always aligned to the calendar box */
+body.calendar-page-body .calendar-frame__inner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none; /* don't block hover/click */
+  z-index: 3; /* above iframe */
+
+  /* Two-layer premium border */
+  box-shadow:
+    inset 0 0 0 1px var(--frame-line),
+    inset 0 0 0 3px var(--frame-gold);
+}
+
+/* Optional: smooth corners on the iframe itself */
+body.calendar-page-body .calendar-frame .calendar-iframe {
+  border-radius: var(--inner-radius);
+}
+
+@media (max-width: 640px) {
+  body.calendar-page-body .calendar-wrapper {
+    max-width: 100%;
+  }
+
+  body.calendar-page-body .calendar-frame {
+    --frame-pad: 14px;
+    --frame-radius: 22px;
+    --inner-radius: 16px;
+    --decor-inset: -14px;
+  }
+
+  body.calendar-page-body .calendar-frame__inner {
+    border-radius: var(--inner-radius);
+  }
+}
+
+

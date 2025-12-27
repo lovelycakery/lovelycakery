@@ -56,19 +56,31 @@ class CalendarWidgetReadonly {
     // 通知父窗口調整 iframe 高度
     notifyParentHeight() {
         try {
-            // 獲取實際內容高度
-            const height = Math.max(
-                document.body.scrollHeight,
-                document.body.offsetHeight,
-                document.documentElement.clientHeight,
-                document.documentElement.scrollHeight,
-                document.documentElement.offsetHeight
-            );
+            // Get content height WITHOUT being biased by the iframe viewport height.
+            // Using scrollHeight/clientHeight can create a feedback loop:
+            // parent sets a big initial height -> iframe viewport becomes big -> reported height stays big forever.
+            let height = 0;
+            const container = document.querySelector('.calendar-container');
+            if (container && container.getBoundingClientRect) {
+                const rect = container.getBoundingClientRect();
+                height = rect && rect.height ? rect.height : 0;
+            }
+            if (!height || height <= 0) {
+                height = Math.max(
+                    document.body.offsetHeight,
+                    document.documentElement.offsetHeight,
+                    document.body.scrollHeight,
+                    document.documentElement.scrollHeight
+                );
+            }
             if (height > 0 && window.parent && window.parent !== window) {
+                // Small buffer to avoid edge clipping due to font/layout settling.
+                // Keep this minimal so the frame can visually hug the calendar.
+                const bufferPx = 10;
                 window.parent.postMessage({
                     type: 'calendar-resize',
                     // 留少量 buffer
-                    height: height + 24
+                    height: Math.ceil(height) + bufferPx
                 }, '*');
             }
         } catch (e) {
@@ -103,6 +115,12 @@ class CalendarWidgetReadonly {
         window.addEventListener('load', () => send());
         // initial
         send();
+
+        // Extra one-shot reports to avoid parent/iframe message race conditions.
+        // (Not polling; only during initial load.)
+        setTimeout(() => this.notifyParentHeight(), 80);
+        setTimeout(() => this.notifyParentHeight(), 250);
+        setTimeout(() => this.notifyParentHeight(), 900);
     }
 
     attachOutsideClickToClose() {
@@ -418,6 +436,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('language', e.data.lang);
             }
             window.calendarWidgetReadonly.updateLanguage();
+        }
+        // Parent handshake: request the widget to resend its height
+        if (e && e.data && e.data.type === 'calendar-request-resize') {
+            window.calendarWidgetReadonly.notifyParentHeight();
         }
     });
 });
