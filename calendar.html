@@ -4,18 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>日曆 - Lovely Cakery</title>
-    <link rel="stylesheet" href="assets/css/styles.css?v=20251227-17">
-    <!-- Calendar frame module (decorative only; iframe calendar stays untouched) -->
-    <link rel="stylesheet" href="assets/css/calendar-frame.css?v=20251227-17">
-    <!-- Preload frame image so it appears immediately (reduces "frame pops in later") -->
-    <link rel="preload" as="image" href="assets/images/calendar/frames/frame-current.png" fetchpriority="high">
+    <link rel="stylesheet" href="assets/css/styles.css?v=20251227-19">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500&display=swap">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
     <noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"></noscript>
 </head>
-<body class="calendar-page-body" data-frame="on">
+<body class="calendar-page-body">
     <header class="header">
         <div class="container">
             <div class="nav-wrapper">
@@ -60,24 +56,19 @@
         <div class="container">
             <!-- 嵌入只讀日曆組件 -->
             <div class="calendar-wrapper">
-                <!-- Decorative frame: swap ONLY the SVG for monthly changes (A-scheme) -->
-                <div class="calendar-frame">
-                    <div class="calendar-frame__inner">
-                        <iframe 
-                            src="calendar-widget-readonly.html?v=20251227-17" 
-                            class="calendar-iframe"
-                            title="Calendar Widget"
-                            frameborder="0"
-                            scrolling="no">
-                        </iframe>
-                    </div>
-                </div>
+                <iframe 
+                    src="calendar-widget-readonly.html?v=20251227-19" 
+                    class="calendar-iframe"
+                    title="Calendar Widget"
+                    frameborder="0"
+                    scrolling="no">
+                </iframe>
             </div>
         </div>
     </main>
     
     <script src="assets/js/i18n.js"></script>
-    <script src="assets/js/calendar-embed.js?v=20251227-17"></script>
+    <script src="assets/js/calendar-embed.js?v=20251227-19"></script>
 </body>
 </html>
 
