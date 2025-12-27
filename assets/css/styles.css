@@ -524,6 +524,10 @@ body.calendar-page-body {
     }
 
     /* 季節限定（手機）：圖片縮小為 0.8 倍（整個圖卡縮小並置中） */
+    .seasonal-page .gallery-grid {
+        gap: 26px; /* 增加垂直間隔（手機） */
+    }
+
     .seasonal-page .gallery-item {
         display: flex;
         justify-content: center;
