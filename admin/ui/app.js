@@ -9,6 +9,7 @@ const state = {
   selectedDate: '',
   clickHookInstalled: false,
   hookTimer: 0,
+  lastSelectedDayEl: null,
 };
 
 function logStatus(msg) {
@@ -76,6 +77,25 @@ function tryInstallCalendarClickHook() {
   if (!innerIframe || !innerIframe.contentWindow || !innerIframe.contentDocument) return false;
 
   const doc = innerIframe.contentDocument;
+
+  // Inject highlight styles once per iframe document (admin-only; does not ship to the site).
+  try {
+    if (!doc.getElementById('lovely-admin-style')) {
+      const style = doc.createElement('style');
+      style.id = 'lovely-admin-style';
+      style.textContent = `
+        .calendar-day.lovely-admin-selected {
+          outline: 3px solid rgba(212, 165, 116, 0.95);
+          outline-offset: 2px;
+          box-shadow: 0 0 0 6px rgba(212, 165, 116, 0.22);
+        }
+      `;
+      doc.head && doc.head.appendChild(style);
+    }
+  } catch (e) {
+    // ignore
+  }
+
   // Hook once, in capture phase, so we can treat all clicks as "edit" in admin context.
   doc.addEventListener(
     'click',
@@ -86,6 +106,17 @@ function tryInstallCalendarClickHook() {
         if (!dayEl) return;
         const date = dayEl.getAttribute('data-date') || '';
         if (!date) return;
+
+        // Visual selection highlight
+        try {
+          if (state.lastSelectedDayEl && state.lastSelectedDayEl !== dayEl) {
+            state.lastSelectedDayEl.classList.remove('lovely-admin-selected');
+          }
+          dayEl.classList.add('lovely-admin-selected');
+          state.lastSelectedDayEl = dayEl;
+        } catch (e2) {
+          // ignore
+        }
 
         // Admin behavior: click always opens editor (sidebar), not tooltip.
         e.preventDefault();
