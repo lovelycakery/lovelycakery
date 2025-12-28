@@ -251,8 +251,7 @@ async function main() {
     if (!pre.ok) return;
 
     try {
-      const msg = prompt('Commit 訊息（可留空）', 'Update calendar data') || '';
-      const r = await LovelyAdmin.publish({ message: msg });
+      const r = await LovelyAdmin.publish({ message: 'Update calendar data' });
       if (r && r.ok) {
         logStatus('✅ 已上傳（push）完成。CI 會自動檢查與部署。');
       } else {
