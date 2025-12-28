@@ -27,6 +27,55 @@ pass() {
   echo -e "${GREEN}✅ $1${NC}"
 }
 
+# 0) Guardrails: ensure Pages workflow deploys only site/
+if [ -f ".github/workflows/pages.yml" ]; then
+python3 - <<'PY'
+from pathlib import Path
+import re, sys
+
+p = Path(".github/workflows/pages.yml")
+text = p.read_text(encoding="utf-8", errors="ignore")
+
+# We expect upload-pages-artifact to point at `site`
+m = re.search(r"upload-pages-artifact@v\d+[\s\S]*?path:\s*([^\s#]+)", text, re.IGNORECASE)
+if not m:
+    print("ERROR: Pages workflow missing upload-pages-artifact path.")
+    sys.exit(1)
+path_val = m.group(1).strip().strip('"').strip("'")
+if path_val != "site":
+    print(f"ERROR: Pages workflow deploy path must be 'site' but found: {path_val}")
+    sys.exit(1)
+print("OK: Pages workflow deploy path is site/")
+PY
+pass "Pages deploys only site/"
+else
+warn "No .github/workflows/pages.yml found; skipping Pages deploy-path guard."
+fi
+
+# 0.1) Guardrails: site must not reference admin/
+python3 - <<'PY'
+from pathlib import Path
+import sys
+
+root = Path("site")
+bad = []
+for p in root.rglob("*"):
+    if not p.is_file():
+        continue
+    if p.suffix.lower() not in (".html", ".js", ".css"):
+        continue
+    txt = p.read_text(encoding="utf-8", errors="ignore")
+    if "admin/" in txt or "/admin" in txt:
+        bad.append(str(p))
+if bad:
+    print("ERROR: site/ contains references to admin/:")
+    for b in bad:
+        print("  " + b)
+    sys.exit(1)
+print("OK: site/ does not reference admin/")
+PY
+pass "site/ has no admin/ references"
+
 # 1) Ensure no missing local assets referenced by HTML
 python3 - <<'PY'
 import re, pathlib, sys
@@ -48,6 +97,59 @@ if missing:
 print("OK: all referenced local assets exist")
 PY
 pass "HTML asset references are valid"
+
+# 1.5) Validate calendar-data.json schema (strict)
+python3 - <<'PY'
+import json, re, sys
+from pathlib import Path
+
+p = Path("site/assets/data/calendar-data.json")
+if not p.exists():
+    print("ERROR: missing site/assets/data/calendar-data.json")
+    sys.exit(1)
+
+try:
+    data = json.loads(p.read_text(encoding="utf-8", errors="strict"))
+except Exception as e:
+    print("ERROR: calendar-data.json is not valid JSON:", e)
+    sys.exit(1)
+
+if not isinstance(data, dict):
+    print("ERROR: calendar-data.json must be an object.")
+    sys.exit(1)
+
+events = data.get("events")
+if not isinstance(events, list):
+    print("ERROR: calendar-data.json must contain an 'events' array.")
+    sys.exit(1)
+
+allowed = {"available", "unavailable", "closed"}
+date_re = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+seen = set()
+for i, ev in enumerate(events):
+    if not isinstance(ev, dict):
+        print(f"ERROR: events[{i}] must be an object.")
+        sys.exit(1)
+    date = ev.get("date")
+    status = ev.get("status")
+    desc = ev.get("description")
+    if not isinstance(date, str) or not date_re.match(date):
+        print(f"ERROR: events[{i}].date invalid: {date!r}")
+        sys.exit(1)
+    if date in seen:
+        print(f"ERROR: duplicate date in events: {date}")
+        sys.exit(1)
+    seen.add(date)
+    if not isinstance(status, str) or status not in allowed:
+        print(f"ERROR: events[{i}].status invalid for {date}: {status!r} (allowed: {sorted(allowed)})")
+        sys.exit(1)
+    if not isinstance(desc, str):
+        print(f"ERROR: events[{i}].description must be a string for {date} (can be empty).")
+        sys.exit(1)
+
+print(f"OK: calendar-data.json schema valid ({len(events)} events)")
+PY
+pass "calendar-data.json schema is valid"
 
 # 2) Enforce script requirements / order
 # - Main pages with language switcher must include i18n.js (it auto-inits when .lang-btn exists)
