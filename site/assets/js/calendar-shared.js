@@ -15,7 +15,8 @@
     // If opened as file://, load from GitHub raw to bypass local fetch restrictions / stale local copies.
     const isLocalFile = window.location.protocol === 'file:';
     return isLocalFile
-      ? 'https://raw.githubusercontent.com/lovelycakery/lovelycakery/main/assets/data/calendar-data.json'
+      // Repo moved the deployable site into /site, so the raw path includes that prefix.
+      ? 'https://raw.githubusercontent.com/lovelycakery/lovelycakery/main/site/assets/data/calendar-data.json'
       : 'assets/data/calendar-data.json';
   }
 

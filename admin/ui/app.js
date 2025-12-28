@@ -126,18 +126,6 @@ async function main() {
     }
   }, 250);
 
-  $('pickSiteBtn').addEventListener('click', async () => {
-    const r = await LovelyAdmin.pickSiteDir();
-    if (r && r.ok) {
-      logStatus('✅ 已切換 site 資料夾');
-      state.siteInfo = await LovelyAdmin.getSiteInfo();
-      $('siteInfo').textContent = state.siteInfo.siteDir;
-      await refreshCalendarData();
-      setSelectedDate('');
-      reloadPreview();
-    }
-  });
-
   $('preflightBtn').addEventListener('click', async () => {
     await runPreflightAndReport();
   });

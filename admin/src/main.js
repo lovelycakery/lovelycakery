@@ -349,11 +349,14 @@ async function ensureSiteDir() {
     return __siteDir;
   }
 
-  const picked = await pickSiteDirInteractive();
-  if (!picked) throw new Error('No site folder selected.');
-  __siteDir = picked;
-  await saveConfig({ ...(cfg || {}), siteDir: __siteDir });
-  return __siteDir;
+  // Safety: do not allow arbitrary folder selection from the UI.
+  // The collaborator should keep admin/ and site/ together (siblings), so auto-detection can succeed.
+  throw new Error(
+    'Cannot find a valid site/ folder.\n\n' +
+      'Please place the admin tool next to the site folder:\n' +
+      '  <folder>/admin  (this tool)\n' +
+      '  <folder>/site   (the website)\n'
+  );
 }
 
 async function startServer() {
@@ -413,14 +416,8 @@ ipcMain.handle('site:getInfo', async () => {
   return { siteDir, repoRoot };
 });
 
-ipcMain.handle('site:pickDir', async () => {
-  const picked = await pickSiteDirInteractive();
-  if (!picked) return { ok: false, canceled: true };
-  __siteDir = picked;
-  const cfg = await loadConfig();
-  await saveConfig({ ...(cfg || {}), siteDir: __siteDir });
-  return { ok: true, siteDir: __siteDir };
-});
+// Intentionally no UI/IPC to pick arbitrary site dirs.
+// Safety rule: the admin tool auto-detects/locks the site folder to prevent editing the wrong project.
 
 ipcMain.handle('calendar:read', async () => {
   const siteDir = await ensureSiteDir();

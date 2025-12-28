@@ -3,7 +3,6 @@ const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('LovelyAdmin', {
   // Site selection / info
   getSiteInfo: () => ipcRenderer.invoke('site:getInfo'),
-  pickSiteDir: () => ipcRenderer.invoke('site:pickDir'),
 
   // Calendar data
   readCalendarData: () => ipcRenderer.invoke('calendar:read'),
