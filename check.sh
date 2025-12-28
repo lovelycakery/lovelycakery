@@ -12,7 +12,28 @@ NC='\033[0m'
 
 echo -e "${BLUE}🔎 Running pre-deploy checks...${NC}\n"
 
-SITE_DIR="site"
+# Derive deploy root from GitHub Pages workflow when available.
+# This keeps checks aligned with the actual Pages artifact path if it ever changes.
+SITE_DIR="$(python3 - <<'PY'
+from pathlib import Path
+import re
+
+p = Path(".github/workflows/pages.yml")
+if not p.exists():
+    print("site")
+    raise SystemExit(0)
+
+text = p.read_text(encoding="utf-8", errors="ignore")
+m = re.search(r"upload-pages-artifact@v\d+[\s\S]*?path:\s*([^\s#]+)", text, re.IGNORECASE)
+if not m:
+    print("site")
+    raise SystemExit(0)
+
+path_val = m.group(1).strip().strip('"').strip("'")
+print(path_val or "site")
+PY
+)"
+export SITE_DIR
 
 fail() {
   echo -e "${RED}❌ CHECK FAILED:${NC} $1" >&2
@@ -27,7 +48,12 @@ pass() {
   echo -e "${GREEN}✅ $1${NC}"
 }
 
-# 0) Guardrails: ensure Pages workflow deploys only site/
+# 0) Guardrails: ensure Pages workflow deploy path exists and matches our derived SITE_DIR
+if [ ! -d "$SITE_DIR" ]; then
+  fail "Deploy root folder not found: $SITE_DIR"
+fi
+pass "Deploy root folder exists: $SITE_DIR"
+
 if [ -f ".github/workflows/pages.yml" ]; then
 python3 - <<'PY'
 from pathlib import Path
@@ -36,28 +62,30 @@ import re, sys
 p = Path(".github/workflows/pages.yml")
 text = p.read_text(encoding="utf-8", errors="ignore")
 
-# We expect upload-pages-artifact to point at `site`
+# We expect upload-pages-artifact to point at the derived SITE_DIR
 m = re.search(r"upload-pages-artifact@v\d+[\s\S]*?path:\s*([^\s#]+)", text, re.IGNORECASE)
 if not m:
     print("ERROR: Pages workflow missing upload-pages-artifact path.")
     sys.exit(1)
 path_val = m.group(1).strip().strip('"').strip("'")
-if path_val != "site":
-    print(f"ERROR: Pages workflow deploy path must be 'site' but found: {path_val}")
+expected = __import__("os").environ.get("SITE_DIR", "site")
+if path_val != expected:
+    print(f"ERROR: Pages workflow deploy path must be '{expected}' but found: {path_val}")
     sys.exit(1)
-print("OK: Pages workflow deploy path is site/")
+print(f"OK: Pages workflow deploy path is {expected}/")
 PY
-pass "Pages deploys only site/"
+pass "Pages deploy path matches deploy root"
 else
 warn "No .github/workflows/pages.yml found; skipping Pages deploy-path guard."
 fi
 
-# 0.1) Guardrails: site must not reference admin/
+# 0.1) Guardrails: deploy root must not reference admin/
 python3 - <<'PY'
 from pathlib import Path
 import sys
+import os
 
-root = Path("site")
+root = Path(os.environ.get("SITE_DIR", "site"))
 bad = []
 for p in root.rglob("*"):
     if not p.is_file():
@@ -72,14 +100,15 @@ if bad:
     for b in bad:
         print("  " + b)
     sys.exit(1)
-print("OK: site/ does not reference admin/")
+print("OK: deploy root does not reference admin/")
 PY
-pass "site/ has no admin/ references"
+pass "deploy root has no admin/ references"
 
 # 1) Ensure no missing local assets referenced by HTML
 python3 - <<'PY'
 import re, pathlib, sys
-root = pathlib.Path('site')
+import os
+root = pathlib.Path(os.environ.get("SITE_DIR", "site"))
 html_files = list(root.glob('*.html'))
 missing = []
 pattern = re.compile(r'(?:src|href)=["\'](assets/[^"\'#?]+)')
@@ -102,8 +131,9 @@ pass "HTML asset references are valid"
 python3 - <<'PY'
 import json, re, sys
 from pathlib import Path
+import os
 
-p = Path("site/assets/data/calendar-data.json")
+p = Path(os.environ.get("SITE_DIR", "site")) / "assets/data/calendar-data.json"
 if not p.exists():
     print("ERROR: missing site/assets/data/calendar-data.json")
     sys.exit(1)
@@ -155,41 +185,46 @@ pass "calendar-data.json schema is valid"
 python3 - <<'PY'
 from pathlib import Path
 import re, sys
+import os
 
-# This project is deployed from /site, so raw URLs must include /main/site/...
+# Raw URLs used by code under the deploy root must match the deploy root prefix.
 bad = []
 good = []
 pat = re.compile(r"https://raw\.githubusercontent\.com/lovelycakery/lovelycakery/main/([^\s\"')]+)")
 
-for p in Path("site/assets/js").glob("*.js"):
+deploy_dir = os.environ.get("SITE_DIR", "site").strip("/").strip()
+js_root = Path(deploy_dir) / "assets/js"
+for p in js_root.glob("*.js"):
     txt = p.read_text(encoding="utf-8", errors="ignore")
     for m in pat.finditer(txt):
         tail = m.group(1)
-        if tail.startswith("assets/"):
-            bad.append((p.as_posix(), m.group(0)))
-        if tail.startswith("site/"):
+        if not tail.startswith(deploy_dir + "/"):
+            bad.append((p.as_posix(), m.group(0), deploy_dir))
+        else:
             good.append((p.as_posix(), m.group(0)))
 
 if bad:
-    print("ERROR: Found GitHub raw URLs missing 'site/' prefix (would break file:// fallback):")
-    for fp, url in bad:
+    print("ERROR: Found GitHub raw URLs not matching deploy root prefix (would break file:// fallback):")
+    for fp, url, dd in bad:
         print(f"  {fp}: {url}")
+        print(f"    Expected prefix: https://raw.githubusercontent.com/lovelycakery/lovelycakery/main/{dd}/")
     sys.exit(1)
 
 # If there are any raw URLs, ensure at least one correct example exists (sanity).
 if good:
-    print(f"OK: GitHub raw URLs include site/ prefix ({len(good)} found)")
+    print(f"OK: GitHub raw URLs match deploy root prefix ({len(good)} found)")
 else:
     print("OK: No GitHub raw URLs found in site/assets/js")
 PY
-pass "GitHub raw URLs are consistent with site/ deploy layout"
+pass "GitHub raw URLs are consistent with deploy layout"
 
 # 2) Enforce script requirements / order
 # - Main pages with language switcher must include i18n.js (it auto-inits when .lang-btn exists)
 # - Calendar pages must include the right embed/widget scripts
 python3 - <<'PY'
 import pathlib, re, sys
-root = pathlib.Path('site')
+import os
+root = pathlib.Path(os.environ.get("SITE_DIR", "site"))
 html_files = list(root.glob('*.html'))
 src_re = re.compile(r'<script[^>]+src=["\']([^"\']+)["\']', re.I)
 
@@ -379,9 +414,9 @@ else
 fi
 
 # 3) Architecture guardrails: avoid reintroducing polling loops in assets/js
-if grep -R --line-number --fixed-string "setInterval(" site/assets/js >/dev/null 2>&1; then
+if grep -R --line-number --fixed-string "setInterval(" "$SITE_DIR/assets/js" >/dev/null 2>&1; then
   echo "Found setInterval usage:"
-  grep -R --line-number --fixed-string "setInterval(" site/assets/js || true
+  grep -R --line-number --fixed-string "setInterval(" "$SITE_DIR/assets/js" || true
   fail "setInterval() found in assets/js. Prefer event-driven logic to reduce bugs."
 fi
 pass "No setInterval() in assets/js"
