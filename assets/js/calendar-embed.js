@@ -1,7 +1,7 @@
 // Calendar embed controller for calendar.html
 // Responsibilities:
 // - Keep iframe height in sync with widget content (postMessage)
-// - Keep CSS var --header-h updated so calendar page offsets correctly
+// - Header height CSS var (--header-h) is handled by assets/js/i18n.js (shared across the site)
 //
 // Why:
 // - Avoid transform scale (causes "slow shrink" + mobile drifting)
@@ -24,17 +24,7 @@
     return document.querySelector('.calendar-iframe');
   }
 
-  function setHeaderHeightVar() {
-    const header = document.querySelector('.header');
-    const headerH = header ? header.offsetHeight : 100;
-    document.documentElement.style.setProperty('--header-h', headerH + 'px');
-  }
-
   function init() {
-    setHeaderHeightVar();
-    window.addEventListener('resize', setHeaderHeightVar);
-    window.addEventListener('load', setHeaderHeightVar);
-
     // Handshake: after iframe loads, request a resize message.
     // This avoids a race where the iframe posts its initial height before the parent listener is ready.
     function requestResize() {

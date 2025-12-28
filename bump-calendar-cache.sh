@@ -10,15 +10,22 @@ set -euo pipefail
 # Pages that carry the version:
 # - calendar.html
 # - calendar-widget-readonly.html
+# - calendar-widget.html
+# - calendar-manager-local.html
 #
 # What triggers a bump:
 # - Any change to these files (staged/unstaged/untracked):
 #   - assets/css/styles.css
 #   - assets/css/calendar-widget.css
+#   - assets/css/calendar-frame.css
+#   - assets/js/i18n.js
 #   - assets/js/calendar-embed.js
+#   - assets/js/calendar-shared.js
+#   - assets/js/calendar-widget.js
 #   - assets/js/calendar-widget-readonly.js
 #   - assets/data/calendar-data.json
 #   - calendar.html
+#   - calendar-widget.html
 #   - calendar-widget-readonly.html
 
 ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -41,7 +48,7 @@ collect_changed_files() {
 should_bump=0
 while IFS= read -r f; do
   case "$f" in
-    assets/css/styles.css|assets/css/calendar-widget.css|assets/js/calendar-embed.js|assets/js/calendar-widget-readonly.js|assets/data/calendar-data.json|calendar.html|calendar-widget-readonly.html)
+    assets/css/styles.css|assets/css/calendar-widget.css|assets/css/calendar-frame.css|assets/js/i18n.js|assets/js/calendar-embed.js|assets/js/calendar-shared.js|assets/js/calendar-widget.js|assets/js/calendar-widget-readonly.js|assets/data/calendar-data.json|calendar.html|calendar-widget.html|calendar-widget-readonly.html|calendar-manager-local.html)
       should_bump=1
       break
       ;;
@@ -85,7 +92,12 @@ import re
 from pathlib import Path
 
 new_v = "${new_v}"
-targets = [Path("calendar.html"), Path("calendar-widget-readonly.html")]
+targets = [
+  Path("calendar.html"),
+  Path("calendar-widget-readonly.html"),
+  Path("calendar-widget.html"),
+  Path("calendar-manager-local.html"),
+]
 
 pat = re.compile(r"\?v=([0-9]{8}-[0-9]+)")
 for p in targets:
@@ -97,6 +109,6 @@ for p in targets:
         p.write_text(new_text, encoding="utf-8")
 PY
 
-echo "✅ bump-calendar-cache: updated ?v= to ${new_v} (calendar.html + calendar-widget-readonly.html)"
+echo "✅ bump-calendar-cache: updated ?v= to ${new_v} (calendar.html + calendar-widget-readonly.html + calendar-widget.html + calendar-manager-local.html)"
 
 

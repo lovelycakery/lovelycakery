@@ -69,12 +69,13 @@ errors = []
 for f in html_files:
     text = f.read_text(encoding='utf-8', errors='ignore')
     srcs = get_srcs(text)
-    # If language switcher exists on the page, i18n.js must be present.
-    if 'class="lang-btn' in text or "class='lang-btn" in text or 'lang-btn' in text:
-        # Heuristic: only enforce on main pages, not widget pages (they don't include lang buttons anyway).
-        if f.name in ('index.html', 'calendar.html', 'seasonal.html', 'all-items.html', 'order.html', 'contact.html'):
-            if 'assets/js/i18n.js' not in srcs:
-                errors.append(f"{f}: missing assets/js/i18n.js (required for language switcher)")
+    # Main site pages: header + language switcher are rendered by assets/js/site-header.js,
+    # so the HTML won't contain ".lang-btn" literals. Enforce scripts explicitly.
+    if f.name in ('index.html', 'calendar.html', 'seasonal.html', 'all-items.html', 'order.html', 'contact.html'):
+        if 'assets/js/site-header.js' not in srcs:
+            errors.append(f"{f}: missing assets/js/site-header.js (required for shared header/nav)")
+        if 'assets/js/i18n.js' not in srcs:
+            errors.append(f"{f}: missing assets/js/i18n.js (required for language switcher)")
 
     if f.name == 'calendar.html':
         # calendar embed controller should be present
@@ -146,7 +147,12 @@ if [ -d ".git" ]; then
 import re, sys
 from pathlib import Path
 
-targets = [Path("calendar.html"), Path("calendar-widget-readonly.html")]
+targets = [
+    Path("calendar.html"),
+    Path("calendar-widget-readonly.html"),
+    Path("calendar-widget.html"),
+    Path("calendar-manager-local.html"),
+]
 pat = re.compile(r"\?v=([0-9]{8}-[0-9]+)")
 
 versions = []
@@ -181,7 +187,7 @@ PY
 import re, subprocess, sys
 from pathlib import Path
 
-targets = ["calendar.html", "calendar-widget-readonly.html"]
+targets = ["calendar.html", "calendar-widget-readonly.html", "calendar-widget.html", "calendar-manager-local.html"]
 pat = re.compile(r"\?v=([0-9]{8}-[0-9]+)")
 
 def extract_from_text(text: str) -> str | None:

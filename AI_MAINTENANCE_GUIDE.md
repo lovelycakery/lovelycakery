@@ -1,15 +1,15 @@
-# AI 維護手冊（給「新的對話」快速上手用）
+# AI 維護手冊（以「目前架構」為準）
 
 > 這個專案是 **純靜態網站**（HTML/CSS/JS），沒有 build system、沒有框架。  
-> 新的對話無法讀取舊對話，所以本文件把「架構意圖、檔案職責、常見修改流程、踩雷點」一次寫清楚。
+> 新的對話無法讀取舊對話，所以本文件把「目前程式架構、模組職責、對外介面契約、維護操作與注意事項」集中在同一處，避免資訊分散。
 
 ## 架構總覽（你要先知道的 5 件事）
 
 1. **主站頁面**：`index.html`, `calendar.html`, `seasonal.html`, `all-items.html`, `order.html`, `contact.html`
-2. **共用語言切換**：`assets/js/i18n.js`（唯一語言模組）
-3. **i18n 自動初始化**：`i18n.js` 會在頁面存在 `.lang-btn` 時自動 init（不需要額外入口腳本）
+2. **共用導覽列/header**：`assets/js/site-header.js`（主站 6 頁共用，避免 6 份 HTML 重複）
+3. **共用語言切換**：`assets/js/i18n.js`（唯一語言模組；頁面有 `.lang-btn` 時自動初始化）
 4. **日曆採 iframe 隔離**：`calendar.html` 內嵌 `calendar-widget-readonly.html`
-5. **日曆資料來源**：`assets/data/calendar-data.json`（訪客端讀）、管理端可寫入（可選 GitHub API 或下載 JSON）
+5. **日曆資料來源**：`assets/data/calendar-data.json`（訪客端讀；管理端可「同步」更新，需本機設定 GitHub Token）
 
 ---
 
@@ -25,35 +25,100 @@
 ### CSS
 - `assets/css/styles.css`：主站共用樣式（header/nav、各分頁版面）
 - `assets/css/calendar-widget.css`：日曆 widget 專用樣式（iframe 內隔離）
+- `assets/css/calendar-frame.css`：日曆裝飾外框（可選；目前未預設啟用）
 
 ### JS（核心）
+- `assets/js/site-header.js`
+  - **主站共用 header/nav 產生器**
+  - 導覽列內容（新增/改名稱/改順序）以此檔為單一來源
 - `assets/js/i18n.js`
   - **唯一語言模組**
   - 機制：
     - 讀寫 `localStorage.language`（值：`zh` / `en`）
     - `applyLanguage()`：把所有 `[data-en][data-zh]` 的文字替換
-  - `initLanguageSwitcher()`：綁 `.lang-btn` 點擊事件（若頁面有 `.lang-btn` 會自動 init）
+  - `initLanguageSwitcher()`：綁 `.lang-btn` 點擊事件（若頁面有 `.lang-btn` 會自動初始化）
     - 切換時會 **postMessage** 給所有 iframe：`{type:'lovely-language', lang}`
 - `assets/js/calendar-shared.js`
   - 日曆共用工具（避免 readonly / editable 兩份重複邏輯）
   - 負責：dataFile/cacheVersion、events array → map、月份標題、日期 key、語言套用 helper
 - `assets/js/calendar-embed.js`
-  - `calendar.html` 專用：負責 iframe 高度 + 縮放計算
+  - `calendar.html` 專用：負責 iframe 高度同步（不做 transform 縮放）
   - 監聽 iframe `postMessage({type:'calendar-resize', height})`
 - `assets/js/calendar-widget.js`
-  - 可編輯日曆（管理端）
+  - 可編輯日曆 widget（管理端 iframe 內）
+  - **儲存策略（架構契約）**：
+    - 「儲存」：只寫入本機 `localStorage`（不會自動上傳）
+    - 「同步」：由管理工具頁 `calendar-manager-local.html` 透過 `postMessage` 明確觸發，才會嘗試用 GitHub API 上傳
   - 讀寫 localStorage：
     - `calendarEvents`：事件資料備份
-    - `calendarEventsUnsynced`：是否未同步到 GitHub
-  - GitHub API 更新：**可選**
-    - 若存在 `GITHUB_CONFIG` + `checkGitHubConfig()` 且 valid → 走 GitHub API
-    - 否則 → 下載 `calendar-data.json`（手動上傳）
+    - `calendarEventsUnsynced`：是否仍有未同步變更
+  - GitHub API 同步（需要本機私密設定）：
+    - 若存在 `GITHUB_CONFIG` + `checkGitHubConfig()` 且 valid → 走 GitHub API 更新 `assets/data/calendar-data.json`
+    - 若缺少設定 → 會提示無法同步（此時需改用手動方式更新 JSON）
 - `assets/js/calendar-widget-readonly.js`
   - 只讀日曆（訪客端）
   - 只讀：不提供編輯，只提供 hover tooltip（有 description 才顯示）
   - render 後會 `postMessage({type:'calendar-resize', height})` 讓父頁調整 iframe 高度
 
 ---
+
+## 檔案結構（架構相關，一律以此為準）
+
+```
+Cursor/
+├── index.html          # 首頁
+├── calendar.html       # 日曆頁（嵌入只讀 widget）
+├── calendar-widget-readonly.html # 只讀日曆 widget（iframe 內）
+├── calendar-widget.html          # 可編輯日曆 widget（管理用）
+├── calendar-manager-local.html   # 日曆管理工具（包 UI + 內嵌可編輯 widget）
+├── README.md           # 專案總覽/部署與常用指令（非架構真相來源）
+├── deploy.sh           # 部署腳本（會自動跑 check.sh / bump-calendar-cache.sh / 圖片壓縮）
+├── check.sh            # 部署前檢查（缺檔、script 順序、快取版本、輪詢回歸、私密設定誤提交等）
+├── bump-calendar-cache.sh # 日曆相關頁面 cache-busting（?v=...）統一更新
+└── assets/             # 靜態資源
+    ├── css/
+    │   ├── styles.css              # 主站共用樣式（含 header/nav）
+    │   ├── calendar-widget.css     # 日曆 widget 專用樣式（iframe 內）
+    │   └── calendar-frame.css      # 日曆裝飾外框（可選）
+    ├── js/
+    │   ├── site-header.js          # 共用導覽列/header（主站 6 頁共用）
+    │   ├── i18n.js                 # 語言切換（頁面有 .lang-btn 時自動 init）
+    │   ├── calendar-embed.js       # calendar.html 專用：iframe 高度控制
+    │   ├── calendar-shared.js      # 日曆共用工具（readonly/editable 共用）
+    │   ├── calendar-widget-readonly.js
+    │   └── calendar-widget.js
+    ├── data/
+    │   └── calendar-data.json      # 日曆資料（訪客端讀，管理端可同步更新）
+    └── images/
+        ├── cakes.jpg               # 首頁圖片
+        ├── calendar/               # 日曆頁面圖片（含 frames/）
+        ├── seasonal/               # 季節限定頁面圖片
+        ├── products/               # 全部品項頁面圖片
+        ├── order/                  # 訂購方式頁面圖片
+        └── contact/                # 地圖頁面圖片
+```
+
+## 圖片組織方式（架構相關，一律以此為準）
+
+- **首頁圖片**：放在 `assets/images/`（例如：`cakes.jpg`）
+- **日曆頁面**：放在 `assets/images/calendar/`
+- **季節限定頁面**：放在 `assets/images/seasonal/`
+- **全部品項頁面**：放在 `assets/images/products/`
+- **訂購方式頁面**：放在 `assets/images/order/`
+- **地圖頁面**：放在 `assets/images/contact/`
+
+使用範例：
+
+```html
+<!-- 日曆頁面 -->
+<img src="assets/images/calendar/calendar-hero.jpg" alt="Calendar">
+
+<!-- 季節限定頁面 -->
+<img src="assets/images/seasonal/spring-cake.jpg" alt="Spring Cake">
+
+<!-- 產品圖片 -->
+<img src="assets/images/products/matcha-cake.jpg" alt="Matcha Cake">
+```
 
 ## 「本機私密設定」規範（非常重要）
 
@@ -72,7 +137,8 @@ const GITHUB_CONFIG = {
 function checkGitHubConfig() { /* calendar-widget.js 會呼叫 */ }
 ```
 
-> `calendar-widget.html` / `calendar-manager-local.html` 會嘗試載入 `github-config.local.js`；沒找到就自動走下載模式。
+> `calendar-widget.html` / `calendar-manager-local.html` 會嘗試載入 `github-config.local.js`；若沒找到就無法使用 GitHub API 同步（仍可先在本機儲存變更）。
+> 補充：目前「下載 JSON」沒有做成 UI 按鈕；若要走手動流程，建議直接編輯 `assets/data/calendar-data.json` 後部署，或自行加一個下載按鈕呼叫 `downloadJSON()`。
 
 ---
 
@@ -80,21 +146,17 @@ function checkGitHubConfig() { /* calendar-widget.js 會呼叫 */ }
 
 ### A) 新增一個「主站分頁」
 1. 複製任一頁（例如 `seasonal.html`）
-2. **保留**底部 `i18n.js`（即可）：
-   - `assets/js/i18n.js`（會在頁面有 `.lang-btn` 時自動初始化）
+2. 確保頁面有 header 佔位元素：
+   - `<header class="header" id="site-header"></header>`
+3. **保留**底部共用腳本載入順序：
+   - `assets/js/site-header.js`
+   - `assets/js/i18n.js`（語言切換會在 `.lang-btn` 存在時自動初始化；`.lang-btn` 由 header 產生）
 3. 文案要支援雙語：用 `data-en` / `data-zh`
 
 ### B) 修改導覽列（header/nav）
-目前導覽列是 **6 份 HTML 重複**（純靜態常見）。  
-修改時要同步改：
-- `index.html`
-- `calendar.html`
-- `seasonal.html`
-- `all-items.html`
-- `order.html`
-- `contact.html`
-
-（想降低重複：可引入簡單模板或靜態產生器，但目前專案刻意保持零 build。）
+導覽列採用 **由 JS 生成**（主站 6 頁共用）。  
+調整導覽列請改：
+- `assets/js/site-header.js`（`renderNavItems()` 裡的 items 陣列）
 
 ### C) 修改日曆 UI / 規則
 - 只讀端：改 `calendar-widget-readonly.html/.js` + `assets/css/calendar-widget.css`
@@ -108,9 +170,11 @@ function checkGitHubConfig() { /* calendar-widget.js 會呼叫 */ }
 - **外框圖片入口（固定檔名，最容易維護）**：`assets/images/calendar/frames/frame-current.png`
   - 每月更換外框：只要替換這張圖片內容（檔名不變），不用改任何 HTML/CSS/JS
   - 圖片建議：PNG/WebP（需保留透明中心），尺寸建議 1024px 左右即可
-- **外框開關（只改一行）**：在 `calendar.html` 的 `<body>`：
-  - 開啟：`data-frame="on"`
-  - 關閉：`data-frame="off"`
+- **啟用方式（目前需手動接線一次）**：
+  - `calendar.html` 額外引入 `assets/css/calendar-frame.css`
+  - 並把 iframe 外層包上 `.calendar-frame` / `.calendar-frame__inner`（外框會疊在 iframe 上方，且 `pointer-events: none` 不會擋操作）
+- **外框開關（啟用後只改一行）**：在 `calendar.html` 的 `<body class="calendar-page-body">` 加上：
+  - 關閉外框：`data-frame="off"`（預設不加或 `on` 則顯示）
 
 > 備註：外框會以 overlay 方式疊在 iframe 上方，且 `pointer-events: none` 不會擋日曆操作。
 > 由於外框是圖片資源，建議在部署前跑圖片壓縮（見下方效能章節）。
@@ -123,8 +187,8 @@ function checkGitHubConfig() { /* calendar-widget.js 會呼叫 */ }
 ## 容易踩雷的點（請新的對話特別注意）
 
 - **script 載入順序**
-  - 主站頁：只需要 `i18n.js`
-  - 日曆嵌入頁 `calendar.html`：再加上 `calendar-embed.js`
+  - 主站頁：`site-header.js` → `i18n.js`
+  - 日曆嵌入頁 `calendar.html`：`site-header.js` → `i18n.js` → `calendar-embed.js`
   - 日曆 widget 頁：`i18n.js` + `calendar-shared.js` 再載入各自的 widget 腳本
 - **不要重新加回 setInterval 輪詢語言**
   - 目前語言同步用 postMessage（事件驅動），更不容易出 bug
@@ -136,7 +200,8 @@ function checkGitHubConfig() { /* calendar-widget.js 會呼叫 */ }
 
 ---
 
-## 快速檢查（改完必做）
+## 快速檢查（變更後必做）
+（以下是「變更後」建議一定要跑的檢查，避免缺檔/順序錯誤/快取沒更新等問題。）
 
 ### 1) 檔案引用完整性檢查（避免缺檔 404）
 在 repo 根目錄跑：
@@ -165,7 +230,8 @@ PY
 
 ### 2) 確認沒有語言輪詢
 ```bash
-rg "setInterval\\(" assets/js
+# 若有安裝 ripgrep 可用 rg；否則用 grep 也可以
+rg "setInterval\\(" assets/js || grep -R --line-number --fixed-string "setInterval(" assets/js
 ```
 
 ### 3) 一鍵檢查（推薦）

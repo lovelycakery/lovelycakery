@@ -47,6 +47,10 @@
 
 > `deploy.sh` 會在 push 前自動執行 `./check.sh`（缺檔/載入順序/輪詢回歸/私密設定誤提交等檢查）。
 > 你也可以單獨先跑：`./check.sh`
+>
+> `deploy.sh` 也會自動：
+> - 壓縮本次變更的圖片（`scripts/optimize_images.py --only-changed`）
+> - 更新日曆相關資源的快取版本號（`bump-calendar-cache.sh`，會統一更新相關頁面的 `?v=...`）
 
 ## 圖片最佳化（建議每次新增/替換圖片都做）
 
@@ -77,57 +81,5 @@ git push origin main
 
 直接在瀏覽器開啟 `index.html` 即可預覽網站。
 
-## 檔案結構
-
-```
-Cursor/
-├── index.html          # 首頁
-├── README.md          # 說明文件
-├── deploy.sh          # 部署腳本
-└── assets/            # 靜態資源
-    ├── css/
-    │   └── styles.css
-    ├── js/
-    │   ├── i18n.js                 # 語言切換（頁面有 .lang-btn 時自動 init）
-    │   ├── calendar-embed.js        # calendar.html 專用：iframe 高度控制
-    │   ├── calendar-shared.js       # 日曆共用工具（readonly/editable 共用）
-    │   ├── calendar-widget-readonly.js
-    │   └── calendar-widget.js
-    └── images/
-        ├── cakes.jpg           # 首頁圖片
-        ├── calendar/           # 日曆頁面圖片
-        ├── seasonal/           # 季節限定頁面圖片
-        ├── products/           # 全部品項頁面圖片
-        ├── order/              # 訂購方式頁面圖片
-        └── contact/            # 地圖頁面圖片
-```
-
-## 圖片組織方式
-
-**分頁圖片存放位置：**
-
-- **首頁圖片**：直接放在 `assets/images/`（例如：`cakes.jpg`）
-- **日曆頁面**：放在 `assets/images/calendar/`
-- **季節限定頁面**：放在 `assets/images/seasonal/`
-- **全部品項頁面**：放在 `assets/images/products/`
-- **訂購方式頁面**：放在 `assets/images/order/`
-- **地圖頁面**：放在 `assets/images/contact/`
-
-**使用範例：**
-```html
-<!-- 日曆頁面 -->
-<img src="assets/images/calendar/calendar-hero.jpg" alt="Calendar">
-
-<!-- 季節限定頁面 -->
-<img src="assets/images/seasonal/spring-cake.jpg" alt="Spring Cake">
-
-<!-- 產品圖片 -->
-<img src="assets/images/products/matcha-cake.jpg" alt="Matcha Cake">
-```
-
-## 功能
-
-- ✅ 響應式設計（支援手機、平板、電腦）
-- ✅ 中英文切換
-- ✅ 語言選擇記憶功能（使用 localStorage）
+> 與**程式架構**相關的說明（檔案職責、檔案結構、圖片/資產規範、script 載入順序、踩雷點）請一律以 `AI_MAINTENANCE_GUIDE.md` 為準。
 
