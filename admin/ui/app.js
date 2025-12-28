@@ -8,6 +8,7 @@ const state = {
   eventsByDate: new Map(),
   selectedDate: '',
   clickHookInstalled: false,
+  hookTimer: 0,
 };
 
 function logStatus(msg) {
@@ -58,6 +59,10 @@ function reloadPreview() {
   const url = `${getPreviewBaseUrl()}/calendar.html?adminPreview=1&ts=${Date.now()}`;
   iframe.src = url;
   state.clickHookInstalled = false;
+  if (state.hookTimer) {
+    clearInterval(state.hookTimer);
+    state.hookTimer = 0;
+  }
 }
 
 function tryInstallCalendarClickHook() {
@@ -95,7 +100,50 @@ function tryInstallCalendarClickHook() {
   );
 
   state.clickHookInstalled = true;
+  logStatus('✅ 日曆點擊已連結（可點日期編輯）');
   return true;
+}
+
+function startHookWatcher(options = {}) {
+  const maxWaitMs = typeof options.maxWaitMs === 'number' ? options.maxWaitMs : 12000;
+  const intervalMs = typeof options.intervalMs === 'number' ? options.intervalMs : 250;
+
+  if (state.hookTimer) {
+    clearInterval(state.hookTimer);
+    state.hookTimer = 0;
+  }
+
+  const startedAt = Date.now();
+  let lastHintAt = 0;
+
+  state.hookTimer = setInterval(() => {
+    try {
+      const ok = tryInstallCalendarClickHook();
+      if (ok) {
+        clearInterval(state.hookTimer);
+        state.hookTimer = 0;
+        return;
+      }
+
+      // Periodic hint so users understand why save is disabled.
+      const elapsed = Date.now() - startedAt;
+      if (elapsed - lastHintAt > 1500) {
+        lastHintAt = elapsed;
+        logStatus('⏳ 等待日曆載入（尚未連結點擊）…');
+      }
+
+      if (elapsed > maxWaitMs) {
+        clearInterval(state.hookTimer);
+        state.hookTimer = 0;
+        logStatus(
+          '❌ 無法連結日曆點擊。\n' +
+            '請確認左側預覽日曆有正常顯示；若仍無法點選日期，請關閉工具後重開或回報此訊息。'
+        );
+      }
+    } catch (e) {
+      // ignore
+    }
+  }, intervalMs);
 }
 
 async function runPreflightAndReport() {
@@ -116,15 +164,17 @@ async function main() {
   await refreshCalendarData();
   reloadPreview();
 
-  // Keep trying to hook into the nested iframe after loads (no polling loops in site; admin tool is ok).
-  const hookTimer = setInterval(() => {
-    try {
-      const ok = tryInstallCalendarClickHook();
-      if (ok) clearInterval(hookTimer);
-    } catch (e) {
-      // ignore
-    }
-  }, 250);
+  const previewFrame = $('previewFrame');
+  if (previewFrame) {
+    // Re-install the click hook every time the preview reloads.
+    previewFrame.addEventListener('load', () => {
+      state.clickHookInstalled = false;
+      startHookWatcher({ maxWaitMs: 12000, intervalMs: 250 });
+    });
+  }
+
+  // Also start the watcher right away (covers the case where load fires before listener is attached).
+  startHookWatcher({ maxWaitMs: 12000, intervalMs: 250 });
 
   $('preflightBtn').addEventListener('click', async () => {
     await runPreflightAndReport();
