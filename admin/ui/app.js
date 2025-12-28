@@ -46,7 +46,8 @@ function setSelectedDate(dateStr) {
   $('descInput').value = ev && typeof ev.description === 'string' ? ev.description : '';
 
   $('saveBtn').disabled = !state.selectedDate;
-  $('clearBtn').disabled = !state.selectedDate;
+  // Clear button only enabled if date is selected AND has an existing event
+  $('clearBtn').disabled = !state.selectedDate || !has;
 }
 
 function getPreviewBaseUrl() {
@@ -227,7 +228,7 @@ async function main() {
   });
 
   $('clearBtn').addEventListener('click', async () => {
-    if (!state.selectedDate) return;
+    if (!state.selectedDate || !state.eventsByDate.has(state.selectedDate)) return;
     const ok = confirm(`確定要清除 ${state.selectedDate} 的事件嗎？`);
     if (!ok) return;
     try {

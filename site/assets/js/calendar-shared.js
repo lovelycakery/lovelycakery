@@ -39,8 +39,10 @@
   }
 
   function formatDateKey(year, month, day) {
-    const date = new Date(year, month, day);
-    return date.toISOString().split('T')[0];
+    // Format directly as YYYY-MM-DD without timezone conversion (toISOString can shift dates).
+    const m = String(month + 1).padStart(2, '0');
+    const d = String(day).padStart(2, '0');
+    return `${year}-${m}-${d}`;
   }
 
   const MONTHS_ZH = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];

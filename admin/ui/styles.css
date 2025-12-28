@@ -146,8 +146,12 @@ body {
 }
 
 .panel__actions {
-  display: grid;
+  display: flex;
   gap: 10px;
+}
+
+.panel__actions .btn {
+  flex: 1;
 }
 
 .btn {
