@@ -1,0 +1,20 @@
+{
+  "name": "lovely-admin",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Local-only admin tool for Lovely Cakery (safe file writes + one-button publish).",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist:win": "electron-builder --win --x64"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^24.13.3"
+  }
+}
+
+

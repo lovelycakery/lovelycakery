@@ -2,6 +2,11 @@
 
 手工千層蛋糕網站，支援中英文切換。
 
+## 專案資料夾結構（重要）
+
+- `site/`：**網站本體（會部署到 GitHub Pages）**
+- `admin/`：本機管理工具（不會被部署；給合作者用）
+
 ## 維護手冊（給「新的對話」/未來維護用）
 
 請先閱讀 `AI_MAINTENANCE_GUIDE.md`，裡面包含：
@@ -13,6 +18,8 @@
 - 避免 CLS（圖片加 width/height）
 
 ## 部署到 GitHub Pages
+
+> 本專案使用 **GitHub Actions** 部署：push 到 `main` 後會先跑檢查（`check.sh`），檢查通過才會部署 `site/`。
 
 ### 快速部署（使用腳本）
 
@@ -31,9 +38,7 @@
    - 進入儲存庫頁面：https://github.com/lovelycakery/lovelycakery
    - 點擊 "Settings"（設定）
    - 在左側選單找到 "Pages"
-   - 在 "Source" 選擇 "Deploy from a branch"
-   - Branch 選擇 "main"，資料夾選擇 "/ (root)"
-   - 點擊 "Save"
+   - 在 "Source" 選擇 **GitHub Actions**
 
 4. **等待部署完成**
    - 幾分鐘後，你的網站就會在以下網址上線：
@@ -79,7 +84,7 @@ git push origin main
 
 ## 本地測試
 
-直接在瀏覽器開啟 `index.html` 即可預覽網站。
+直接在瀏覽器開啟 `site/index.html` 即可預覽網站。
 
 > 與**程式架構**相關的說明（檔案職責、檔案結構、圖片/資產規範、script 載入順序、踩雷點）請一律以 `AI_MAINTENANCE_GUIDE.md` 為準。
 

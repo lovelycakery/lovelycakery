@@ -3,13 +3,20 @@
 > 這個專案是 **純靜態網站**（HTML/CSS/JS），沒有 build system、沒有框架。  
 > 新的對話無法讀取舊對話，所以本文件把「目前程式架構、模組職責、對外介面契約、維護操作與注意事項」集中在同一處，避免資訊分散。
 
+## 重要：專案資料夾結構（2025-12 起）
+
+- `site/`：**網站本體**（GitHub Pages 會部署這個資料夾）
+- `admin/`：本機管理工具（不部署；給合作者用）
+
+> 本文件後續提到的「網站檔案路徑」若未特別註明，一律以 `site/` 內為準（例如 `assets/js/i18n.js` 實際位置是 `site/assets/js/i18n.js`）。
+
 ## 架構總覽（你要先知道的 5 件事）
 
 1. **主站頁面**：`index.html`, `calendar.html`, `seasonal.html`, `all-items.html`, `order.html`, `contact.html`
 2. **共用導覽列/header**：`assets/js/site-header.js`（主站 6 頁共用，避免 6 份 HTML 重複）
 3. **共用語言切換**：`assets/js/i18n.js`（唯一語言模組；頁面有 `.lang-btn` 時自動初始化）
 4. **日曆採 iframe 隔離**：`calendar.html` 內嵌 `calendar-widget-readonly.html`
-5. **日曆資料來源**：`assets/data/calendar-data.json`（訪客端讀；管理端可「同步」更新，需本機設定 GitHub Token）
+5. **日曆資料來源**：`assets/data/calendar-data.json`（訪客端讀；管理端可更新資料檔）
 
 ---
 
@@ -65,37 +72,35 @@
 ## 檔案結構（架構相關，一律以此為準）
 
 ```
-Cursor/
-├── index.html          # 首頁
-├── calendar.html       # 日曆頁（嵌入只讀 widget）
-├── calendar-widget-readonly.html # 只讀日曆 widget（iframe 內）
-├── calendar-widget.html          # 可編輯日曆 widget（管理用）
-├── calendar-manager-local.html   # 日曆管理工具（包 UI + 內嵌可編輯 widget）
-├── README.md           # 專案總覽/部署與常用指令（非架構真相來源）
-├── deploy.sh           # 部署腳本（會自動跑 check.sh / bump-calendar-cache.sh / 圖片壓縮）
-├── check.sh            # 部署前檢查（缺檔、script 順序、快取版本、輪詢回歸、私密設定誤提交等）
-├── bump-calendar-cache.sh # 日曆相關頁面 cache-busting（?v=...）統一更新
-└── assets/             # 靜態資源
-    ├── css/
-    │   ├── styles.css              # 主站共用樣式（含 header/nav）
-    │   ├── calendar-widget.css     # 日曆 widget 專用樣式（iframe 內）
-    │   └── calendar-frame.css      # 日曆裝飾外框（可選）
-    ├── js/
-    │   ├── site-header.js          # 共用導覽列/header（主站 6 頁共用）
-    │   ├── i18n.js                 # 語言切換（頁面有 .lang-btn 時自動 init）
-    │   ├── calendar-embed.js       # calendar.html 專用：iframe 高度控制
-    │   ├── calendar-shared.js      # 日曆共用工具（readonly/editable 共用）
-    │   ├── calendar-widget-readonly.js
-    │   └── calendar-widget.js
-    ├── data/
-    │   └── calendar-data.json      # 日曆資料（訪客端讀，管理端可同步更新）
-    └── images/
-        ├── cakes.jpg               # 首頁圖片
-        ├── calendar/               # 日曆頁面圖片（含 frames/）
-        ├── seasonal/               # 季節限定頁面圖片
-        ├── products/               # 全部品項頁面圖片
-        ├── order/                  # 訂購方式頁面圖片
-        └── contact/                # 地圖頁面圖片
+repo-root/
+├── site/                          # ✅ 網站本體（部署目錄）
+│   ├── index.html                 # 首頁
+│   ├── calendar.html              # 日曆頁（嵌入只讀 widget）
+│   ├── calendar-widget-readonly.html # 只讀日曆 widget（iframe 內）
+│   ├── calendar-widget.html          # 可編輯日曆 widget（舊管理用；訪客不會用到）
+│   ├── calendar-manager-local.html   # 舊日曆管理頁（訪客不會用到）
+│   └── assets/                    # 靜態資源
+│       ├── css/
+│       │   ├── styles.css
+│       │   ├── calendar-widget.css
+│       │   └── calendar-frame.css
+│       ├── js/
+│       │   ├── site-header.js
+│       │   ├── i18n.js
+│       │   ├── calendar-embed.js
+│       │   ├── calendar-shared.js
+│       │   ├── calendar-widget-readonly.js
+│       │   └── calendar-widget.js
+│       ├── data/
+│       │   └── calendar-data.json
+│       └── images/
+│           └── ...
+├── admin/                         # ✅ 本機管理工具（不部署）
+│   ├── ADMIN_SAFETY_GUIDE.md
+│   └── ...
+├── check.sh                       # 部署/CI 檢查（會檢查 site/）
+├── bump-calendar-cache.sh         # 更新日曆相關頁面 cache-busting（寫入 site/）
+└── deploy.sh                      # 手動部署腳本（主要用於 push；Pages 由 Actions 部署）
 ```
 
 ## 圖片組織方式（架構相關，一律以此為準）
@@ -123,7 +128,7 @@ Cursor/
 ## 「本機私密設定」規範（非常重要）
 
 - GitHub API Token **不要**提交到 repo
-- 本機建立：`assets/js/github-config.local.js`（被 `.gitignore` 忽略）
+- 本機建立：`site/assets/js/github-config.local.js`（被 `.gitignore` 忽略）
 - 內容格式（範例）：
 
 ```javascript

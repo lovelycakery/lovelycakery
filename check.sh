@@ -12,6 +12,8 @@ NC='\033[0m'
 
 echo -e "${BLUE}🔎 Running pre-deploy checks...${NC}\n"
 
+SITE_DIR="site"
+
 fail() {
   echo -e "${RED}❌ CHECK FAILED:${NC} $1" >&2
   exit 1
@@ -28,7 +30,7 @@ pass() {
 # 1) Ensure no missing local assets referenced by HTML
 python3 - <<'PY'
 import re, pathlib, sys
-root = pathlib.Path('.')
+root = pathlib.Path('site')
 html_files = list(root.glob('*.html'))
 missing = []
 pattern = re.compile(r'(?:src|href)=["\'](assets/[^"\'#?]+)')
@@ -52,7 +54,7 @@ pass "HTML asset references are valid"
 # - Calendar pages must include the right embed/widget scripts
 python3 - <<'PY'
 import pathlib, re, sys
-root = pathlib.Path('.')
+root = pathlib.Path('site')
 html_files = list(root.glob('*.html'))
 src_re = re.compile(r'<script[^>]+src=["\']([^"\']+)["\']', re.I)
 
@@ -135,7 +137,7 @@ if [ -d ".git" ]; then
   needs_bump=0
   while IFS= read -r f; do
     case "$f" in
-      assets/css/styles.css|assets/css/calendar-widget.css|assets/css/calendar-frame.css|assets/js/i18n.js|assets/js/calendar-embed.js|assets/js/calendar-shared.js|assets/js/calendar-widget.js|assets/js/calendar-widget-readonly.js|calendar.html|calendar-widget.html|calendar-widget-readonly.html)
+      site/assets/css/styles.css|site/assets/css/calendar-widget.css|site/assets/css/calendar-frame.css|site/assets/js/i18n.js|site/assets/js/calendar-embed.js|site/assets/js/calendar-shared.js|site/assets/js/calendar-widget.js|site/assets/js/calendar-widget-readonly.js|site/calendar.html|site/calendar-widget.html|site/calendar-widget-readonly.html|site/calendar-manager-local.html|site/assets/data/calendar-data.json)
         needs_bump=1
         break
         ;;
@@ -148,10 +150,10 @@ import re, sys
 from pathlib import Path
 
 targets = [
-    Path("calendar.html"),
-    Path("calendar-widget-readonly.html"),
-    Path("calendar-widget.html"),
-    Path("calendar-manager-local.html"),
+    Path("site/calendar.html"),
+    Path("site/calendar-widget-readonly.html"),
+    Path("site/calendar-widget.html"),
+    Path("site/calendar-manager-local.html"),
 ]
 pat = re.compile(r"\?v=([0-9]{8}-[0-9]+)")
 
@@ -187,7 +189,7 @@ PY
 import re, subprocess, sys
 from pathlib import Path
 
-targets = ["calendar.html", "calendar-widget-readonly.html", "calendar-widget.html", "calendar-manager-local.html"]
+targets = ["site/calendar.html", "site/calendar-widget-readonly.html", "site/calendar-widget.html", "site/calendar-manager-local.html"]
 pat = re.compile(r"\?v=([0-9]{8}-[0-9]+)")
 
 def extract_from_text(text: str) -> str | None:
@@ -242,9 +244,9 @@ else
 fi
 
 # 3) Architecture guardrails: avoid reintroducing polling loops in assets/js
-if grep -R --line-number --fixed-string "setInterval(" assets/js >/dev/null 2>&1; then
+if grep -R --line-number --fixed-string "setInterval(" site/assets/js >/dev/null 2>&1; then
   echo "Found setInterval usage:"
-  grep -R --line-number --fixed-string "setInterval(" assets/js || true
+  grep -R --line-number --fixed-string "setInterval(" site/assets/js || true
   fail "setInterval() found in assets/js. Prefer event-driven logic to reduce bugs."
 fi
 pass "No setInterval() in assets/js"
@@ -254,6 +256,7 @@ pass "No setInterval() in assets/js"
 if grep -R --line-number --fixed-string "github-config.js" \
   --exclude="check.sh" \
   --exclude="deploy.sh" \
+  --exclude-dir="admin" \
   --exclude-dir=".git" \
   --include="*.html" --include="*.md" --include="*.js" --include="*.css" \
   . >/dev/null 2>&1; then
@@ -261,6 +264,7 @@ if grep -R --line-number --fixed-string "github-config.js" \
   grep -R --line-number --fixed-string "github-config.js" \
     --exclude="check.sh" \
     --exclude="deploy.sh" \
+    --exclude-dir="admin" \
     --exclude-dir=".git" \
     --include="*.html" --include="*.md" --include="*.js" --include="*.css" \
     . || true
@@ -270,11 +274,11 @@ pass "No legacy github-config.js references"
 
 # 5) Prevent accidental committing of local secret config
 if [ -d ".git" ]; then
-  if git ls-files --error-unmatch assets/js/github-config.local.js >/dev/null 2>&1; then
-    fail "assets/js/github-config.local.js is TRACKED by git. It must stay local-only."
+  if git ls-files --error-unmatch site/assets/js/github-config.local.js >/dev/null 2>&1; then
+    fail "site/assets/js/github-config.local.js is TRACKED by git. It must stay local-only."
   fi
-  if git ls-files --error-unmatch assets/js/admin-password-config.local.js >/dev/null 2>&1; then
-    fail "assets/js/admin-password-config.local.js is TRACKED by git. It must stay local-only."
+  if git ls-files --error-unmatch site/assets/js/admin-password-config.local.js >/dev/null 2>&1; then
+    fail "site/assets/js/admin-password-config.local.js is TRACKED by git. It must stay local-only."
   fi
 else
   warn "No .git directory found; skipping git tracking checks."

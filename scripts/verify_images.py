@@ -26,11 +26,11 @@ from PIL import Image
 
 def iter_targets(root: Path) -> list[Path]:
     out: list[Path] = []
-    out += sorted((root / "assets/images/products").glob("*.jpg"))
-    out += sorted((root / "assets/images/seasonal").glob("*.jpg"))
-    out += sorted((root / "assets/images/calendar/frames").glob("*.png"))
-    out += sorted((root / "assets/images/logo").glob("*.png"))
-    hero = root / "assets/images/cakes.jpg"
+    out += sorted((root / "site/assets/images/products").glob("*.jpg"))
+    out += sorted((root / "site/assets/images/seasonal").glob("*.jpg"))
+    out += sorted((root / "site/assets/images/calendar/frames").glob("*.png"))
+    out += sorted((root / "site/assets/images/logo").glob("*.png"))
+    hero = root / "site/assets/images/cakes.jpg"
     if hero.exists():
         out.append(hero)
     return out

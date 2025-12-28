@@ -221,6 +221,9 @@ class CalendarWidgetReadonly {
     createDayElement(container, day, isOtherMonth, dateKey, isToday = false) {
         const dayEl = document.createElement('div');
         dayEl.className = 'calendar-day read-only';
+        // Admin/automation-friendly hook: expose the computed date key on the DOM.
+        // This is safe for visitors and lets local admin tools map clicks -> dates without duplicating calendar math.
+        dayEl.setAttribute('data-date', dateKey);
         if (isOtherMonth) {
             dayEl.classList.add('other-month');
         }

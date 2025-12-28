@@ -15,18 +15,19 @@ set -euo pipefail
 #
 # What triggers a bump:
 # - Any change to these files (staged/unstaged/untracked):
-#   - assets/css/styles.css
-#   - assets/css/calendar-widget.css
-#   - assets/css/calendar-frame.css
-#   - assets/js/i18n.js
-#   - assets/js/calendar-embed.js
-#   - assets/js/calendar-shared.js
-#   - assets/js/calendar-widget.js
-#   - assets/js/calendar-widget-readonly.js
-#   - assets/data/calendar-data.json
-#   - calendar.html
-#   - calendar-widget.html
-#   - calendar-widget-readonly.html
+#   - site/assets/css/styles.css
+#   - site/assets/css/calendar-widget.css
+#   - site/assets/css/calendar-frame.css
+#   - site/assets/js/i18n.js
+#   - site/assets/js/calendar-embed.js
+#   - site/assets/js/calendar-shared.js
+#   - site/assets/js/calendar-widget.js
+#   - site/assets/js/calendar-widget-readonly.js
+#   - site/assets/data/calendar-data.json
+#   - site/calendar.html
+#   - site/calendar-widget.html
+#   - site/calendar-widget-readonly.html
+#   - site/calendar-manager-local.html
 
 ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$ROOT_DIR"
@@ -48,7 +49,7 @@ collect_changed_files() {
 should_bump=0
 while IFS= read -r f; do
   case "$f" in
-    assets/css/styles.css|assets/css/calendar-widget.css|assets/css/calendar-frame.css|assets/js/i18n.js|assets/js/calendar-embed.js|assets/js/calendar-shared.js|assets/js/calendar-widget.js|assets/js/calendar-widget-readonly.js|assets/data/calendar-data.json|calendar.html|calendar-widget.html|calendar-widget-readonly.html|calendar-manager-local.html)
+    site/assets/css/styles.css|site/assets/css/calendar-widget.css|site/assets/css/calendar-frame.css|site/assets/js/i18n.js|site/assets/js/calendar-embed.js|site/assets/js/calendar-shared.js|site/assets/js/calendar-widget.js|site/assets/js/calendar-widget-readonly.js|site/assets/data/calendar-data.json|site/calendar.html|site/calendar-widget.html|site/calendar-widget-readonly.html|site/calendar-manager-local.html)
       should_bump=1
       break
       ;;
@@ -66,7 +67,7 @@ today="$(date -u +%Y%m%d)"
 current_v="$(python3 - <<'PY'
 import re
 from pathlib import Path
-p = Path("calendar.html")
+p = Path("site/calendar.html")
 if not p.exists():
     print("")
     raise SystemExit(0)
@@ -93,10 +94,10 @@ from pathlib import Path
 
 new_v = "${new_v}"
 targets = [
-  Path("calendar.html"),
-  Path("calendar-widget-readonly.html"),
-  Path("calendar-widget.html"),
-  Path("calendar-manager-local.html"),
+  Path("site/calendar.html"),
+  Path("site/calendar-widget-readonly.html"),
+  Path("site/calendar-widget.html"),
+  Path("site/calendar-manager-local.html"),
 ]
 
 pat = re.compile(r"\?v=([0-9]{8}-[0-9]+)")

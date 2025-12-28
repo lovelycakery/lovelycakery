@@ -46,12 +46,12 @@ class Result:
 
 def iter_targets(root: Path, include_hero: bool) -> list[Path]:
     targets: list[Path] = []
-    targets += sorted((root / "assets/images/products").glob("*.jpg"))
-    targets += sorted((root / "assets/images/seasonal").glob("*.jpg"))
-    targets += sorted((root / "assets/images/calendar/frames").glob("*.png"))
-    targets += sorted((root / "assets/images/logo").glob("*.png"))
+    targets += sorted((root / "site/assets/images/products").glob("*.jpg"))
+    targets += sorted((root / "site/assets/images/seasonal").glob("*.jpg"))
+    targets += sorted((root / "site/assets/images/calendar/frames").glob("*.png"))
+    targets += sorted((root / "site/assets/images/logo").glob("*.png"))
     if include_hero:
-        hero = root / "assets/images/cakes.jpg"
+        hero = root / "site/assets/images/cakes.jpg"
         if hero.exists():
             targets.append(hero)
     return targets
@@ -87,8 +87,8 @@ def iter_changed_targets(root: Path, include_hero: bool) -> list[Path]:
     if not git_dir.exists():
         raise RuntimeError("No .git directory found; --only-changed requires a git repository.")
 
-    allowed_prefixes = ("assets/images/products/", "assets/images/seasonal/", "assets/images/calendar/frames/", "assets/images/logo/")
-    allowed_exact = {"assets/images/cakes.jpg"} if include_hero else set()
+    allowed_prefixes = ("site/assets/images/products/", "site/assets/images/seasonal/", "site/assets/images/calendar/frames/", "site/assets/images/logo/")
+    allowed_exact = {"site/assets/images/cakes.jpg"} if include_hero else set()
 
     out: list[Path] = []
     for rel in _git_changed_files(root):
