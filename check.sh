@@ -151,6 +151,39 @@ print(f"OK: calendar-data.json schema valid ({len(events)} events)")
 PY
 pass "calendar-data.json schema is valid"
 
+# 1.6) Guard against broken GitHub raw URLs after repo structure changes (e.g. site/ prefix)
+python3 - <<'PY'
+from pathlib import Path
+import re, sys
+
+# This project is deployed from /site, so raw URLs must include /main/site/...
+bad = []
+good = []
+pat = re.compile(r"https://raw\.githubusercontent\.com/lovelycakery/lovelycakery/main/([^\s\"')]+)")
+
+for p in Path("site/assets/js").glob("*.js"):
+    txt = p.read_text(encoding="utf-8", errors="ignore")
+    for m in pat.finditer(txt):
+        tail = m.group(1)
+        if tail.startswith("assets/"):
+            bad.append((p.as_posix(), m.group(0)))
+        if tail.startswith("site/"):
+            good.append((p.as_posix(), m.group(0)))
+
+if bad:
+    print("ERROR: Found GitHub raw URLs missing 'site/' prefix (would break file:// fallback):")
+    for fp, url in bad:
+        print(f"  {fp}: {url}")
+    sys.exit(1)
+
+# If there are any raw URLs, ensure at least one correct example exists (sanity).
+if good:
+    print(f"OK: GitHub raw URLs include site/ prefix ({len(good)} found)")
+else:
+    print("OK: No GitHub raw URLs found in site/assets/js")
+PY
+pass "GitHub raw URLs are consistent with site/ deploy layout"
+
 # 2) Enforce script requirements / order
 # - Main pages with language switcher must include i18n.js (it auto-inits when .lang-btn exists)
 # - Calendar pages must include the right embed/widget scripts
