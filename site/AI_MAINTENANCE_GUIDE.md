@@ -16,7 +16,7 @@
 2. **共用導覽列/header**：`assets/js/site-header.js`（主站 6 頁共用，避免 6 份 HTML 重複）
 3. **共用語言切換**：`assets/js/i18n.js`（唯一語言模組；頁面有 `.lang-btn` 時自動初始化）
 4. **日曆採 iframe 隔離**：`calendar.html` 內嵌 `calendar-widget-readonly.html`
-5. **日曆資料來源**：`assets/data/calendar-data.json`（訪客端讀；管理端可更新資料檔）
+5. **日曆資料來源**：`assets/data/calendar-data.json`（訪客端讀；管理端會直接更新此檔案）
 
 ---
 
@@ -26,8 +26,10 @@
 - `index.html`：首頁
 - `calendar.html`：日曆頁（iframe 嵌入只讀日曆）
 - `calendar-widget-readonly.html`：只讀日曆 widget 頁（iframe 內）
-- `calendar-widget.html`：可編輯日曆 widget 頁（給管理用）
-- `calendar-manager-local.html`：管理工具（包一層 UI + 載入可編輯 widget）
+- `calendar-widget.html`：可編輯日曆 widget 頁（**舊管理流程**；目前不建議使用）
+- `calendar-manager-local.html`：舊管理工具頁（**舊管理流程**；目前不建議使用）
+
+> **目前建議的日曆管理方式**：使用 `admin/` 的本機管理工具（Electron），直接寫入 `assets/data/calendar-data.json`，並自動 bump `?v=...`，避免 GitHub token 與 localStorage 同步問題。
 
 ### CSS
 - `assets/css/styles.css`：主站共用樣式（header/nav、各分頁版面）
@@ -53,19 +55,13 @@
   - 監聽 iframe `postMessage({type:'calendar-resize', height})`
 - `assets/js/calendar-widget.js`
   - 可編輯日曆 widget（管理端 iframe 內）
-  - **儲存策略（架構契約）**：
-    - 「儲存」：只寫入本機 `localStorage`（不會自動上傳）
-    - 「同步」：由管理工具頁 `calendar-manager-local.html` 透過 `postMessage` 明確觸發，才會嘗試用 GitHub API 上傳
-  - 讀寫 localStorage：
-    - `calendarEvents`：事件資料備份
-    - `calendarEventsUnsynced`：是否仍有未同步變更
-  - GitHub API 同步（需要本機私密設定）：
-    - 若存在 `GITHUB_CONFIG` + `checkGitHubConfig()` 且 valid → 走 GitHub API 更新 `assets/data/calendar-data.json`
-    - 若缺少設定 → 會提示無法同步（此時需改用手動方式更新 JSON）
+  - 這是 **舊管理流程** 的編輯器（localStorage +（可選）GitHub API token 同步）。
+  - 目前主流程已改為 `admin/` 本機工具「直接寫入檔案」。
 - `assets/js/calendar-widget-readonly.js`
   - 只讀日曆（訪客端）
   - 只讀：不提供編輯，只提供 hover tooltip（有 description 才顯示）
   - render 後會 `postMessage({type:'calendar-resize', height})` 讓父頁調整 iframe 高度
+  - 另外：每個日期格會帶 `data-date="YYYY-MM-DD"`（提供管理工具點擊對應日期用；對訪客端無影響）
 
 ---
 
@@ -112,6 +108,8 @@ repo-root/
 - **訂購方式頁面**：放在 `assets/images/order/`
 - **地圖頁面**：放在 `assets/images/contact/`
 
+> 注意：上述路徑是以 `site/` 內部為準（例如實際檔案位置是 `site/assets/images/...`，但在 HTML 內仍寫 `assets/images/...`）。
+
 使用範例：
 
 ```html
@@ -142,7 +140,8 @@ const GITHUB_CONFIG = {
 function checkGitHubConfig() { /* calendar-widget.js 會呼叫 */ }
 ```
 
-> `calendar-widget.html` / `calendar-manager-local.html` 會嘗試載入 `github-config.local.js`；若沒找到就無法使用 GitHub API 同步（仍可先在本機儲存變更）。
+> 這段是 **舊管理流程** 的說明：`calendar-widget.html` / `calendar-manager-local.html` 會嘗試載入 `github-config.local.js`。
+> 目前建議改用 `admin/` 管理工具（不需要 token）。
 > 補充：目前「下載 JSON」沒有做成 UI 按鈕；若要走手動流程，建議直接編輯 `assets/data/calendar-data.json` 後部署，或自行加一個下載按鈕呼叫 `downloadJSON()`。
 
 ---
@@ -165,7 +164,8 @@ function checkGitHubConfig() { /* calendar-widget.js 會呼叫 */ }
 
 ### C) 修改日曆 UI / 規則
 - 只讀端：改 `calendar-widget-readonly.html/.js` + `assets/css/calendar-widget.css`
-- 管理端：改 `calendar-widget.html` / `calendar-manager-local.html` / `assets/js/calendar-widget.js`
+- 管理端（新）：改 `admin/` 管理工具（不會部署到網站）
+- 管理端（舊）：改 `calendar-widget.html` / `calendar-manager-local.html` / `assets/js/calendar-widget.js`
 - **不要**把主站 `styles.css` 拿去改日曆格子的樣式（日曆在 iframe 內）
 
 ### C.1) 日曆外框（可每月更換、可一鍵關閉）
