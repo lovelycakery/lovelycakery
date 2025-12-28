@@ -529,11 +529,31 @@ ipcMain.handle('publish:run', async (_evt, payload) => {
   // Stage only site/ (safety: do not commit admin/ by accident)
   const relSite = path.relative(repoRoot, siteDir) || 'site';
   try {
+    // Check for unstaged changes first (better UX: fail fast with clear message)
+    const unstaged = await execGit(['diff', '--name-only', relSite], repoRoot).catch(() => ({ stdout: '' }));
+    const unstagedFiles = (unstaged.stdout || '').trim().split('\n').filter(Boolean);
+    
+    // Also check for untracked files in site/
+    const untracked = await execGit(['ls-files', '--others', '--exclude-standard', relSite], repoRoot).catch(() => ({ stdout: '' }));
+    const untrackedFiles = (untracked.stdout || '').trim().split('\n').filter(Boolean);
+    
+    if (unstagedFiles.length === 0 && untrackedFiles.length === 0) {
+      return {
+        ok: false,
+        phase: 'git',
+        message: '沒有變更需要發布。\n\n請先在管理工具中編輯並「儲存」日曆資料，或直接在 site/ 資料夾中修改檔案後再試。',
+      };
+    }
+    
     await execGit(['add', relSite], repoRoot);
     const diff = await execGit(['diff', '--cached', '--name-only'], repoRoot);
     const changed = (diff.stdout || '').trim().split('\n').filter(Boolean);
     if (changed.length === 0) {
-      return { ok: false, phase: 'git', message: 'No changes to publish.' };
+      return {
+        ok: false,
+        phase: 'git',
+        message: '沒有變更需要提交（git add 後沒有 staged changes）。\n\n這可能是因為變更已被其他程序提交，或檔案已被忽略。',
+      };
     }
 
     const msg = (payload && payload.message && String(payload.message).trim())
@@ -545,9 +565,21 @@ ipcMain.handle('publish:run', async (_evt, payload) => {
     return { ok: true, phase: 'done' };
   } catch (e) {
     const stderr = e && e.stderr ? String(e.stderr) : '';
-    const message = stderr || (e && e.message) || 'Publish failed';
+    const stdout = e && e.stdout ? String(e.stdout) : '';
+    const code = e && e.code ? String(e.code) : '';
+    const errMsg = e && e.message ? String(e.message) : '';
+    
+    // Combine all error info for better debugging
+    let message = stderr || errMsg || 'Publish failed';
+    if (stdout && !message.includes(stdout)) {
+      message = `${message}\n\nOutput: ${stdout}`;
+    }
+    if (code) {
+      message = `${message}\n\nExit code: ${code}`;
+    }
+    
     // Friendly hint for auth issues
-    const authHint = /auth|authentication|permission|denied|publickey/i.test(message)
+    const authHint = /auth|authentication|permission|denied|publickey|host key verification failed/i.test(message)
       ? 'Git push requires login/credentials. Please set up git authentication (SSH key or HTTPS credential) and try again.'
       : '';
     return { ok: false, phase: 'git', message, authHint };

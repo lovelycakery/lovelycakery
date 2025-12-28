@@ -256,9 +256,10 @@ async function main() {
       if (r && r.ok) {
         logStatus('✅ 已上傳（push）完成。CI 會自動檢查與部署。');
       } else {
+        const phase = r && r.phase ? String(r.phase) : 'unknown';
         const m = r && r.message ? String(r.message) : 'Publish failed';
         const hint = r && r.authHint ? String(r.authHint) : '';
-        logStatus('❌ 發布失敗：\n' + m + (hint ? '\n\n' + hint : ''));
+        logStatus(`❌ 發布失敗（階段：${phase}）：\n${m}${hint ? '\n\n' + hint : ''}\n\n請把完整錯誤訊息複製給我以便診斷。`);
       }
     } catch (e) {
       logStatus(`❌ 發布失敗：${e && e.message ? e.message : String(e)}`);
