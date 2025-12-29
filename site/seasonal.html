@@ -22,31 +22,16 @@
             </div>
 
             <div class="gallery-grid">
-                <div class="gallery-item">
-                    <div class="gallery-image-wrapper">
-                        <img src="assets/images/seasonal/1.jpg" alt="Seasonal Special 1" class="gallery-image" loading="lazy" decoding="async" width="1600" height="1600">
-                    </div>
-                </div>
-                <div class="gallery-item">
-                    <div class="gallery-image-wrapper">
-                        <img src="assets/images/seasonal/2.jpg" alt="Seasonal Special 2" class="gallery-image" loading="lazy" decoding="async" width="1600" height="1600">
-                    </div>
-                </div>
-                <div class="gallery-item">
-                    <div class="gallery-image-wrapper">
-                        <img src="assets/images/seasonal/3.jpg" alt="Seasonal Special 3" class="gallery-image" loading="lazy" decoding="async" width="1600" height="1600">
-                    </div>
-                </div>
-                <div class="gallery-item">
-                    <div class="gallery-image-wrapper">
-                        <img src="assets/images/seasonal/4.jpg" alt="Seasonal Special 4" class="gallery-image" loading="lazy" decoding="async" width="1600" height="1600">
-                    </div>
-                </div>
+                <!-- Images loaded dynamically by gallery-loader.js -->
             </div>
         </div>
     </main>
     <script src="assets/js/site-header.js"></script>
     <script src="assets/js/i18n.js"></script>
+    <script src="assets/js/gallery-loader.js"></script>
+    <script>
+        LovelyGalleryLoader.init('seasonal');
+    </script>
 </body>
 </html>
 

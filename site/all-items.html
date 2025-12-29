@@ -22,51 +22,16 @@
             </div>
 
             <div class="gallery-grid">
-                <div class="gallery-item">
-                    <div class="gallery-image-wrapper">
-                        <img src="assets/images/products/5.jpg" alt="Product 5" class="gallery-image" loading="lazy" decoding="async" width="1600" height="1600">
-                    </div>
-                </div>
-                <div class="gallery-item">
-                    <div class="gallery-image-wrapper">
-                        <img src="assets/images/products/6.jpg" alt="Product 6" class="gallery-image" loading="lazy" decoding="async" width="1600" height="1600">
-                    </div>
-                </div>
-                <div class="gallery-item">
-                    <div class="gallery-image-wrapper">
-                        <img src="assets/images/products/7.jpg" alt="Product 7" class="gallery-image" loading="lazy" decoding="async" width="1600" height="1600">
-                    </div>
-                </div>
-                <div class="gallery-item">
-                    <div class="gallery-image-wrapper">
-                        <img src="assets/images/products/8.jpg" alt="Product 8" class="gallery-image" loading="lazy" decoding="async" width="1600" height="1600">
-                    </div>
-                </div>
-                <div class="gallery-item">
-                    <div class="gallery-image-wrapper">
-                        <img src="assets/images/products/9.jpg" alt="Product 9" class="gallery-image" loading="lazy" decoding="async" width="1600" height="1600">
-                    </div>
-                </div>
-                <div class="gallery-item">
-                    <div class="gallery-image-wrapper">
-                        <img src="assets/images/products/10.jpg" alt="Product 10" class="gallery-image" loading="lazy" decoding="async" width="1600" height="1600">
-                    </div>
-                </div>
-                <div class="gallery-item">
-                    <div class="gallery-image-wrapper">
-                        <img src="assets/images/products/11.jpg" alt="Product 11" class="gallery-image" loading="lazy" decoding="async" width="1600" height="1600">
-                    </div>
-                </div>
-                <div class="gallery-item">
-                    <div class="gallery-image-wrapper">
-                        <img src="assets/images/products/12.jpg" alt="Product 12" class="gallery-image" loading="lazy" decoding="async" width="1600" height="1600">
-                    </div>
-                </div>
+                <!-- Images loaded dynamically by gallery-loader.js -->
             </div>
         </div>
     </main>
     <script src="assets/js/site-header.js"></script>
     <script src="assets/js/i18n.js"></script>
+    <script src="assets/js/gallery-loader.js"></script>
+    <script>
+        LovelyGalleryLoader.init('products');
+    </script>
 </body>
 </html>
 

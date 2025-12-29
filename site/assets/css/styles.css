@@ -507,6 +507,25 @@ body.calendar-page-body {
     display: block;
 }
 
+.gallery-item-info {
+    margin-top: 12px;
+    text-align: center;
+}
+
+.gallery-item-name {
+    font-size: 18px;
+    font-weight: 500;
+    color: #3d2817;
+    margin-bottom: 4px;
+    font-family: 'Playfair Display', serif;
+}
+
+.gallery-item-price {
+    font-size: 16px;
+    color: #8b6f47;
+    font-weight: 400;
+}
+
 /* ============================================
    全部品項（all-items）：圖片顯示縮小為原本 0.9 倍 + 版面微調（僅此頁）
    ============================================ */
@@ -519,11 +538,25 @@ body.calendar-page-body {
     box-shadow: none;
     border-radius: 0;
     overflow: visible;
+    /* 恢復為正方形，不要改 aspect-ratio */
+    aspect-ratio: 1;
 }
 
 .all-items-page .gallery-image {
     transform: scale(0.8);
-    transform-origin: center;
+    transform-origin: top center; /* 從頂部開始縮放 */
+}
+
+.all-items-page .gallery-item-info {
+    margin-top: -16px; /* 使用負值來抵消圖片縮小後的空白 */
+}
+
+.all-items-page .gallery-item-name {
+    font-size: 16px;
+}
+
+.all-items-page .gallery-item-price {
+    font-size: 14px;
 }
 
 /* 響應式：平板 - 分頁樣式 */
@@ -591,6 +624,23 @@ body.calendar-page-body {
     /* 全部品項（手機）：兩欄時讓圖片不要再額外縮小，保持可讀性 */
     .all-items-page .gallery-image {
         transform: scale(1);
+    }
+
+    /* 手機版：名稱和價格字體調整 */
+    .gallery-item-name {
+        font-size: 16px;
+    }
+
+    .gallery-item-price {
+        font-size: 14px;
+    }
+
+    .all-items-page .gallery-item-name {
+        font-size: 14px;
+    }
+
+    .all-items-page .gallery-item-price {
+        font-size: 13px;
     }
 }
 
@@ -956,6 +1006,147 @@ body.calendar-page-body {
         border-radius: 8px;
         max-width: 100% !important;
         min-width: auto !important;
+    }
+}
+
+/* ============================================
+   圖片 Modal（訪客頁面點擊圖片顯示）
+   ============================================ */
+.image-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.image-modal__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    cursor: pointer;
+}
+
+.image-modal__content {
+    position: relative;
+    background: #ffffff;
+    border-radius: 16px;
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    z-index: 10001;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.image-modal__close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    color: #3d2817;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10002;
+    transition: background 0.2s;
+}
+
+.image-modal__close:hover {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.image-modal__image-wrapper {
+    width: 100%;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 16px 16px 0 0;
+}
+
+.image-modal__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.image-modal__info {
+    padding: 24px;
+}
+
+.image-modal__name {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: #3d2817;
+    margin-bottom: 12px;
+}
+
+.image-modal__price {
+    font-size: 20px;
+    font-weight: 600;
+    color: #c8a24a;
+    margin-bottom: 16px;
+}
+
+.image-modal__description {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #3d2817;
+    margin-bottom: 16px;
+    white-space: pre-wrap;
+}
+
+.image-modal__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.image-modal__tag {
+    display: inline-block;
+    padding: 6px 12px;
+    background: #f5f3f0;
+    border: 1px solid #e0ddd8;
+    border-radius: 20px;
+    font-size: 13px;
+    color: #3d2817;
+}
+
+@media (max-width: 768px) {
+    .image-modal {
+        padding: 10px;
+    }
+    
+    .image-modal__content {
+        max-width: 100%;
+        border-radius: 12px;
+    }
+    
+    .image-modal__name {
+        font-size: 20px;
+    }
+    
+    .image-modal__price {
+        font-size: 18px;
+    }
+    
+    .image-modal__description {
+        font-size: 14px;
     }
 }
 
