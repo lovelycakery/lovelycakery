@@ -534,21 +534,26 @@ body.calendar-page-body {
 }
 
 .all-items-page .gallery-image-wrapper {
-    /* 移除「框」感（陰影/外框），由圖片本身縮放來達到 0.8 倍與等距留白 */
+    /* 移除「框」感（陰影/外框），使用 padding 來控制圖片顯示大小 */
     box-shadow: none;
     border-radius: 0;
     overflow: visible;
-    /* 恢復為正方形，不要改 aspect-ratio */
     aspect-ratio: 1;
+    padding: 10% 10% 5% 10%; /* 上左右 10%，底部 5% 減少下方空白 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .all-items-page .gallery-image {
-    transform: scale(0.8);
-    transform-origin: top center; /* 從頂部開始縮放 */
+    transform: none; /* 移除 scale，改用 padding 控制 */
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* 保持圖片比例，完整顯示 */
 }
 
 .all-items-page .gallery-item-info {
-    margin-top: -16px; /* 使用負值來抵消圖片縮小後的空白 */
+    margin-top: -8px; /* 使用負值讓文字更靠近圖片 */
 }
 
 .all-items-page .gallery-item-name {
@@ -621,9 +626,9 @@ body.calendar-page-body {
         gap: 14px;
     }
 
-    /* 全部品項（手機）：兩欄時讓圖片不要再額外縮小，保持可讀性 */
-    .all-items-page .gallery-image {
-        transform: scale(1);
+    /* 全部品項（手機）：兩欄時可以調整 padding 讓圖片更大 */
+    .all-items-page .gallery-image-wrapper {
+        padding: 5%; /* 手機版減少 padding，讓圖片顯示更大 */
     }
 
     /* 手機版：名稱和價格字體調整 */

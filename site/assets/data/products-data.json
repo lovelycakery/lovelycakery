@@ -2,15 +2,8 @@
   "schema_version": 1,
   "items": [
     {
-      "image": "assets/images/products/香草千層.jpg",
-      "name": "香草千層",
-      "price": "2200",
-      "description": "",
-      "tags": []
-    },
-    {
-      "image": "assets/images/products/伯爵茶千層.jpg",
-      "name": "伯爵茶千層",
+      "image": "assets/images/products/檸檬千層.jpg",
+      "name": "檸檬千層",
       "price": "2200",
       "description": "",
       "tags": []
@@ -23,15 +16,22 @@
       "tags": []
     },
     {
-      "image": "assets/images/products/檸檬千層.jpg",
-      "name": "檸檬千層",
+      "image": "assets/images/products/藍莓千層.jpg",
+      "name": "藍莓千層",
       "price": "2200",
       "description": "",
       "tags": []
     },
     {
-      "image": "assets/images/products/藍莓千層.jpg",
-      "name": "藍莓千層",
+      "image": "assets/images/products/香草千層.jpg",
+      "name": "香草千層",
+      "price": "2200",
+      "description": "",
+      "tags": []
+    },
+    {
+      "image": "assets/images/products/伯爵茶千層.jpg",
+      "name": "伯爵茶千層",
       "price": "2200",
       "description": "",
       "tags": []

@@ -1,44 +1,9 @@
 {
   "events": [
     {
-      "date": "2025-12-02",
-      "description": "",
-      "status": "available"
-    },
-    {
-      "date": "2025-12-08",
-      "status": "available",
-      "description": ""
-    },
-    {
       "date": "2025-12-10",
       "description": "機哩瓜拉機哩瓜拉",
       "status": "closed"
-    },
-    {
-      "date": "2025-12-15",
-      "description": "",
-      "status": "unavailable"
-    },
-    {
-      "date": "2025-12-23",
-      "status": "available",
-      "description": ""
-    },
-    {
-      "date": "2025-12-28",
-      "description": "",
-      "status": "available"
-    },
-    {
-      "date": "2025-12-30",
-      "description": "",
-      "status": "available"
-    },
-    {
-      "date": "2025-12-31",
-      "status": "available",
-      "description": ""
     }
   ]
 }

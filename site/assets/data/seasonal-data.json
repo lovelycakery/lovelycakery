@@ -2,29 +2,29 @@
   "schema_version": 1,
   "items": [
     {
-      "image": "assets/images/seasonal/草莓千層.jpg",
-      "name": "草莓千層",
-      "price": "2200",
-      "description": "",
+      "image": "assets/images/seasonal/草莓千層2.jpg",
+      "name": "草莓千層2",
+      "price": "2300",
+      "description": "八拉巴拉巴拉八拉巴拉巴拉八拉巴拉巴拉八拉巴拉巴拉八拉巴拉巴拉八拉巴拉巴拉八拉巴拉巴拉八拉巴拉巴拉",
       "tags": []
     },
     {
-      "image": "assets/images/seasonal/芒果千層.jpg",
-      "name": "芒果千層",
-      "price": "2200",
-      "description": "",
-      "tags": []
-    },
-    {
-      "image": "assets/images/seasonal/抹茶千層.jpg",
-      "name": "抹茶千層",
-      "price": "2200",
+      "image": "assets/images/seasonal/草莓千層3.jpg",
+      "name": "草莓千層3",
+      "price": "2000",
       "description": "",
       "tags": []
     },
     {
       "image": "assets/images/seasonal/巧克力千層.jpg",
       "name": "巧克力千層",
+      "price": "2500",
+      "description": "",
+      "tags": []
+    },
+    {
+      "image": "assets/images/seasonal/抹茶水果千層.jpg",
+      "name": "抹茶水果千層",
       "price": "2200",
       "description": "",
       "tags": []

@@ -106,7 +106,26 @@
   function renderIntoHeader() {
     const header = document.getElementById('site-header');
     if (!header) return;
-    header.innerHTML = buildHeaderHtml();
+    
+    // 檢查是否為編輯模式
+    const urlParams = new URLSearchParams(window.location.search);
+    const isAdminMode = urlParams.get('adminPreview') === '1';
+    const adminMode = urlParams.get('mode');
+    const isEditMode = isAdminMode && adminMode === 'edit';
+    
+    if (isEditMode) {
+      // 編輯模式下隱藏 header
+      header.style.display = 'none';
+      // 同時調整 main-content 的 margin-top，因為沒有 header 了
+      const mainContent = document.querySelector('.main-content');
+      if (mainContent) {
+        mainContent.style.marginTop = '0';
+      }
+    } else {
+      // 預覽模式或正常模式，正常顯示 header
+      header.style.display = '';
+      header.innerHTML = buildHeaderHtml();
+    }
   }
 
   function init() {
