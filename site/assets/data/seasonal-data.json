@@ -6,28 +6,38 @@
       "name": "草莓千層2",
       "price": "2300",
       "description": "八拉巴拉巴拉八拉巴拉巴拉八拉巴拉巴拉八拉巴拉巴拉八拉巴拉巴拉八拉巴拉巴拉八拉巴拉巴拉八拉巴拉巴拉",
-      "tags": []
+      "tags": [
+        "含酒精"
+      ]
     },
     {
       "image": "assets/images/seasonal/草莓千層3.jpg",
       "name": "草莓千層3",
       "price": "2000",
       "description": "",
-      "tags": []
+      "tags": [
+        "奶蛋素"
+      ]
     },
     {
       "image": "assets/images/seasonal/巧克力千層.jpg",
       "name": "巧克力千層",
       "price": "2500",
       "description": "",
-      "tags": []
+      "tags": [
+        "無咖啡因"
+      ]
     },
     {
       "image": "assets/images/seasonal/抹茶水果千層.jpg",
       "name": "抹茶水果千層",
       "price": "2200",
       "description": "",
-      "tags": []
+      "tags": [
+        "奶蛋素",
+        "無咖啡因",
+        "含酒精"
+      ]
     }
   ]
 }

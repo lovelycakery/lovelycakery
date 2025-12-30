@@ -13,7 +13,9 @@
       "name": "焦糖千層",
       "price": "2200",
       "description": "",
-      "tags": []
+      "tags": [
+        "奶蛋素"
+      ]
     },
     {
       "image": "assets/images/products/藍莓千層.jpg",
@@ -41,7 +43,9 @@
       "name": "提拉米蘇千層",
       "price": "2200",
       "description": "",
-      "tags": []
+      "tags": [
+        "含酒精"
+      ]
     },
     {
       "image": "assets/images/products/紅茶千層.jpg",

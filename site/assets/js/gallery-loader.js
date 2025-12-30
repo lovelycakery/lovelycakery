@@ -59,6 +59,149 @@
     document.body.style.overflow = 'hidden';
   }
 
+  // 標籤顏色定義（精緻可愛風格 - 單色）
+  const TAG_COLORS = {
+    '奶蛋素': { 
+      bg: '#8fc4a3', 
+      text: '#ffffff',
+      shadow: 'rgba(143, 196, 163, 0.4)'
+    },      // 柔和綠色
+    '無咖啡因': { 
+      bg: '#9bc4d9', 
+      text: '#ffffff',
+      shadow: 'rgba(155, 196, 217, 0.4)'
+    },    // 柔和藍色
+    '含酒精': { 
+      bg: '#e8a689', 
+      text: '#ffffff',
+      shadow: 'rgba(232, 166, 137, 0.4)'
+    },      // 柔和橙粉色
+  };
+
+  // 篩選圖片
+  function filterGallery(selectedTags) {
+    const items = document.querySelectorAll('.gallery-item');
+    
+    if (selectedTags.length === 0) {
+      // 沒有選中任何標籤，顯示所有圖片
+      items.forEach(item => {
+        item.style.display = '';
+      });
+      return;
+    }
+
+    // 有選中標籤，只顯示包含任一選中標籤的圖片（OR 邏輯）
+    items.forEach(item => {
+      const itemTags = item.dataset.tags ? item.dataset.tags.split(',') : [];
+      const hasSelectedTag = selectedTags.some(tag => itemTags.includes(tag));
+      item.style.display = hasSelectedTag ? '' : 'none';
+    });
+  }
+
+  // 渲染圖例（可勾選）
+  function renderTagLegend(container) {
+    // 檢查是否已經有圖例
+    const existingLegend = document.querySelector('.tag-legend');
+    if (existingLegend) {
+      existingLegend.remove();
+    }
+
+    // 創建圖例容器
+    const legend = document.createElement('div');
+    legend.className = 'tag-legend';
+    
+    const legendItems = Object.keys(TAG_COLORS).map(tag => {
+      const color = TAG_COLORS[tag];
+      return `
+        <div class="tag-legend-item">
+          <label class="tag-legend-checkbox-label">
+            <input type="checkbox" class="tag-legend-checkbox" value="${tag}" data-tag="${tag}">
+            <span class="tag-legend-badge" style="background-color: ${color.bg}; color: ${color.text}; box-shadow: 0 2px 8px ${color.shadow}; --tag-bg-color: ${color.bg};">${tag}</span>
+          </label>
+        </div>
+      `;
+    }).join('');
+
+    legend.innerHTML = `
+      <div class="tag-legend-label" data-en="Filter by Tags" data-zh="篩選標籤">篩選標籤：</div>
+      <div class="tag-legend-items">${legendItems}</div>
+      <button class="tag-legend-clear-btn" data-en="Clear All" data-zh="全部取消">全部取消</button>
+    `;
+
+    // 插入到 page-header 下方，gallery-grid 上方
+    const pageHeader = document.querySelector('.page-header');
+    if (pageHeader) {
+      // 插入到 page-header 的下一個兄弟元素之前（通常是 gallery-grid）
+      if (pageHeader.nextSibling) {
+        pageHeader.parentNode.insertBefore(legend, pageHeader.nextSibling);
+      } else {
+        // 如果沒有下一個兄弟元素，直接插入到 page-header 後面
+        pageHeader.parentNode.appendChild(legend);
+      }
+    } else {
+      // 如果沒有 page-header，插入到 container 前面
+      container.parentNode.insertBefore(legend, container);
+    }
+
+    // 綁定 checkbox 事件
+    const checkboxes = legend.querySelectorAll('.tag-legend-checkbox');
+    checkboxes.forEach(checkbox => {
+      checkbox.addEventListener('change', () => {
+        const selectedTags = Array.from(checkboxes)
+          .filter(cb => cb.checked)
+          .map(cb => cb.value);
+        filterGallery(selectedTags);
+      });
+    });
+
+    // 綁定「全部取消」按鈕事件
+    const clearBtn = legend.querySelector('.tag-legend-clear-btn');
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        // 取消所有 checkbox 的選取
+        checkboxes.forEach(checkbox => {
+          checkbox.checked = false;
+        });
+        // 顯示所有圖片
+        filterGallery([]);
+      });
+    }
+
+    // 應用語言（如果 i18n 已載入）
+    if (window.LovelyI18n) {
+      const currentLang = localStorage.getItem('language') || 'zh';
+      window.LovelyI18n.applyLanguage(currentLang, legend);
+    }
+  }
+
+  // 渲染圖片標籤（右下角）
+  function renderImageTags(imageWrapper, tags) {
+    if (!tags || !Array.isArray(tags) || tags.length === 0) return;
+
+    // 過濾出有顏色定義的標籤
+    const validTags = tags.filter(tag => TAG_COLORS[tag]);
+    if (validTags.length === 0) return;
+
+    const tagsContainer = document.createElement('div');
+    tagsContainer.className = 'gallery-image-tags';
+
+    validTags.forEach(tag => {
+      const color = TAG_COLORS[tag];
+      const tagBadge = document.createElement('span');
+      tagBadge.className = 'gallery-image-tag';
+      tagBadge.textContent = tag;
+      tagBadge.style.backgroundColor = color.bg;
+      tagBadge.style.color = color.text;
+      tagBadge.style.boxShadow = `0 2px 8px ${color.shadow}`;
+      // 設置箭頭尾巴的顏色（使用 CSS 變數）
+      tagBadge.style.setProperty('--tag-bg-color', color.bg);
+      // 使用 ::before 和 ::after 偽元素來創建箭頭
+      tagsContainer.appendChild(tagBadge);
+    });
+
+    imageWrapper.appendChild(tagsContainer);
+  }
+
   function renderGallery(items, container) {
     container.innerHTML = '';
     
@@ -67,6 +210,9 @@
     const isAdminMode = urlParams.get('adminPreview') === '1';
     const adminMode = urlParams.get('mode'); // 'edit' 或 'preview'
     const isEditMode = isAdminMode && adminMode === 'edit'; // 只有在編輯模式下才啟用拖曳和點擊編輯
+    
+    // 渲染圖例（在頁面上方）
+    renderTagLegend(container);
     
     items.forEach((item, index) => {
       const itemEl = document.createElement('div');
@@ -78,15 +224,35 @@
       const imageAlt = item.name || 'Gallery image';
       const imageName = item.name || '未命名';
       
-      itemEl.innerHTML = `
-        <div class="gallery-image-wrapper">
-          <img src="${imageSrc}" alt="${imageAlt}" class="gallery-image" loading="lazy" decoding="async" width="1600" height="1600">
-        </div>
-        <div class="gallery-item-info">
-          <div class="gallery-item-name">${imageName}</div>
-          ${item.price ? `<div class="gallery-item-price">NT$ ${item.price}</div>` : ''}
-        </div>
+      // 將標籤儲存到 data 屬性中，用於篩選
+      if (item.tags && Array.isArray(item.tags) && item.tags.length > 0) {
+        // 只儲存有顏色定義的標籤
+        const validTags = item.tags.filter(tag => TAG_COLORS[tag]);
+        if (validTags.length > 0) {
+          itemEl.dataset.tags = validTags.join(',');
+        }
+      }
+      
+      const imageWrapper = document.createElement('div');
+      imageWrapper.className = 'gallery-image-wrapper';
+      imageWrapper.innerHTML = `
+        <img src="${imageSrc}" alt="${imageAlt}" class="gallery-image" loading="lazy" decoding="async" width="1600" height="1600">
       `;
+      
+      // 如果有標籤，在圖片上顯示標籤
+      if (item.tags && Array.isArray(item.tags) && item.tags.length > 0) {
+        renderImageTags(imageWrapper, item.tags);
+      }
+      
+      const itemInfo = document.createElement('div');
+      itemInfo.className = 'gallery-item-info';
+      itemInfo.innerHTML = `
+        <div class="gallery-item-name">${imageName}</div>
+        ${item.price ? `<div class="gallery-item-price">NT$ ${item.price}</div>` : ''}
+      `;
+      
+      itemEl.appendChild(imageWrapper);
+      itemEl.appendChild(itemInfo);
       
       // ============================================
       // ADMIN 編輯模式：拖曳排序 + 點擊編輯功能
@@ -378,7 +544,7 @@
     document.head.appendChild(style);
   }
 
-  // 監聽來自父窗口的消息（滾動和選取狀態）
+  // 監聽來自父窗口的消息（滾動、選取狀態、語言切換）
   let currentSelectedIndex = -1; // 追蹤當前選取的圖片索引
   
   window.addEventListener('message', (e) => {
@@ -387,6 +553,18 @@
     const isSameOrigin = e.origin === window.location.origin;
     const isLocalhost = e.origin.startsWith('http://127.0.0.1:') || e.origin.startsWith('http://localhost:');
     if (!isSameOrigin && !isLocalhost) {
+      return;
+    }
+    
+    // 處理語言切換消息
+    if (e.data && e.data.type === 'lovely-language') {
+      const lang = e.data.lang;
+      if (window.LovelyI18n && lang) {
+        const legend = document.querySelector('.tag-legend');
+        if (legend) {
+          window.LovelyI18n.applyLanguage(lang, legend);
+        }
+      }
       return;
     }
     
