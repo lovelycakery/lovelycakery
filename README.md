@@ -14,7 +14,7 @@
   - `site/AI_MAINTENANCE_GUIDE.md`：網站架構真相（檔案職責、日曆 iframe、快取版本、踩雷點）
 - **管理工具（`admin/`）**
   - `admin/README.md`：如何啟動/使用管理工具
-  - `admin/ADMIN_SAFETY_GUIDE.md`：管理工具安全護欄（必遵守）
+  - `admin/ARCHITECTURE.md`：管理工具架構與安全規則（必讀）
 
 ## 部署到 GitHub Pages
 

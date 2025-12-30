@@ -9,12 +9,11 @@
     "dist:win": "electron-builder --win --x64"
   },
   "dependencies": {
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "sharp": "^0.34.5"
   },
   "devDependencies": {
     "electron": "^33.0.0",
     "electron-builder": "^24.13.3"
   }
 }
-
-

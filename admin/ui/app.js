@@ -10,12 +10,66 @@ const state = {
   clickHookInstalled: false,
   hookTimer: 0,
   lastSelectedDayEl: null,
+  currentTab: 'calendar', // 'calendar' | 'seasonal' | 'products'
+  currentMode: 'edit', // 'edit' | 'preview'
+  imageData: {
+    seasonal: { items: [] },
+    products: { items: [] },
+  },
+  editingImageIndex: -1,
+  scrollToImageIndex: -1, // 需要滾動到的圖片索引（-1 表示不需要滾動）
 };
 
 function logStatus(msg) {
   const box = $('statusBox');
+  if (!box) return;
+  
   const ts = new Date().toLocaleString();
   box.textContent = `[${ts}] ${msg}\n` + (box.textContent || '');
+  // 狀態欄會正常記錄所有狀態，但不會自動展開
+}
+
+function showErrorMessage(msg) {
+  const errorEl = $('errorMessage');
+  if (errorEl) {
+    errorEl.textContent = msg;
+    errorEl.style.display = 'flex';
+  }
+  // 同時記錄到狀態欄
+  logStatus(`⚠️ ${msg}`);
+}
+
+function clearErrorMessage() {
+  const errorEl = $('errorMessage');
+  if (errorEl) {
+    errorEl.style.display = 'none';
+    errorEl.textContent = '';
+  }
+}
+
+function showSuccessMessage(msg) {
+  const successEl = $('successMessage');
+  const errorEl = $('errorMessage');
+  if (successEl) {
+    // 先清除錯誤訊息
+    if (errorEl) {
+      errorEl.style.display = 'none';
+      errorEl.textContent = '';
+    }
+    // 顯示成功訊息
+    successEl.textContent = msg;
+    successEl.style.display = 'flex';
+  }
+  // 同時記錄到狀態欄
+  logStatus(`✅ ${msg}`);
+}
+
+function clearSuccessMessage() {
+  const successEl = $('successMessage');
+  if (successEl) {
+    successEl.style.display = 'none';
+    successEl.textContent = '';
+  }
 }
 
 function buildEventsMap(data) {
@@ -37,17 +91,53 @@ async function refreshCalendarData() {
 
 function setSelectedDate(dateStr) {
   state.selectedDate = dateStr || '';
-  $('selectedDate').textContent = state.selectedDate || '尚未選取';
+  
+  // 清除成功訊息
+  clearSuccessMessage();
+  
+  // 更新顯示格式為「選取日期：（日期）」
+  const displayText = state.selectedDate ? `選取日期：${state.selectedDate}` : '選取日期：尚未選取';
+  $('selectedDate').textContent = displayText;
 
-  const has = state.selectedDate && state.eventsByDate.has(state.selectedDate);
-  const ev = has ? state.eventsByDate.get(state.selectedDate) : null;
+  const calendarEditForm = $('calendarEditForm');
+  const calendarPanel = $('calendarPanel');
+  
+  // 關鍵修復：只在日曆分頁時才顯示/操作日曆相關元素
+  // 如果不在日曆分頁，確保日曆面板和表單都隱藏，避免覆蓋圖片面板
+  if (state.currentTab !== 'calendar') {
+    if (calendarPanel) {
+      calendarPanel.style.display = 'none';
+    }
+    if (calendarEditForm) {
+      calendarEditForm.style.display = 'none';
+    }
+    return; // 提前返回，不執行後續邏輯
+  }
+  
+  if (state.selectedDate) {
+    // 有選取日期時，顯示編輯表單
+    if (calendarEditForm) {
+      calendarEditForm.style.display = 'block';
+    }
+    
+    const has = state.eventsByDate.has(state.selectedDate);
+    const ev = has ? state.eventsByDate.get(state.selectedDate) : null;
 
-  $('statusSelect').value = ev && ev.status ? ev.status : 'available';
-  $('descInput').value = ev && typeof ev.description === 'string' ? ev.description : '';
+    $('statusSelect').value = ev && ev.status ? ev.status : 'available';
+    $('descInput').value = ev && typeof ev.description === 'string' ? ev.description : '';
 
-  $('saveBtn').disabled = !state.selectedDate;
-  // Clear button only enabled if date is selected AND has an existing event
-  $('clearBtn').disabled = !state.selectedDate || !has;
+    $('saveBtn').disabled = false;
+    // Clear button only enabled if date has an existing event
+    $('clearBtn').disabled = !has;
+  } else {
+    // 沒有選取日期時，隱藏編輯表單
+    if (calendarEditForm) {
+      calendarEditForm.style.display = 'none';
+    }
+    
+    $('saveBtn').disabled = true;
+    $('clearBtn').disabled = true;
+  }
 }
 
 function getPreviewBaseUrl() {
@@ -189,24 +279,348 @@ async function runPreflightAndReport() {
   return { ok: true };
 }
 
+function switchTab(tabName) {
+  state.currentTab = tabName;
+  
+  // Stop hook watcher if switching away from calendar
+  if (tabName !== 'calendar' && state.hookTimer) {
+    clearInterval(state.hookTimer);
+    state.hookTimer = 0;
+    state.clickHookInstalled = false;
+  }
+  
+  // Update tab buttons
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    if (btn.dataset.tab === tabName) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+  
+  // Show/hide panels
+  clearErrorMessage(); // 切換分頁時清除錯誤訊息
+  clearSuccessMessage(); // 切換分頁時清除成功訊息
+  
+  const calendarPanel = $('calendarPanel');
+  const imagePanel = $('imagePanel');
+  if (tabName === 'calendar') {
+    calendarPanel.style.display = 'block';
+    imagePanel.style.display = 'none';
+  } else {
+    calendarPanel.style.display = 'none';
+    imagePanel.style.display = 'block';
+    loadImageData(tabName);
+    // 切換分頁時清空編輯面板
+    clearImageEditPanel();
+  }
+  
+  // Reload preview
+  reloadPreviewForCurrentTab();
+}
+
+function reloadPreviewForCurrentTab() {
+  const page = state.currentTab === 'calendar' ? 'calendar.html' : (state.currentTab === 'seasonal' ? 'seasonal.html' : 'all-items.html');
+  const previewBase = getPreviewBaseUrl();
+  const iframe = $('previewFrame');
+  // 傳遞當前模式，讓 iframe 知道是編輯模式還是預覽模式
+  const mode = state.currentMode === 'edit' ? 'edit' : 'preview';
+  iframe.src = `${previewBase}/${page}?adminPreview=1&mode=${mode}&ts=${Date.now()}`;
+}
+
+// ============================================
+// 監聽來自 iframe 的訊息（拖曳排序和點擊編輯）
+// ============================================
+// 重要：此處理器接收來自預覽 iframe 的兩種訊息：
+// 1. 'gallery-reorder': 拖曳排序操作
+// 2. 'gallery-edit': 點擊編輯操作
+// 
+// 安全檢查：
+// - 只接受同源訊息（e.origin === location.origin）
+// - 驗證訊息類型和參數有效性
+// - 驗證當前標籤頁是否為 seasonal 或 products
+// ============================================
+window.addEventListener('message', async (e) => {
+  // 安全檢查：只接受來自同源的訊息
+  if (e.origin !== location.origin) {
+    console.warn('Rejected message from different origin:', e.origin);
+    return;
+  }
+  
+  // 驗證訊息格式
+  if (!e.data || typeof e.data !== 'object' || !e.data.type) {
+    console.warn('Invalid message format:', e.data);
+    return;
+  }
+  
+  // 處理拖曳排序訊息
+  if (e.data.type === 'gallery-reorder') {
+    const { fromIndex, toIndex } = e.data;
+    const type = state.currentTab === 'seasonal' ? 'seasonal' : 'products';
+    
+    // 驗證：只處理 seasonal 或 products 標籤頁
+    if (type !== 'seasonal' && type !== 'products') {
+      console.warn('Invalid tab for reorder:', state.currentTab);
+      return;
+    }
+    
+    // 驗證索引有效性
+    if (typeof fromIndex !== 'number' || typeof toIndex !== 'number' ||
+        fromIndex < 0 || toIndex < 0 || isNaN(fromIndex) || isNaN(toIndex)) {
+      console.warn('Invalid indices for reorder:', { fromIndex, toIndex });
+      logStatus(`❌ 排序失敗：無效的索引 (${fromIndex} → ${toIndex})`);
+      return;
+    }
+    
+    try {
+      // 執行排序
+      reorderImages(type, fromIndex, toIndex);
+      // 成功訊息會在 updateImageData 中顯示
+    } catch (err) {
+      console.error('Reorder failed:', err);
+      const errorMsg = err && err.message ? err.message : String(err);
+      logStatus(`❌ 排序失敗：${errorMsg}`);
+      showErrorMessage(`排序失敗：${errorMsg}`);
+    }
+  } 
+  // 處理點擊編輯訊息
+  else if (e.data.type === 'gallery-edit') {
+    const { index } = e.data;
+    const type = state.currentTab === 'seasonal' ? 'seasonal' : 'products';
+    
+    // 驗證：只處理 seasonal 或 products 標籤頁
+    if (type !== 'seasonal' && type !== 'products') {
+      console.warn('Invalid tab for edit:', state.currentTab);
+      return;
+    }
+    
+    // 驗證索引有效性
+    if (typeof index !== 'number' || index < 0 || isNaN(index)) {
+      console.warn('Invalid index for edit:', index);
+      logStatus(`❌ 編輯失敗：無效的圖片索引 (${index})`);
+      return;
+    }
+    
+    // 驗證索引是否在範圍內
+    const items = state.imageData[type] && state.imageData[type].items;
+    if (!items || !Array.isArray(items) || index >= items.length) {
+      console.warn('Index out of range:', { index, length: items ? items.length : 0 });
+      logStatus(`❌ 編輯失敗：圖片索引超出範圍 (${index + 1}/${items ? items.length : 0})`);
+      return;
+    }
+    
+    try {
+      // 關鍵修復：在打開編輯面板之前，立即強制移除 iframe 的焦點
+      // 因為 postMessage 是從 iframe 發送的，此時焦點可能在 iframe 上
+      const iframe = $('previewFrame');
+      if (iframe && document.activeElement === iframe) {
+        // 強制將焦點移開 iframe
+        document.body.focus();
+        // 使用 requestAnimationFrame 確保在下一幀執行，避免被 iframe 搶回焦點
+        requestAnimationFrame(() => {
+          document.body.focus();
+        });
+      }
+      
+      // 在右側面板中顯示編輯表單
+      openImageEditPanel(type, index);
+      logStatus(`📝 編輯圖片：${index + 1}`);
+    } catch (err) {
+      console.error('Open edit panel failed:', err);
+      logStatus(`❌ 打開編輯失敗：${err && err.message ? err.message : String(err)}`);
+    }
+  } else {
+    // 未知的訊息類型
+    console.warn('Unknown message type:', e.data.type);
+  }
+});
+
+function switchMode(mode) {
+  state.currentMode = mode;
+  const mainContainer = $('mainContainer');
+  const editModeBtn = $('editModeBtn');
+  const previewModeBtn = $('previewModeBtn');
+  const topbarCenter = $('topbarCenter');
+  
+  if (mode === 'preview') {
+    mainContainer.classList.add('preview-mode');
+    editModeBtn.classList.remove('active');
+    previewModeBtn.classList.add('active');
+    topbarCenter.style.display = 'none';
+    
+    // 切換到預覽模式時，清除圖片選取狀態
+    if ((state.currentTab === 'seasonal' || state.currentTab === 'products') && state.editingImageIndex >= 0) {
+      const iframe = $('previewFrame');
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage({
+          type: 'gallery-select',
+          index: -1, // -1 表示取消選取
+        }, '*');
+      }
+    }
+    
+    // Stop hook watcher in preview mode
+    if (state.hookTimer) {
+      clearInterval(state.hookTimer);
+      state.hookTimer = 0;
+      state.clickHookInstalled = false;
+    }
+  } else {
+    mainContainer.classList.remove('preview-mode');
+    editModeBtn.classList.add('active');
+    previewModeBtn.classList.remove('active');
+    topbarCenter.style.display = 'flex';
+    
+    // 切換回編輯模式時，如果有選取的圖片，會在 iframe load 事件中重新標記
+    
+    // Restart hook watcher if on calendar tab
+    if (state.currentTab === 'calendar') {
+      state.clickHookInstalled = false;
+      startHookWatcher({ maxWaitMs: 12000, intervalMs: 250 });
+    }
+  }
+  
+  // Reload preview to reflect mode change
+  reloadPreviewForCurrentTab();
+}
+
+async function loadImageData(type) {
+  try {
+    const res = await LovelyAdmin.readImageData({ type });
+    if (res && res.ok) {
+      state.imageData[type] = res.data;
+      // 不再需要渲染圖片列表，點擊圖片時直接在面板中編輯
+    } else {
+      logStatus(`❌ 無法載入 ${type} 資料`);
+    }
+  } catch (e) {
+    logStatus(`❌ 載入 ${type} 資料失敗：${e && e.message ? e.message : String(e)}`);
+  }
+}
+
 async function main() {
   state.siteInfo = await LovelyAdmin.getSiteInfo();
-  $('siteInfo').textContent = state.siteInfo && state.siteInfo.siteDir ? state.siteInfo.siteDir : '';
 
+  // Initialize mode switcher
+  $('editModeBtn').addEventListener('click', () => switchMode('edit'));
+  $('previewModeBtn').addEventListener('click', () => switchMode('preview'));
+  
+  // Initialize status toggle
+  const statusToggle = $('statusToggle');
+  const statusBox = $('statusBox');
+  if (statusToggle && statusBox) {
+    // 狀態欄預設隱藏，只能手動點擊打開
+    statusToggle.addEventListener('click', () => {
+      const isExpanded = statusBox.classList.contains('show');
+      if (isExpanded) {
+        statusBox.classList.remove('show');
+        statusToggle.classList.remove('expanded');
+      } else {
+        statusBox.classList.add('show');
+        statusToggle.classList.add('expanded');
+      }
+    });
+  }
+  
+  // Initialize image edit panel buttons (disabled by default)
+  $('imageEditSaveBtn').disabled = true;
+  $('imageEditDeleteBtn').disabled = true;
+
+  // Initialize tabs
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      switchTab(btn.dataset.tab);
+    });
+  });
+  
+  // Start with calendar tab in edit mode
+  switchTab('calendar');
+  switchMode('edit');
+  
   await refreshCalendarData();
-  reloadPreview();
 
   const previewFrame = $('previewFrame');
   if (previewFrame) {
-    // Re-install the click hook every time the preview reloads.
+    // Re-install the click hook every time the preview reloads (only for calendar tab in edit mode).
     previewFrame.addEventListener('load', () => {
-      state.clickHookInstalled = false;
-      startHookWatcher({ maxWaitMs: 12000, intervalMs: 250 });
+      // Only start hook watcher if we're on the calendar tab and in edit mode
+      if (state.currentTab === 'calendar' && state.currentMode === 'edit') {
+        state.clickHookInstalled = false;
+        startHookWatcher({ maxWaitMs: 12000, intervalMs: 250 });
+      }
+      
+      // 關鍵修復：如果不在日曆分頁，且正在編輯圖片，確保焦點不會停留在 iframe 上
+      if ((state.currentTab === 'seasonal' || state.currentTab === 'products') && 
+          state.editingImageIndex >= 0 && 
+          state.currentMode === 'edit') {
+        // 延遲一下，確保 iframe 完全載入
+        setTimeout(() => {
+          // 方法1：暫時移除 iframe 的 tabindex，防止它自動獲得焦點
+          const originalTabIndex = previewFrame.getAttribute('tabindex');
+          previewFrame.setAttribute('tabindex', '-1');
+          
+          // 方法2：如果焦點在 iframe 上，強制移開
+          if (document.activeElement === previewFrame) {
+            const nameInput = $('imageNameInput');
+            if (nameInput && nameInput.offsetParent !== null) {
+              nameInput.focus();
+              nameInput.select();
+            } else {
+              document.body.focus();
+            }
+          }
+          
+          // 方法3：使用 requestAnimationFrame 確保在下一幀執行
+          requestAnimationFrame(() => {
+            const nameInput = $('imageNameInput');
+            if (nameInput && nameInput.offsetParent !== null) {
+              nameInput.focus();
+              nameInput.select();
+            }
+            // 恢復 iframe 的 tabindex（如果需要）
+            if (originalTabIndex !== null) {
+              previewFrame.setAttribute('tabindex', originalTabIndex);
+            } else {
+              previewFrame.removeAttribute('tabindex');
+            }
+          });
+        }, 100);
+      }
+      
+      // 如果有需要滾動到的圖片索引，發送滾動消息
+      if (state.scrollToImageIndex >= 0 && 
+          (state.currentTab === 'seasonal' || state.currentTab === 'products') &&
+          previewFrame.contentWindow) {
+        // 使用 setTimeout 確保 iframe 內容已完全渲染
+        setTimeout(() => {
+          previewFrame.contentWindow.postMessage({
+            type: 'gallery-scroll-to',
+            index: state.scrollToImageIndex,
+          }, '*');
+          // 重置索引，避免重複滾動
+          state.scrollToImageIndex = -1;
+        }, 300);
+      }
+      
+      // 如果已經有選取的圖片，且是編輯模式，重新標記選取狀態
+      if (state.editingImageIndex >= 0 && 
+          (state.currentTab === 'seasonal' || state.currentTab === 'products') &&
+          state.currentMode === 'edit' &&
+          previewFrame.contentWindow) {
+        setTimeout(() => {
+          previewFrame.contentWindow.postMessage({
+            type: 'gallery-select',
+            index: state.editingImageIndex,
+          }, '*');
+        }, 300);
+      }
     });
   }
 
-  // Also start the watcher right away (covers the case where load fires before listener is attached).
-  startHookWatcher({ maxWaitMs: 12000, intervalMs: 250 });
+  // Also start the watcher right away if on calendar tab in edit mode (covers the case where load fires before listener is attached).
+  if (state.currentTab === 'calendar' && state.currentMode === 'edit') {
+    startHookWatcher({ maxWaitMs: 12000, intervalMs: 250 });
+  }
 
   $('preflightBtn').addEventListener('click', async () => {
     await runPreflightAndReport();
@@ -220,32 +634,56 @@ async function main() {
       await LovelyAdmin.upsertCalendarEvent({ date: state.selectedDate, status, description });
       await LovelyAdmin.bumpCalendarVersion();
       await refreshCalendarData();
-      logStatus(`✅ 已儲存：${state.selectedDate} (${status})`);
-      reloadPreview();
+      const statusText = status === 'available' ? '可預訂' : status === 'unavailable' ? '不可預訂' : '休息';
+      showSuccessMessage(`已儲存：${state.selectedDate} (${statusText})`);
+      
+      // 只在日曆分頁時才重新載入預覽，避免在其他分頁時重新載入 iframe 導致焦點問題
+      if (state.currentTab === 'calendar') {
+        reloadPreviewForCurrentTab();
+      }
     } catch (e) {
-      logStatus(`❌ 儲存失敗：${e && e.message ? e.message : String(e)}`);
+      const errorMsg = e && e.message ? e.message : String(e);
+      logStatus(`❌ 儲存失敗：${errorMsg}`);
+      showErrorMessage(`儲存失敗：${errorMsg}`);
     }
   });
 
   $('clearBtn').addEventListener('click', async () => {
     if (!state.selectedDate || !state.eventsByDate.has(state.selectedDate)) return;
-    const ok = confirm(`確定要清除 ${state.selectedDate} 的事件嗎？`);
-    if (!ok) return;
+    
+    // 使用 Electron dialog API（在主進程執行，不會影響渲染進程焦點）
+    const result = await LovelyAdmin.confirmDialog({
+      message: '確定要清除日曆事件嗎？',
+      detail: `日期：${state.selectedDate}`,
+    });
+    
+    if (!result || !result.ok) return;
+    
     try {
       await LovelyAdmin.deleteCalendarEvent({ date: state.selectedDate });
       await LovelyAdmin.bumpCalendarVersion();
       await refreshCalendarData();
-      logStatus(`✅ 已清除：${state.selectedDate}`);
+      const clearedDate = state.selectedDate; // 保存日期，因為 setSelectedDate 會清除成功訊息
       setSelectedDate(state.selectedDate);
-      reloadPreview();
+      showSuccessMessage(`已清除：${clearedDate}`); // 在 setSelectedDate 之後顯示，避免被清除
+
+      // 只在日曆分頁時才重新載入預覽
+      if (state.currentTab === 'calendar') {
+        reloadPreviewForCurrentTab();
+      }
     } catch (e) {
-      logStatus(`❌ 清除失敗：${e && e.message ? e.message : String(e)}`);
+      const errorMsg = e && e.message ? e.message : String(e);
+      logStatus(`❌ 清除失敗：${errorMsg}`);
+      showErrorMessage(`清除失敗：${errorMsg}`);
     }
   });
 
   $('publishBtn').addEventListener('click', async () => {
-    const ok = confirm('確定要一鍵發布嗎？\n\n流程：本機檢查 → commit → push → CI 檢查通過才會部署。');
-    if (!ok) return;
+    const result = await LovelyAdmin.confirmDialog({
+      message: '確定要一鍵發布嗎？',
+      detail: '流程：本機檢查 → commit → push → CI 檢查通過才會部署。',
+    });
+    if (!result || !result.ok) return;
 
     const pre = await runPreflightAndReport();
     if (!pre.ok) return;
@@ -266,9 +704,495 @@ async function main() {
   });
 }
 
+// renderImageList 已移除：不再需要圖片列表，點擊預覽頁面的圖片即可在右側面板編輯
+
+async function validateImageData(type) {
+  try {
+    const res = await LovelyAdmin.validateImageData({ type });
+    if (res && res.issues && res.issues.length > 0) {
+      const issues = res.issues.map(i => `- ${i.message}`).join('\n');
+      logStatus(`⚠️ ${type === 'seasonal' ? '季節限定' : '全部品項'} 資料驗證發現問題：\n${issues}`);
+    } else {
+      logStatus(`✅ ${type === 'seasonal' ? '季節限定' : '全部品項'} 資料驗證通過`);
+    }
+  } catch (e) {
+    logStatus(`❌ 驗證失敗：${e && e.message ? e.message : String(e)}`);
+  }
+}
+
+// 更新選取圖片顯示的輔助函數
+function updateSelectedImageDisplay(imageName) {
+  const displayText = imageName ? `選取圖片：${imageName}` : '選取圖片：尚未選取';
+  $('selectedImage').textContent = displayText;
+}
+
+function openImageEditPanel(type, index) {
+  clearErrorMessage(); // 清除錯誤訊息
+  clearSuccessMessage(); // 清除成功訊息
+  
+  const item = state.imageData[type].items[index];
+  if (!item) return;
+  
+  state.editingImageIndex = index;
+  
+  // 更新選取的圖片顯示（合併為一行）
+  updateSelectedImageDisplay(item.name || '未命名');
+  
+  // 填充表單
+  $('imageNameInput').value = item.name || '';
+  $('imagePriceInput').value = item.price || '';
+  $('imageDescInput').value = item.description || '';
+  
+  // Reset checkboxes
+  document.querySelectorAll('.tag-checkboxes input[type="checkbox"]').forEach(cb => {
+    cb.checked = false;
+  });
+  
+  // Set checkboxes from tags
+  if (item.tags && Array.isArray(item.tags)) {
+    item.tags.forEach(tag => {
+      const cb = document.querySelector(`#tag-${tag === '奶蛋素' ? 'vegetarian' : tag === '無咖啡因' ? 'caffeine-free' : tag === '含酒精' ? 'alcohol' : ''}`);
+      if (cb) cb.checked = true;
+    });
+  }
+  
+  // 顯示編輯表單
+  $('imageEditForm').style.display = 'block';
+  
+  // 啟用按鈕
+  $('imageEditSaveBtn').disabled = false;
+  $('imageEditDeleteBtn').disabled = false;
+  
+  // 通知 iframe 標記選取的圖片
+  const iframe = $('previewFrame');
+  if (iframe && iframe.contentWindow) {
+    iframe.contentWindow.postMessage({
+      type: 'gallery-select',
+      index: index,
+    }, '*');
+  }
+  
+  // 強制聚焦到輸入框，確保即使焦點在 iframe 上也能正常輸入
+  // 使用多層延遲和重試機制，確保焦點能正確轉移
+  const focusInput = () => {
+    const nameInput = $('imageNameInput');
+    if (!nameInput || nameInput.offsetParent === null) return false; // 元素不可見
+    
+    // 先嘗試移除 iframe 的焦點（如果有的話）
+    const iframe = $('previewFrame');
+    if (iframe && (document.activeElement === iframe || document.activeElement === iframe.contentDocument?.activeElement)) {
+      // 強制將焦點移開 iframe
+      document.body.focus();
+      // 使用 requestAnimationFrame 確保在下一幀執行
+      requestAnimationFrame(() => {
+        document.body.focus();
+      });
+    }
+    
+    // 聚焦到輸入框
+    nameInput.focus();
+    
+    // 檢查是否成功
+    if (document.activeElement === nameInput) {
+      nameInput.select(); // 選中現有文字，方便直接輸入
+      return true;
+    }
+    return false;
+  };
+  
+  // 立即嘗試一次
+  if (!focusInput()) {
+    // 如果失敗，使用 requestAnimationFrame 在下一幀再試
+    requestAnimationFrame(() => {
+      if (!focusInput()) {
+        // 如果還是失敗，延遲再試
+        setTimeout(() => {
+          if (!focusInput()) {
+            // 如果還是失敗，再延遲一次（可能是 iframe 正在載入）
+            setTimeout(() => {
+              focusInput();
+            }, 200);
+          }
+        }, 100);
+      }
+    });
+  }
+}
+
+function clearImageEditPanel() {
+  state.editingImageIndex = -1;
+  updateSelectedImageDisplay(null); // 使用輔助函數更新顯示
+  $('imageNameInput').value = '';
+  $('imagePriceInput').value = '';
+  $('imageDescInput').value = '';
+  
+  // Reset checkboxes
+  document.querySelectorAll('.tag-checkboxes input[type="checkbox"]').forEach(cb => {
+    cb.checked = false;
+  });
+  
+  // 隱藏編輯表單
+  $('imageEditForm').style.display = 'none';
+  
+  // 禁用按鈕
+  $('imageEditSaveBtn').disabled = true;
+  $('imageEditDeleteBtn').disabled = true;
+  
+  // 通知 iframe 取消選取標記
+  const iframe = $('previewFrame');
+  if (iframe && iframe.contentWindow) {
+    iframe.contentWindow.postMessage({
+      type: 'gallery-select',
+      index: -1, // -1 表示取消選取
+    }, '*');
+  }
+}
+
+async function saveImageEdit(type) {
+  const name = $('imageNameInput').value.trim();
+  const price = $('imagePriceInput').value.trim();
+  const description = $('imageDescInput').value.trim();
+  
+  if (!name) {
+    await LovelyAdmin.alertDialog({
+      message: '請輸入圖片名稱',
+    });
+    return;
+  }
+  
+  const tags = [];
+  document.querySelectorAll('.tag-checkboxes input[type="checkbox"]:checked').forEach(cb => {
+    tags.push(cb.value);
+  });
+  
+  const index = state.editingImageIndex;
+  if (index < 0) return;
+  
+  const item = state.imageData[type].items[index];
+  // 保存原始名稱，以便失敗時恢復
+  const originalName = item.name || '';
+  
+  item.name = name;
+  item.price = price;
+  item.description = description;
+  item.tags = tags;
+  
+  // Update will handle file renaming
+  try {
+    await updateImageData(type); // 這會顯示「已更新 季節限定/全部品項 資料」
+    // 更新後保持編輯狀態，但更新選取的圖片顯示
+    const updatedItem = state.imageData[type].items[index];
+    if (updatedItem) {
+      updateSelectedImageDisplay(updatedItem.name || '未命名');
+    }
+  } catch (e) {
+    // 如果更新失敗（特別是重複命名錯誤），恢復原始名稱
+    const errorMsg = e && e.message ? e.message : String(e);
+    if (errorMsg.includes('目標檔名已存在') || errorMsg.includes('檔名已存在')) {
+      // 恢復原始名稱到輸入欄位和資料
+      item.name = originalName;
+      $('imageNameInput').value = originalName;
+      // 更新顯示
+      updateSelectedImageDisplay(originalName || '未命名');
+      // 顯示錯誤訊息
+      showErrorMessage(errorMsg);
+    } else {
+      // 其他錯誤也顯示
+      logStatus(`❌ 儲存失敗：${errorMsg}`);
+      showErrorMessage(`儲存失敗：${errorMsg}`);
+    }
+    // 不再重新拋出錯誤，因為已經處理了
+  }
+}
+
+async function updateImageData(type) {
+  try {
+    await LovelyAdmin.updateImageData({ type, items: state.imageData[type].items });
+    await loadImageData(type);
+    const typeName = type === 'seasonal' ? '季節限定' : '全部品項';
+    showSuccessMessage(`已更新 ${typeName} 資料`);
+    
+    // Reload preview - 使用 reloadPreviewForCurrentTab 確保傳遞正確的 mode 參數
+    // 這樣 iframe 重新載入後才能正確判斷是編輯模式還是預覽模式
+    reloadPreviewForCurrentTab();
+  } catch (e) {
+    let errorMsg = e && e.message ? e.message : String(e);
+    
+    // 簡化錯誤訊息：去掉 "Error invoking remote method 'images:update': Error:" 前綴
+    if (errorMsg.includes('Error invoking remote method')) {
+      // 提取實際的錯誤訊息
+      const match = errorMsg.match(/Error:\s*(.+)$/);
+      if (match && match[1]) {
+        errorMsg = `Error: ${match[1]}`;
+      } else {
+        // 如果沒有匹配到，嘗試提取最後的錯誤訊息
+        const parts = errorMsg.split('Error:');
+        if (parts.length > 1) {
+          errorMsg = `Error: ${parts[parts.length - 1].trim()}`;
+        }
+      }
+    }
+    
+    logStatus(`❌ 更新失敗：${errorMsg}`);
+    // 如果是檔名衝突的錯誤，顯示在上方
+    if (errorMsg.includes('目標檔名已存在') || errorMsg.includes('檔名已存在')) {
+      showErrorMessage(errorMsg);
+    }
+    // 重新拋出錯誤，讓調用者可以處理
+    throw e;
+  }
+}
+
+async function deleteImage(type, index) {
+  const item = state.imageData[type].items[index];
+  if (!item) return;
+  
+  const result = await LovelyAdmin.confirmDialog({
+    message: `確定要刪除「${item.name}」嗎？`,
+    detail: '這會同時刪除檔案和 JSON 記錄。',
+  });
+  if (!result || !result.ok) return;
+  
+  try {
+    // Delete file
+    await LovelyAdmin.deleteImage({ type, imagePath: item.image });
+    
+    // Remove from array
+    state.imageData[type].items.splice(index, 1);
+    
+    // Update JSON (這會顯示成功訊息，但我們要顯示刪除訊息)
+    const typeName = type === 'seasonal' ? '季節限定' : '全部品項';
+    try {
+      await LovelyAdmin.updateImageData({ type, items: state.imageData[type].items });
+      await loadImageData(type);
+      showSuccessMessage(`已刪除圖片：${item.name}`);
+      reloadPreviewForCurrentTab();
+    } catch (e) {
+      const errorMsg = e && e.message ? e.message : String(e);
+      logStatus(`❌ 更新資料失敗：${errorMsg}`);
+      showErrorMessage(`刪除失敗：${errorMsg}`);
+      // 清空編輯面板
+      clearImageEditPanel();
+      return; // 不再繼續執行
+    }
+    
+    // 清空編輯面板
+    clearImageEditPanel();
+  } catch (e) {
+    const errorMsg = e && e.message ? e.message : String(e);
+    logStatus(`❌ 刪除失敗：${errorMsg}`);
+    showErrorMessage(`刪除失敗：${errorMsg}`);
+    // 清空編輯面板
+    clearImageEditPanel();
+  }
+}
+
+function reorderImages(type, fromIndex, toIndex) {
+  const items = state.imageData[type].items;
+  const [moved] = items.splice(fromIndex, 1);
+  items.splice(toIndex, 0, moved);
+  // 使用自訂成功訊息
+  updateImageData(type, `已重新排序：從位置 ${fromIndex + 1} 移動到位置 ${toIndex + 1}`);
+}
+
+function promptImageName(defaultName) {
+  return new Promise((resolve) => {
+    // 直接使用檔名（去掉副檔名）作為圖片名稱
+    // 上傳後可以在右側面板編輯名稱
+    const name = defaultName.replace(/\.[^.]+$/, '') || 'untitled';
+    resolve(name.trim());
+  });
+}
+
+async function handleDroppedFiles(type, files) {
+  try {
+    let lastUploadedImagePath = null; // 記錄最後上傳的圖片路徑
+    
+    for (const file of files) {
+      try {
+        // 在 Electron 33+ 中，file.path 已被移除，需要使用 webUtils.getPathForFile
+        let filePath;
+        if (file.path) {
+          // 舊版本 Electron 可能還有 path 屬性
+          filePath = file.path;
+        } else if (LovelyAdmin.getPathForFile) {
+          // 使用 webUtils.getPathForFile 獲取檔案路徑（Electron 33+）
+          filePath = LovelyAdmin.getPathForFile(file);
+        } else {
+          logStatus(`❌ 無法獲取檔案路徑：${file.name || '未知檔案'}（不支援的 Electron 版本）`);
+          continue;
+        }
+        
+        // 驗證：必須有路徑
+        if (!filePath) {
+          logStatus(`❌ 無法獲取檔案路徑：${file.name || '未知檔案'}`);
+          continue;
+        }
+        
+        // 驗證：路徑必須看起來像完整路徑（包含路徑分隔符）
+        if (!filePath.includes('/') && !filePath.includes('\\') && !filePath.match(/^[A-Za-z]:/)) {
+          logStatus(`❌ 無效的檔案路徑：${filePath}`);
+          continue;
+        }
+        
+        const fileName = filePath.split(/[/\\]/).pop();
+        logStatus(`⏳ 準備上傳：${fileName}...`);
+        
+        // 使用檔名（去掉副檔名）作為圖片名稱
+        const name = await promptImageName(fileName);
+        if (!name || !name.trim()) {
+          logStatus(`❌ 跳過：${fileName}（無法產生有效名稱）`);
+          continue;
+        }
+        
+        const uploadRes = await LovelyAdmin.uploadImage({ 
+          type, 
+          filePath, 
+          name: name.trim() 
+        });
+        
+        if (uploadRes && uploadRes.ok) {
+          // Add to items array
+          const newItem = {
+            image: uploadRes.imagePath,
+            name: uploadRes.name,
+            price: '',
+            description: '',
+            tags: [],
+          };
+          state.imageData[type].items.push(newItem);
+          lastUploadedImagePath = uploadRes.imagePath; // 記錄最後上傳的圖片路徑
+          logStatus(`✅ 已上傳：${fileName} → ${uploadRes.name}.jpg`);
+        } else {
+          const errorMsg = `上傳失敗：${fileName}`;
+          logStatus(`❌ ${errorMsg}`);
+          showErrorMessage(errorMsg);
+        }
+      } catch (e) {
+        const errorMsg = e && e.message ? e.message : String(e);
+        logStatus(`❌ 上傳失敗：${errorMsg}`);
+        // 顯示錯誤訊息
+        showErrorMessage(`上傳失敗：${errorMsg}`);
+      }
+    }
+    
+    // Update JSON after all uploads
+    // 如果有上傳成功的圖片，顯示上傳成功訊息；否則顯示更新資料訊息
+    if (lastUploadedImagePath && state.imageData[type] && state.imageData[type].items) {
+      const uploadedItem = state.imageData[type].items.find(item => item.image === lastUploadedImagePath);
+      const uploadedName = uploadedItem ? uploadedItem.name : '圖片';
+      const typeName = type === 'seasonal' ? '季節限定' : '全部品項';
+      await updateImageData(type, `已上傳圖片到 ${typeName}：${uploadedName}`);
+    } else {
+      await updateImageData(type);
+    }
+    
+    // 如果有上傳成功的圖片，自動選取最後上傳的那一張並滾動到該位置
+    if (lastUploadedImagePath && state.imageData[type] && state.imageData[type].items) {
+      const index = state.imageData[type].items.findIndex(item => item.image === lastUploadedImagePath);
+      if (index !== -1) {
+        openImageEditPanel(type, index);
+        
+        // 設置需要滾動到的索引，iframe 載入完成後會自動滾動
+        state.scrollToImageIndex = index;
+      }
+    }
+  } catch (e) {
+    const errorMsg = e && e.message ? e.message : String(e);
+    logStatus(`❌ 處理拖曳檔案失敗：${errorMsg}`);
+    showErrorMessage(`處理拖曳檔案失敗：${errorMsg}`);
+  }
+}
+
+async function handleImageUpload(type) {
+  try {
+    // Use Electron dialog to select files
+    const res = await LovelyAdmin.selectImageFiles();
+    if (!res || !res.ok || !res.files || res.files.length === 0) {
+      return;
+    }
+    
+    // 將檔案路徑轉換為 File 物件格式（用於統一處理）
+    const files = res.files.map(filePath => ({
+      path: filePath,
+      name: filePath.split(/[/\\]/).pop(),
+    }));
+    
+    await handleDroppedFiles(type, files);
+  } catch (e) {
+    const errorMsg = e && e.message ? e.message : String(e);
+    logStatus(`❌ 選擇檔案失敗：${errorMsg}`);
+    showErrorMessage(`選擇檔案失敗：${errorMsg}`);
+  }
+}
+
 window.addEventListener('load', () => {
   main().catch((e) => {
     logStatus(`❌ 啟動失敗：${e && e.message ? e.message : String(e)}`);
+  });
+  
+  // Image upload handlers
+  const uploadArea = $('imageUploadArea');
+  
+  uploadArea.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    uploadArea.classList.add('dragover');
+  });
+  
+  uploadArea.addEventListener('dragleave', () => {
+    uploadArea.classList.remove('dragover');
+  });
+  
+  uploadArea.addEventListener('drop', async (e) => {
+    e.preventDefault();
+    uploadArea.classList.remove('dragover');
+    
+    if (state.currentTab !== 'seasonal' && state.currentTab !== 'products') {
+      return;
+    }
+    
+    // 獲取拖曳的檔案
+    const files = Array.from(e.dataTransfer.files || []);
+    if (files.length === 0) {
+      // 如果沒有檔案，回退到檔案選擇對話框
+      await handleImageUpload(state.currentTab);
+      return;
+    }
+    
+    // 處理拖曳的檔案
+    await handleDroppedFiles(state.currentTab, files);
+  });
+  
+  // 單一點擊監聽器：使用 Electron dialog 選擇檔案
+  uploadArea.addEventListener('click', async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (state.currentTab === 'seasonal' || state.currentTab === 'products') {
+      await handleImageUpload(state.currentTab);
+    }
+  });
+  
+  // Image edit panel handlers
+  $('imageEditSaveBtn').addEventListener('click', () => {
+    if (state.currentTab === 'seasonal' || state.currentTab === 'products') {
+      if (state.editingImageIndex >= 0) {
+        saveImageEdit(state.currentTab);
+      }
+    }
+  });
+  
+  $('imageEditDeleteBtn').addEventListener('click', () => {
+    if (state.currentTab === 'seasonal' || state.currentTab === 'products') {
+      if (state.editingImageIndex >= 0) {
+        deleteImage(state.currentTab, state.editingImageIndex);
+      }
+    }
+  });
+  
+  $('validateBtn').addEventListener('click', () => {
+    if (state.currentTab === 'seasonal' || state.currentTab === 'products') {
+      validateImageData(state.currentTab);
+    }
   });
 });
 
