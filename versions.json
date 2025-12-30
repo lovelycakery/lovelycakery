@@ -105,8 +105,8 @@
     {
       "version": "v2.1",
       "description": "正式版 2.1：新增圖片標籤功能（奶蛋素、無咖啡因、含酒精），支援標籤篩選、精緻箭頭造型標籤設計",
-      "git_commit": "3370506b00ac1b8b3ba394821801b5e96b5d08cf",
-      "git_commit_short": "3370506",
+      "git_commit": "92f99a95e79841b9b60d8559b00c70a2e078db74",
+      "git_commit_short": "92f99a9",
       "git_tag": "v2.1",
       "created_at": "2025-12-30",
       "created_by": "chiamin",
