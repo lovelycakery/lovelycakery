@@ -397,7 +397,7 @@ body.calendar-page-body {
     }
 
     .nav-link {
-        font-size: 14px;  /* 手機上的導覽連結字型大小（稍微增大） */
+        font-size: 15px;  /* 手機上的導覽連結字型大小（再增大一點） */
         letter-spacing: 0.1px;
     }
 
@@ -481,7 +481,7 @@ body.calendar-page-body {
     }
 
     .nav-link {
-        font-size: 13px;  /* 超小屏幕的導覽連結字體（稍微增大） */
+        font-size: 14px;  /* 超小屏幕的導覽連結字體（再增大一點） */
         letter-spacing: 0.1px;
     }
 
