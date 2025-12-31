@@ -5,7 +5,11 @@
       "image": "assets/images/products/檸檬千層.jpg",
       "name": "檸檬千層",
       "name_en": "Lemon Mille Crepe",
-      "price": "2200",
+      "prices": {
+        "size6": "2000",
+        "size8": "2200",
+        "slice": "200"
+      },
       "description": "",
       "description_en": "",
       "tags": []
@@ -14,7 +18,11 @@
       "image": "assets/images/products/焦糖千層.jpg",
       "name": "焦糖千層",
       "name_en": "Caramel Mille Crepe",
-      "price": "2200",
+      "prices": {
+        "size6": "2000",
+        "size8": "2200",
+        "slice": "200"
+      },
       "description": "",
       "description_en": "",
       "tags": [
@@ -25,7 +33,11 @@
       "image": "assets/images/products/藍莓千層.jpg",
       "name": "藍莓千層",
       "name_en": "Blueberry Mille Crepe",
-      "price": "2200",
+      "prices": {
+        "size6": "2000",
+        "size8": "2200",
+        "slice": "200"
+      },
       "description": "",
       "description_en": "",
       "tags": []
@@ -34,7 +46,11 @@
       "image": "assets/images/products/香草千層.jpg",
       "name": "香草千層",
       "name_en": "Vanilla Mille Crepe",
-      "price": "2200",
+      "prices": {
+        "size6": "2000",
+        "size8": "2200",
+        "slice": "200"
+      },
       "description": "",
       "description_en": "",
       "tags": [
@@ -45,7 +61,11 @@
       "image": "assets/images/products/伯爵茶千層.jpg",
       "name": "伯爵茶千層",
       "name_en": "Earl Grey Mille Crepe",
-      "price": "2200",
+      "prices": {
+        "size6": "2000",
+        "size8": "2200",
+        "slice": "200"
+      },
       "description": "",
       "description_en": "",
       "tags": []
@@ -54,7 +74,11 @@
       "image": "assets/images/products/提拉米蘇千層.jpg",
       "name": "提拉米蘇千層",
       "name_en": "Tiramisu Mille Crepe",
-      "price": "2200",
+      "prices": {
+        "size6": "2000",
+        "size8": "2200",
+        "slice": "200"
+      },
       "description": "",
       "description_en": "",
       "tags": [
@@ -65,7 +89,11 @@
       "image": "assets/images/products/紅茶千層.jpg",
       "name": "紅茶千層",
       "name_en": "Black Tea Mille Crepe",
-      "price": "2200",
+      "prices": {
+        "size6": "2000",
+        "size8": "2200",
+        "slice": "200"
+      },
       "description": "",
       "description_en": "",
       "tags": []
@@ -74,7 +102,11 @@
       "image": "assets/images/products/咖啡千層.jpg",
       "name": "咖啡千層",
       "name_en": "Coffee Mille Crepe",
-      "price": "2200",
+      "prices": {
+        "size6": "2000",
+        "size8": "2200",
+        "slice": "200"
+      },
       "description": "",
       "description_en": "",
       "tags": []

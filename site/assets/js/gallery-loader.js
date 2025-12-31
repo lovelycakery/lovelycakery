@@ -54,6 +54,53 @@
       tagsHTML = `<div class="image-modal__tags">${tags}</div>`;
     }
     
+    // 處理價格顯示
+    let priceHTML = '';
+    if (item.prices && typeof item.prices === 'object') {
+      const prices = item.prices;
+      const size6 = prices.size6 || '';
+      const size8 = prices.size8 || '';
+      const slice = prices.slice || '';
+      
+      // 如果有任何價格，顯示價格選單
+      if (size6 || size8 || slice) {
+        const sizeOptions = [];
+        if (size6) {
+          const size6TextZh = getSizeText('size6', 'zh');
+          const size6TextEn = getSizeText('size6', 'en');
+          sizeOptions.push(`<option value="size6" data-price="${size6}" data-en="${size6TextEn}" data-zh="${size6TextZh}">${getSizeText('size6', currentLang)}</option>`);
+        }
+        if (size8) {
+          const size8TextZh = getSizeText('size8', 'zh');
+          const size8TextEn = getSizeText('size8', 'en');
+          sizeOptions.push(`<option value="size8" data-price="${size8}" data-en="${size8TextEn}" data-zh="${size8TextZh}">${getSizeText('size8', currentLang)}</option>`);
+        }
+        if (slice) {
+          const sliceTextZh = getSizeText('slice', 'zh');
+          const sliceTextEn = getSizeText('slice', 'en');
+          sizeOptions.push(`<option value="slice" data-price="${slice}" data-en="${sliceTextEn}" data-zh="${sliceTextZh}">${getSizeText('slice', currentLang)}</option>`);
+        }
+        
+        // 預設選擇第一個選項
+        const defaultSize = size6 ? 'size6' : (size8 ? 'size8' : 'slice');
+        const defaultPrice = prices[defaultSize] || '';
+        
+        priceHTML = `
+          <div class="image-modal__price-section">
+            <div class="image-modal__price-select-wrapper">
+              <select class="image-modal__price-select" id="modalPriceSelect">
+                ${sizeOptions.join('')}
+              </select>
+              <span class="image-modal__price-display">NT$ <span id="modalPriceValue">${defaultPrice}</span></span>
+            </div>
+          </div>
+        `;
+      }
+    } else if (item.price) {
+      // 向後兼容：如果還有舊的 price 欄位
+      priceHTML = `<p class="image-modal__price">NT$ ${item.price}</p>`;
+    }
+    
     modal.innerHTML = `
       <div class="image-modal__overlay"></div>
       <div class="image-modal__content">
@@ -63,12 +110,27 @@
         </div>
         <div class="image-modal__info">
           <h3 class="image-modal__name" data-en="${itemNameEn}" data-zh="${itemNameZh}">${itemName}</h3>
-          ${item.price ? `<p class="image-modal__price">NT$ ${item.price}</p>` : ''}
+          ${priceHTML}
           ${itemDescription ? `<p class="image-modal__description" data-en="${itemDescriptionEn}" data-zh="${itemDescriptionZh}">${itemDescription}</p>` : ''}
           ${tagsHTML}
         </div>
       </div>
     `;
+    
+    // 綁定價格選單變更事件
+    if (priceHTML && item.prices) {
+      const priceSelect = modal.querySelector('#modalPriceSelect');
+      const priceValue = modal.querySelector('#modalPriceValue');
+      if (priceSelect && priceValue) {
+        priceSelect.addEventListener('change', (e) => {
+          const selectedOption = e.target.options[e.target.selectedIndex];
+          const price = selectedOption.getAttribute('data-price');
+          if (priceValue) {
+            priceValue.textContent = price;
+          }
+        });
+      }
+    }
     
     const closeModal = () => {
       document.body.removeChild(modal);
@@ -108,10 +170,29 @@
     '含酒精': { zh: '含酒精', en: 'Contains Alcohol' },
   };
 
+  // 尺寸選項中英文對應
+  const SIZE_I18N = {
+    'size6': { zh: '6吋', en: '6"' },
+    'size8': { zh: '8吋', en: '8"' },
+    'slice': { zh: '切片', en: 'Slice' },
+  };
+
   // 獲取標籤的本地化文本
   function getTagText(tag, lang) {
     const normalized = lang === 'en' ? 'en' : 'zh';
     return TAG_I18N[tag] ? TAG_I18N[tag][normalized] : tag;
+  }
+
+  // 獲取尺寸的本地化文本
+  function getSizeText(sizeKey, lang) {
+    const normalized = lang === 'en' ? 'en' : 'zh';
+    return SIZE_I18N[sizeKey] ? SIZE_I18N[sizeKey][normalized] : sizeKey;
+  }
+
+  // 獲取尺寸的本地化文本
+  function getSizeText(sizeKey, lang) {
+    const normalized = lang === 'en' ? 'en' : 'zh';
+    return SIZE_I18N[sizeKey] ? SIZE_I18N[sizeKey][normalized] : sizeKey;
   }
 
   // 篩選圖片
@@ -305,7 +386,6 @@
       itemInfo.className = 'gallery-item-info';
       itemInfo.innerHTML = `
           <div class="gallery-item-name" data-en="${imageNameEn}" data-zh="${imageNameZh}">${imageName}</div>
-          ${item.price ? `<div class="gallery-item-price">NT$ ${item.price}</div>` : ''}
       `;
       
       itemEl.appendChild(imageWrapper);
@@ -652,6 +732,16 @@
         const modalDescription = document.querySelector('.image-modal__description[data-en][data-zh]');
         if (modalDescription) {
           window.LovelyI18n.applyLanguage(lang, modalDescription);
+        }
+        // 更新 modal 中的價格選單選項（如果 modal 存在）
+        const priceSelect = document.querySelector('#modalPriceSelect');
+        if (priceSelect) {
+          const normalized = lang === 'en' ? 'en' : 'zh';
+          Array.from(priceSelect.options).forEach(option => {
+            if (option.hasAttribute('data-en') && option.hasAttribute('data-zh')) {
+              option.textContent = normalized === 'en' ? option.getAttribute('data-en') : option.getAttribute('data-zh');
+            }
+          });
         }
       }
       return;

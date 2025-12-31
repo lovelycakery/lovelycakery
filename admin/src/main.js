@@ -731,7 +731,22 @@ function validateImageData(data) {
       throw new Error('Item name_en must be a string');
     }
     if (typeof item.image !== 'string') throw new Error('Item image path must be a string');
+    // 支持新的 prices 結構和舊的 price 結構
     if (item.price !== undefined && typeof item.price !== 'string') throw new Error('Item price must be a string');
+    if (item.prices !== undefined) {
+      if (typeof item.prices !== 'object' || Array.isArray(item.prices)) {
+        throw new Error('Item prices must be an object');
+      }
+      if (item.prices.size6 !== undefined && typeof item.prices.size6 !== 'string') {
+        throw new Error('Item prices.size6 must be a string');
+      }
+      if (item.prices.size8 !== undefined && typeof item.prices.size8 !== 'string') {
+        throw new Error('Item prices.size8 must be a string');
+      }
+      if (item.prices.slice !== undefined && typeof item.prices.slice !== 'string') {
+        throw new Error('Item prices.slice must be a string');
+      }
+    }
     if (item.description !== undefined && typeof item.description !== 'string') throw new Error('Item description must be a string');
     if (item.description_en !== undefined && typeof item.description_en !== 'string') {
       throw new Error('Item description_en must be a string');

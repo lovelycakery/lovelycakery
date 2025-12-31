@@ -2,21 +2,14 @@
   "schema_version": 1,
   "items": [
     {
-      "image": "assets/images/seasonal/草莓千層2.jpg",
-      "name": "草莓千層2",
-      "name_en": "Strawberry Mille Crepe 2",
-      "price": "2300",
-      "description": "八拉巴拉巴拉八拉巴拉巴拉八拉巴拉巴拉八拉巴拉巴拉八拉巴拉巴拉八拉巴拉巴拉八拉巴拉巴拉八拉巴拉巴拉",
-      "description_en": "A delightful combination of fresh strawberries layered with delicate crepe sheets, creating a perfect harmony of sweetness and texture.",
-      "tags": [
-        "含酒精"
-      ]
-    },
-    {
       "image": "assets/images/seasonal/草莓千層3.jpg",
       "name": "草莓千層3",
       "name_en": "Strawberry Mille Crepe 3",
-      "price": "2000",
+      "prices": {
+        "size6": "1800",
+        "size8": "2000",
+        "slice": "180"
+      },
       "description": "",
       "description_en": "",
       "tags": [
@@ -24,21 +17,14 @@
       ]
     },
     {
-      "image": "assets/images/seasonal/巧克力千層.jpg",
-      "name": "巧克力千層",
-      "name_en": "Chocolate Mille Crepe",
-      "price": "2500",
-      "description": "",
-      "description_en": "",
-      "tags": [
-        "無咖啡因"
-      ]
-    },
-    {
       "image": "assets/images/seasonal/抹茶水果千層.jpg",
       "name": "抹茶水果千層",
       "name_en": "Matcha Fruit Mille Crepe",
-      "price": "2200",
+      "prices": {
+        "size6": "2000",
+        "size8": "2200",
+        "slice": "200"
+      },
       "description": "",
       "description_en": "",
       "tags": [
@@ -48,13 +34,34 @@
       ]
     },
     {
-      "image": "assets/images/seasonal/Screenshot.jpg",
-      "name": "Screenshot",
-      "name_en": "",
-      "price": "",
+      "image": "assets/images/seasonal/巧克力千層.jpg",
+      "name": "巧克力千層",
+      "name_en": "Chocolate Mille Crepe",
+      "prices": {
+        "size6": "2200",
+        "size8": "2500",
+        "slice": "220"
+      },
       "description": "",
       "description_en": "",
-      "tags": []
+      "tags": [
+        "無咖啡因"
+      ]
+    },
+    {
+      "image": "assets/images/seasonal/草莓千層2.jpg",
+      "name": "草莓千層2",
+      "name_en": "Strawberry Mille Crepe 2",
+      "prices": {
+        "size6": "2100",
+        "size8": "2300",
+        "slice": "200"
+      },
+      "description": "八拉巴拉巴拉八拉巴拉巴拉八拉巴拉巴拉八拉巴拉巴拉八拉巴拉巴拉八拉巴拉巴拉八拉巴拉巴拉八拉巴拉巴拉",
+      "description_en": "A delightful combination of fresh strawberries layered with delicate crepe sheets, creating a perfect harmony of sweetness and texture.",
+      "tags": [
+        "含酒精"
+      ]
     }
   ]
 }

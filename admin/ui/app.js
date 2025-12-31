@@ -720,6 +720,204 @@ async function validateImageData(type) {
   }
 }
 
+async function checkEnglishFields() {
+  try {
+    // 確保已經載入兩個類型的資料
+    // 強制重新載入，確保數據是最新的
+    await loadImageData('seasonal');
+    await loadImageData('products');
+    
+    const missing = [];
+    
+    // 檢查季節限定
+    const seasonalItems = state.imageData.seasonal?.items || [];
+    seasonalItems.forEach((item, index) => {
+      const missingFields = [];
+      const missingRequired = [];
+      
+      // 必填欄位
+      if (!item.name || item.name.trim() === '') {
+        missingRequired.push('名稱');
+      }
+      
+      // 建議填寫的欄位
+      if (!item.name_en || item.name_en.trim() === '') {
+        missingFields.push('名稱 (英文)');
+      }
+      // 檢查價格（支持新的 prices 結構和舊的 price 結構）
+      const hasPrices = item.prices && typeof item.prices === 'object' && 
+        (item.prices.size6 || item.prices.size8 || item.prices.slice);
+      const hasOldPrice = item.price && item.price.trim() !== '';
+      if (!hasPrices && !hasOldPrice) {
+        missingFields.push('價格（至少填寫一個尺寸）');
+      }
+      if (!item.description || item.description.trim() === '') {
+        missingFields.push('描述');
+      }
+      if (!item.description_en || item.description_en.trim() === '') {
+        missingFields.push('描述 (英文)');
+      }
+      if (!item.tags || !Array.isArray(item.tags) || item.tags.length === 0) {
+        missingFields.push('標籤');
+      }
+      
+      if (missingRequired.length > 0 || missingFields.length > 0) {
+        missing.push({
+          type: '季節限定',
+          name: item.name || '未命名',
+          index: index,
+          required: missingRequired,
+          fields: missingFields,
+        });
+      }
+    });
+    
+    // 檢查全部品項
+    const productsItems = state.imageData.products?.items || [];
+    productsItems.forEach((item, index) => {
+      const missingFields = [];
+      const missingRequired = [];
+      
+      // 必填欄位
+      if (!item.name || item.name.trim() === '') {
+        missingRequired.push('名稱');
+      }
+      
+      // 建議填寫的欄位
+      if (!item.name_en || item.name_en.trim() === '') {
+        missingFields.push('名稱 (英文)');
+      }
+      // 檢查價格（支持新的 prices 結構和舊的 price 結構）
+      const hasPrices = item.prices && typeof item.prices === 'object' && 
+        (item.prices.size6 || item.prices.size8 || item.prices.slice);
+      const hasOldPrice = item.price && item.price.trim() !== '';
+      if (!hasPrices && !hasOldPrice) {
+        missingFields.push('價格（至少填寫一個尺寸）');
+      }
+      if (!item.description || item.description.trim() === '') {
+        missingFields.push('描述');
+      }
+      if (!item.description_en || item.description_en.trim() === '') {
+        missingFields.push('描述 (英文)');
+      }
+      if (!item.tags || !Array.isArray(item.tags) || item.tags.length === 0) {
+        missingFields.push('標籤');
+      }
+      
+      if (missingRequired.length > 0 || missingFields.length > 0) {
+        missing.push({
+          type: '全部品項',
+          name: item.name || '未命名',
+          index: index,
+          required: missingRequired,
+          fields: missingFields,
+        });
+      }
+    });
+    
+    // 構建狀態欄訊息（完整列表）
+    const requiredCount = missing.filter(m => m.required.length > 0).length;
+    const statusLines = ['📋 欄位檢查結果：'];
+    if (missing.length > 0) {
+      statusLines.push(`共發現 ${missing.length} 個圖片缺少欄位（其中 ${requiredCount} 個缺少必填欄位）：\n`);
+      
+      missing.forEach((m, idx) => {
+        statusLines.push(`${idx + 1}. ${m.type} - ${m.name}`);
+        if (m.required.length > 0) {
+          statusLines.push(`   ⚠️ 必填缺少：${m.required.join('、')}`);
+        }
+        if (m.fields.length > 0) {
+          statusLines.push(`   ⚠️ 建議填寫：${m.fields.join('、')}`);
+        }
+      });
+    } else {
+      statusLines.push('所有圖片都已填寫完整欄位！');
+    }
+    
+    // 記錄到狀態欄
+    logStatus(statusLines.join('\n'));
+    
+    // 顯示結果
+    if (missing.length === 0) {
+      showCheckResultModal(
+        '✅ 檢查完成',
+        '所有圖片都已填寫完整欄位！',
+        []
+      );
+    } else {
+      showCheckResultModal(
+        `⚠️ 發現 ${missing.length} 個圖片缺少欄位`,
+        `共發現 ${missing.length} 個圖片缺少欄位（其中 ${requiredCount} 個缺少必填欄位）`,
+        missing
+      );
+    }
+  } catch (e) {
+    const errorMsg = e && e.message ? e.message : String(e);
+    logStatus(`❌ 檢查欄位失敗：${errorMsg}`);
+    showErrorMessage(`檢查失敗：${errorMsg}`);
+  }
+}
+
+function showCheckResultModal(title, summary, missingItems) {
+  const modal = $('checkResultModal');
+  const modalTitle = $('checkResultModalTitle');
+  const modalBody = $('checkResultModalBody');
+  const modalClose = $('checkResultModalClose');
+  const modalOk = $('checkResultModalOk');
+  const modalOverlay = modal.querySelector('.check-result-modal__overlay');
+  
+  modalTitle.textContent = title;
+  
+  // 構建內容
+  let bodyHTML = `<div style="margin-bottom: 12px; color: var(--muted);">${summary}</div>`;
+  
+  if (missingItems.length === 0) {
+    bodyHTML += '<div style="text-align: center; padding: 20px 0; color: var(--accent);">✅ 完美！</div>';
+  } else {
+    bodyHTML += '<div style="margin-top: 16px;">';
+    missingItems.forEach((m, idx) => {
+      bodyHTML += '<div class="check-item">';
+      bodyHTML += `<div class="check-item-name">${idx + 1}. ${m.type} - ${m.name}</div>`;
+      
+      if (m.required.length > 0) {
+        bodyHTML += `<div class="check-item-field">⚠️ 必填缺少：${m.required.join('、')}</div>`;
+      }
+      if (m.fields.length > 0) {
+        bodyHTML += `<div class="check-item-field">⚠️ 建議填寫：${m.fields.join('、')}</div>`;
+      }
+      
+      bodyHTML += '</div>';
+    });
+    bodyHTML += '</div>';
+  }
+  
+  modalBody.innerHTML = bodyHTML;
+  
+  // 顯示對話框
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  
+  // 關閉對話框的函數
+  const closeModal = () => {
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+  };
+  
+  // 綁定關閉事件
+  modalClose.onclick = closeModal;
+  modalOk.onclick = closeModal;
+  modalOverlay.onclick = closeModal;
+  
+  // ESC 鍵關閉
+  const escHandler = (e) => {
+    if (e.key === 'Escape' && modal.style.display === 'flex') {
+      closeModal();
+      document.removeEventListener('keydown', escHandler);
+    }
+  };
+  document.addEventListener('keydown', escHandler);
+}
+
 // 更新選取圖片顯示的輔助函數
 function updateSelectedImageDisplay(imageName) {
   const displayText = imageName ? `選取圖片：${imageName}` : '選取圖片：尚未選取';
@@ -741,7 +939,23 @@ function openImageEditPanel(type, index) {
   // 填充表單
   $('imageNameInput').value = item.name || '';
   $('imageNameEnInput').value = item.name_en || '';
-  $('imagePriceInput').value = item.price || '';
+  
+  // 處理價格（支持新的 prices 結構和舊的 price 結構）
+  if (item.prices && typeof item.prices === 'object') {
+    $('imagePriceSize6Input').value = item.prices.size6 || '';
+    $('imagePriceSize8Input').value = item.prices.size8 || '';
+    $('imagePriceSliceInput').value = item.prices.slice || '';
+  } else if (item.price) {
+    // 向後兼容：如果有舊的 price，將其設為 8吋的價格
+    $('imagePriceSize6Input').value = '';
+    $('imagePriceSize8Input').value = item.price || '';
+    $('imagePriceSliceInput').value = '';
+  } else {
+    $('imagePriceSize6Input').value = '';
+    $('imagePriceSize8Input').value = '';
+    $('imagePriceSliceInput').value = '';
+  }
+  
   $('imageDescInput').value = item.description || '';
   $('imageDescEnInput').value = item.description_en || '';
   
@@ -826,7 +1040,9 @@ function clearImageEditPanel() {
   updateSelectedImageDisplay(null); // 使用輔助函數更新顯示
   $('imageNameInput').value = '';
   $('imageNameEnInput').value = '';
-  $('imagePriceInput').value = '';
+  $('imagePriceSize6Input').value = '';
+  $('imagePriceSize8Input').value = '';
+  $('imagePriceSliceInput').value = '';
   $('imageDescInput').value = '';
   $('imageDescEnInput').value = '';
   
@@ -855,7 +1071,9 @@ function clearImageEditPanel() {
 async function saveImageEdit(type) {
   const name = $('imageNameInput').value.trim();
   const nameEn = $('imageNameEnInput').value.trim();
-  const price = $('imagePriceInput').value.trim();
+  const priceSize6 = $('imagePriceSize6Input').value.trim();
+  const priceSize8 = $('imagePriceSize8Input').value.trim();
+  const priceSlice = $('imagePriceSliceInput').value.trim();
   const description = $('imageDescInput').value.trim();
   const descriptionEn = $('imageDescEnInput').value.trim();
   
@@ -880,7 +1098,24 @@ async function saveImageEdit(type) {
   
   item.name = name;
   item.name_en = nameEn || ''; // 如果为空，保持空字符串，与现有数据结构一致
-  item.price = price;
+  
+  // 處理價格（使用新的 prices 結構）
+  const prices = {};
+  if (priceSize6) prices.size6 = priceSize6;
+  if (priceSize8) prices.size8 = priceSize8;
+  if (priceSlice) prices.slice = priceSlice;
+  
+  // 如果有任何價格，使用新的 prices 結構，否則刪除價格欄位
+  if (Object.keys(prices).length > 0) {
+    item.prices = prices;
+    // 移除舊的 price 欄位（如果存在）
+    delete item.price;
+  } else {
+    // 如果沒有價格，刪除 prices 和 price
+    delete item.prices;
+    delete item.price;
+  }
+  
   item.description = description;
   item.description_en = descriptionEn || ''; // 如果为空，保持空字符串
   item.tags = tags;
@@ -1065,7 +1300,11 @@ async function handleDroppedFiles(type, files) {
             image: uploadRes.imagePath,
             name: uploadRes.name,
             name_en: '',
-            price: '',
+            prices: {
+              size6: '',
+              size8: '',
+              slice: '',
+            },
             description: '',
             description_en: '',
             tags: [],
@@ -1203,6 +1442,10 @@ window.addEventListener('load', () => {
     if (state.currentTab === 'seasonal' || state.currentTab === 'products') {
       validateImageData(state.currentTab);
     }
+  });
+  
+  $('checkEnglishBtn').addEventListener('click', () => {
+    checkEnglishFields();
   });
 });
 
