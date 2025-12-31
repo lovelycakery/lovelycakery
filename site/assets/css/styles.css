@@ -825,7 +825,8 @@ body.calendar-page-body {
 
     .seasonal-page .gallery-item {
         display: flex;
-        justify-content: center;
+        flex-direction: column;
+        align-items: center;
     }
 
     .seasonal-page .gallery-image-wrapper {
