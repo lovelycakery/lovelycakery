@@ -123,7 +123,6 @@
     }).join('');
 
     legend.innerHTML = `
-      <div class="tag-legend-label" data-en="Filter by Tags" data-zh="篩選標籤">篩選標籤：</div>
       <div class="tag-legend-items">${legendItems}</div>
       <button class="tag-legend-clear-btn" data-en="Clear All" data-zh="全部取消">全部取消</button>
     `;
@@ -236,7 +235,7 @@
       const imageWrapper = document.createElement('div');
       imageWrapper.className = 'gallery-image-wrapper';
       imageWrapper.innerHTML = `
-        <img src="${imageSrc}" alt="${imageAlt}" class="gallery-image" loading="lazy" decoding="async" width="1600" height="1600">
+          <img src="${imageSrc}" alt="${imageAlt}" class="gallery-image" loading="lazy" decoding="async" width="1600" height="1600">
       `;
       
       // 如果有標籤，在圖片上顯示標籤
@@ -247,8 +246,8 @@
       const itemInfo = document.createElement('div');
       itemInfo.className = 'gallery-item-info';
       itemInfo.innerHTML = `
-        <div class="gallery-item-name">${imageName}</div>
-        ${item.price ? `<div class="gallery-item-price">NT$ ${item.price}</div>` : ''}
+          <div class="gallery-item-name">${imageName}</div>
+          ${item.price ? `<div class="gallery-item-price">NT$ ${item.price}</div>` : ''}
       `;
       
       itemEl.appendChild(imageWrapper);
