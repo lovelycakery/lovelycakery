@@ -37,7 +37,7 @@
       { href: 'calendar.html', zh: '日曆', en: 'CALENDAR', isIcon: true, iconType: 'calendar' },
       { href: 'seasonal.html', zh: '季節限定', en: 'SEASONAL' },
       { href: 'all-items.html', zh: '全部品項', en: 'ALL ITEMS' },
-      { href: 'order.html', zh: '訂購方式', en: 'ORDER' },
+      { href: 'order.html', zh: '訂購說明', en: 'ORDER INFO' },
       { href: 'contact.html', zh: '地圖', en: 'MAP' },
     ];
 
