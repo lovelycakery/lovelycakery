@@ -727,9 +727,15 @@ function validateImageData(data) {
   for (const item of data.items) {
     if (!item || typeof item !== 'object') throw new Error('Each item must be an object');
     if (typeof item.name !== 'string') throw new Error('Item name must be a string');
+    if (item.name_en !== undefined && typeof item.name_en !== 'string') {
+      throw new Error('Item name_en must be a string');
+    }
     if (typeof item.image !== 'string') throw new Error('Item image path must be a string');
     if (item.price !== undefined && typeof item.price !== 'string') throw new Error('Item price must be a string');
     if (item.description !== undefined && typeof item.description !== 'string') throw new Error('Item description must be a string');
+    if (item.description_en !== undefined && typeof item.description_en !== 'string') {
+      throw new Error('Item description_en must be a string');
+    }
     if (!Array.isArray(item.tags)) throw new Error('Item tags must be an array');
     for (const tag of item.tags) {
       if (!allowedTags.has(tag)) throw new Error(`Invalid tag: ${tag}`);

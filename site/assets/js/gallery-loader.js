@@ -29,20 +29,43 @@
   }
 
   function createImageModal(item) {
+    const currentLang = localStorage.getItem('language') || 'zh';
     const modal = document.createElement('div');
     modal.className = 'image-modal';
+    
+    // 根據語言獲取名稱和說明
+    const itemNameZh = item.name || '未命名';
+    const itemNameEn = item.name_en || item.name || 'Untitled';
+    const itemName = currentLang === 'en' ? itemNameEn : itemNameZh;
+    
+    const itemDescriptionZh = item.description || '';
+    const itemDescriptionEn = item.description_en || item.description || '';
+    const itemDescription = currentLang === 'en' ? itemDescriptionEn : itemDescriptionZh;
+    
+    // 生成標籤 HTML，支持國際化
+    let tagsHTML = '';
+    if (item.tags && item.tags.length > 0) {
+      const tags = item.tags.map(tag => {
+        const tagText = getTagText(tag, currentLang);
+        const tagTextZh = TAG_I18N[tag] ? TAG_I18N[tag].zh : tag;
+        const tagTextEn = TAG_I18N[tag] ? TAG_I18N[tag].en : tag;
+        return `<span class="image-modal__tag" data-en="${tagTextEn}" data-zh="${tagTextZh}" data-tag-key="${tag}">${tagText}</span>`;
+      }).join('');
+      tagsHTML = `<div class="image-modal__tags">${tags}</div>`;
+    }
+    
     modal.innerHTML = `
       <div class="image-modal__overlay"></div>
       <div class="image-modal__content">
         <button class="image-modal__close" aria-label="關閉">&times;</button>
         <div class="image-modal__image-wrapper">
-          <img src="${item.image}" alt="${item.name}" class="image-modal__image">
+          <img src="${item.image}" alt="${itemName}" class="image-modal__image">
         </div>
         <div class="image-modal__info">
-          <h3 class="image-modal__name">${item.name || '未命名'}</h3>
+          <h3 class="image-modal__name" data-en="${itemNameEn}" data-zh="${itemNameZh}">${itemName}</h3>
           ${item.price ? `<p class="image-modal__price">NT$ ${item.price}</p>` : ''}
-          ${item.description ? `<p class="image-modal__description">${item.description}</p>` : ''}
-          ${item.tags && item.tags.length > 0 ? `<div class="image-modal__tags">${item.tags.map(tag => `<span class="image-modal__tag">${tag}</span>`).join('')}</div>` : ''}
+          ${itemDescription ? `<p class="image-modal__description" data-en="${itemDescriptionEn}" data-zh="${itemDescriptionZh}">${itemDescription}</p>` : ''}
+          ${tagsHTML}
         </div>
       </div>
     `;
@@ -78,6 +101,19 @@
     },      // 柔和橙粉色
   };
 
+  // 標籤中英文對應
+  const TAG_I18N = {
+    '奶蛋素': { zh: '奶蛋素', en: 'Vegetarian' },
+    '無咖啡因': { zh: '無咖啡因', en: 'Caffeine-Free' },
+    '含酒精': { zh: '含酒精', en: 'Contains Alcohol' },
+  };
+
+  // 獲取標籤的本地化文本
+  function getTagText(tag, lang) {
+    const normalized = lang === 'en' ? 'en' : 'zh';
+    return TAG_I18N[tag] ? TAG_I18N[tag][normalized] : tag;
+  }
+
   // 篩選圖片
   function filterGallery(selectedTags) {
     const items = document.querySelectorAll('.gallery-item');
@@ -106,17 +142,23 @@
       existingLegend.remove();
     }
 
+    // 獲取當前語言
+    const currentLang = localStorage.getItem('language') || 'zh';
+
     // 創建圖例容器
     const legend = document.createElement('div');
     legend.className = 'tag-legend';
     
     const legendItems = Object.keys(TAG_COLORS).map(tag => {
       const color = TAG_COLORS[tag];
+      const tagText = getTagText(tag, currentLang);
+      const tagTextZh = TAG_I18N[tag] ? TAG_I18N[tag].zh : tag;
+      const tagTextEn = TAG_I18N[tag] ? TAG_I18N[tag].en : tag;
       return `
         <div class="tag-legend-item">
           <label class="tag-legend-checkbox-label">
             <input type="checkbox" class="tag-legend-checkbox" value="${tag}" data-tag="${tag}">
-            <span class="tag-legend-badge" style="background-color: ${color.bg}; color: ${color.text}; box-shadow: 0 2px 8px ${color.shadow}; --tag-bg-color: ${color.bg};">${tag}</span>
+            <span class="tag-legend-badge" data-en="${tagTextEn}" data-zh="${tagTextZh}" style="background-color: ${color.bg}; color: ${color.text}; box-shadow: 0 2px 8px ${color.shadow}; --tag-bg-color: ${color.bg};">${tagText}</span>
           </label>
         </div>
       `;
@@ -181,14 +223,23 @@
     const validTags = tags.filter(tag => TAG_COLORS[tag]);
     if (validTags.length === 0) return;
 
+    // 獲取當前語言
+    const currentLang = localStorage.getItem('language') || 'zh';
+
     const tagsContainer = document.createElement('div');
     tagsContainer.className = 'gallery-image-tags';
 
     validTags.forEach(tag => {
       const color = TAG_COLORS[tag];
+      const tagText = getTagText(tag, currentLang);
+      const tagTextZh = TAG_I18N[tag] ? TAG_I18N[tag].zh : tag;
+      const tagTextEn = TAG_I18N[tag] ? TAG_I18N[tag].en : tag;
       const tagBadge = document.createElement('span');
       tagBadge.className = 'gallery-image-tag';
-      tagBadge.textContent = tag;
+      tagBadge.textContent = tagText;
+      tagBadge.setAttribute('data-en', tagTextEn);
+      tagBadge.setAttribute('data-zh', tagTextZh);
+      tagBadge.setAttribute('data-tag-key', tag); // 保存原始標籤鍵，用於語言切換
       tagBadge.style.backgroundColor = color.bg;
       tagBadge.style.color = color.text;
       tagBadge.style.boxShadow = `0 2px 8px ${color.shadow}`;
@@ -203,6 +254,9 @@
 
   function renderGallery(items, container) {
     container.innerHTML = '';
+    
+    // 獲取當前語言
+    const currentLang = localStorage.getItem('language') || 'zh';
     
     // 檢測是否為 admin 模式，以及是編輯模式還是預覽模式
     const urlParams = new URLSearchParams(window.location.search);
@@ -220,8 +274,12 @@
       // 處理圖片路徑：在 file:// 協議下，中文字符需要正確編碼
       // 但瀏覽器通常會自動處理，所以直接使用路徑即可
       const imageSrc = item.image;
-      const imageAlt = item.name || 'Gallery image';
-      const imageName = item.name || '未命名';
+      
+      // 根據語言獲取名稱
+      const imageNameZh = item.name || '未命名';
+      const imageNameEn = item.name_en || item.name || 'Untitled';
+      const imageName = currentLang === 'en' ? imageNameEn : imageNameZh;
+      const imageAlt = imageName;
       
       // 將標籤儲存到 data 屬性中，用於篩選
       if (item.tags && Array.isArray(item.tags) && item.tags.length > 0) {
@@ -246,7 +304,7 @@
       const itemInfo = document.createElement('div');
       itemInfo.className = 'gallery-item-info';
       itemInfo.innerHTML = `
-          <div class="gallery-item-name">${imageName}</div>
+          <div class="gallery-item-name" data-en="${imageNameEn}" data-zh="${imageNameZh}">${imageName}</div>
           ${item.price ? `<div class="gallery-item-price">NT$ ${item.price}</div>` : ''}
       `;
       
@@ -562,6 +620,38 @@
         const legend = document.querySelector('.tag-legend');
         if (legend) {
           window.LovelyI18n.applyLanguage(lang, legend);
+        }
+        // 更新所有圖片上的標籤
+        const imageTags = document.querySelectorAll('.gallery-image-tag[data-tag-key]');
+        imageTags.forEach(tagEl => {
+          const tagKey = tagEl.getAttribute('data-tag-key');
+          if (tagKey && TAG_I18N[tagKey]) {
+            const normalized = lang === 'en' ? 'en' : 'zh';
+            tagEl.textContent = TAG_I18N[tagKey][normalized];
+          }
+        });
+        // 更新所有圖片名稱
+        const itemNames = document.querySelectorAll('.gallery-item-name[data-en][data-zh]');
+        itemNames.forEach(nameEl => {
+          window.LovelyI18n.applyLanguage(lang, nameEl);
+        });
+        // 更新 modal 中的標籤（如果 modal 存在）
+        const modalTags = document.querySelectorAll('.image-modal__tag[data-tag-key]');
+        modalTags.forEach(tagEl => {
+          const tagKey = tagEl.getAttribute('data-tag-key');
+          if (tagKey && TAG_I18N[tagKey]) {
+            const normalized = lang === 'en' ? 'en' : 'zh';
+            tagEl.textContent = TAG_I18N[tagKey][normalized];
+          }
+        });
+        // 更新 modal 中的名稱和說明（如果 modal 存在）
+        const modalName = document.querySelector('.image-modal__name[data-en][data-zh]');
+        if (modalName) {
+          window.LovelyI18n.applyLanguage(lang, modalName);
+        }
+        const modalDescription = document.querySelector('.image-modal__description[data-en][data-zh]');
+        if (modalDescription) {
+          window.LovelyI18n.applyLanguage(lang, modalDescription);
         }
       }
       return;

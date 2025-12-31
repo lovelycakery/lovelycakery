@@ -740,8 +740,10 @@ function openImageEditPanel(type, index) {
   
   // 填充表單
   $('imageNameInput').value = item.name || '';
+  $('imageNameEnInput').value = item.name_en || '';
   $('imagePriceInput').value = item.price || '';
   $('imageDescInput').value = item.description || '';
+  $('imageDescEnInput').value = item.description_en || '';
   
   // Reset checkboxes
   document.querySelectorAll('.tag-checkboxes input[type="checkbox"]').forEach(cb => {
@@ -823,8 +825,10 @@ function clearImageEditPanel() {
   state.editingImageIndex = -1;
   updateSelectedImageDisplay(null); // 使用輔助函數更新顯示
   $('imageNameInput').value = '';
+  $('imageNameEnInput').value = '';
   $('imagePriceInput').value = '';
   $('imageDescInput').value = '';
+  $('imageDescEnInput').value = '';
   
   // Reset checkboxes
   document.querySelectorAll('.tag-checkboxes input[type="checkbox"]').forEach(cb => {
@@ -850,8 +854,10 @@ function clearImageEditPanel() {
 
 async function saveImageEdit(type) {
   const name = $('imageNameInput').value.trim();
+  const nameEn = $('imageNameEnInput').value.trim();
   const price = $('imagePriceInput').value.trim();
   const description = $('imageDescInput').value.trim();
+  const descriptionEn = $('imageDescEnInput').value.trim();
   
   if (!name) {
     await LovelyAdmin.alertDialog({
@@ -873,8 +879,10 @@ async function saveImageEdit(type) {
   const originalName = item.name || '';
   
   item.name = name;
+  item.name_en = nameEn || ''; // 如果为空，保持空字符串，与现有数据结构一致
   item.price = price;
   item.description = description;
+  item.description_en = descriptionEn || ''; // 如果为空，保持空字符串
   item.tags = tags;
   
   // Update will handle file renaming
@@ -1056,8 +1064,10 @@ async function handleDroppedFiles(type, files) {
           const newItem = {
             image: uploadRes.imagePath,
             name: uploadRes.name,
+            name_en: '',
             price: '',
             description: '',
+            description_en: '',
             tags: [],
           };
           state.imageData[type].items.push(newItem);
