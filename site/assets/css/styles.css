@@ -882,9 +882,17 @@ body.calendar-page-body {
     }
 
     .gallery-image-tag {
-        font-size: 11px;
-        padding: 5px 10px;
-        border-radius: 18px;
+        /* 隱藏文字：只顯示顏色標籤 */
+        font-size: 0;
+        color: transparent;
+        /* 大小統一：固定寬高，移除padding */
+        width: 24px;
+        height: 20px;
+        min-width: 24px;
+        padding: 0;
+        /* 方形圓角：使用較小的圓角值，保持便利貼形狀 */
+        border-radius: 4px 0 0 4px; /* 左側圓角，保持便利貼形狀 */
+        /* clip-path 和 ::after 箭頭尾巴由預設樣式繼承，保持便利貼形狀 */
     }
 
     .tag-legend-badge {
