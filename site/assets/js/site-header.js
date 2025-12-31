@@ -33,8 +33,8 @@
 
   function renderNavItems(currentPage) {
     const items = [
-      { href: 'index.html', zh: '首頁', en: 'HOME' },
-      { href: 'calendar.html', zh: '日曆', en: 'CALENDAR' },
+      { href: 'index.html', zh: '首頁', en: 'HOME', isIcon: true, iconType: 'home' },
+      { href: 'calendar.html', zh: '日曆', en: 'CALENDAR', isIcon: true, iconType: 'calendar' },
       { href: 'seasonal.html', zh: '季節限定', en: 'SEASONAL' },
       { href: 'all-items.html', zh: '全部品項', en: 'ALL ITEMS' },
       { href: 'order.html', zh: '訂購方式', en: 'ORDER' },
@@ -44,21 +44,50 @@
     const parts = [];
     items.forEach((it, idx) => {
       const isActive = it.href === currentPage;
-      parts.push(
-        '<a href="' +
-          escapeHtml(it.href) +
-          '" class="nav-link' +
-          (isActive ? ' is-active' : '') +
-          '" data-en="' +
-          escapeHtml(it.en) +
-          '" data-zh="' +
-          escapeHtml(it.zh) +
-          '"' +
-          (isActive ? ' aria-current="page"' : '') +
-          '>' +
-          escapeHtml(it.zh) +
-          '</a>'
-      );
+      if (it.isIcon) {
+        // 使用圖標的項目（首頁、日曆）
+        let iconSvg = '';
+        if (it.iconType === 'home') {
+          iconSvg = '<path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>';
+        } else if (it.iconType === 'calendar') {
+          // 使用更明顯的日曆圖標，帶有清晰的日期格子和頂部裝訂線
+          iconSvg = '<path d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z"/><path d="M6 10h2v2H6zm4 0h2v2h-2zm4 0h2v2h-2zm4 0h2v2h-2zM6 13h2v2H6zm4 0h2v2h-2zm4 0h2v2h-2zm4 0h2v2h-2z"/><circle cx="4" cy="6" r="1.5" fill="currentColor" opacity="0.6"/><circle cx="20" cy="6" r="1.5" fill="currentColor" opacity="0.6"/>';
+        }
+        parts.push(
+          '<a href="' +
+            escapeHtml(it.href) +
+            '" class="nav-link nav-link-icon' +
+            (isActive ? ' is-active' : '') +
+            '"' +
+            (isActive ? ' aria-current="page"' : '') +
+            ' aria-label="' +
+            escapeHtml(it.zh) +
+            '" title="' +
+            escapeHtml(it.zh) +
+            '">' +
+            '<svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' +
+            iconSvg +
+            '</svg>' +
+            '</a>'
+        );
+      } else {
+        // 其他項目使用文字
+        parts.push(
+          '<a href="' +
+            escapeHtml(it.href) +
+            '" class="nav-link' +
+            (isActive ? ' is-active' : '') +
+            '" data-en="' +
+            escapeHtml(it.en) +
+            '" data-zh="' +
+            escapeHtml(it.zh) +
+            '"' +
+            (isActive ? ' aria-current="page"' : '') +
+            '>' +
+            escapeHtml(it.zh) +
+            '</a>'
+        );
+      }
       // 移除分隔符，改用 CSS gap 來分隔
     });
     return parts.join('');

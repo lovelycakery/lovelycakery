@@ -83,8 +83,8 @@ body.calendar-page-body {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: 36px;  /* 增大社交圖標容器 */
+    height: 36px;
     color: #3d2817;
     text-decoration: none;
     border-radius: 50%;
@@ -99,8 +99,8 @@ body.calendar-page-body {
 }
 
 .social-icon {
-    width: 18px;
-    height: 18px;
+    width: 22px;  /* 增大社交圖標尺寸 */
+    height: 22px;
     display: block;
 }
 
@@ -111,7 +111,7 @@ body.calendar-page-body {
     font-weight: 700;
     color: #3d2817;
     letter-spacing: 0.5px;
-    margin-left: -12px; /* 讓品牌更靠左（只影響左側 logo 區塊） */
+    margin-left: -80px; /* 讓品牌更靠左（超出容器padding），給分頁選項更多空間 */
 }
 
 .logo a {
@@ -134,22 +134,41 @@ body.calendar-page-body {
 .nav {
     display: flex;
     align-items: center;
-    gap: 16px;  /* 增加間距來分隔導覽連結，取代分隔符 */
+    gap: 20px;  /* 增加間距來分隔導覽連結，讓分頁文字分開一些 */
 }
 
 /* 導覽連結樣式 */
 .nav-link {
     font-family: 'Inter', sans-serif;
-    font-size: 20px;  /* ⭐ 調整導覽連結字型大小：改這個數字 */
+    font-size: 22px;  /* 調整導覽連結字型大小（中文版更大） */
     font-weight: 400;
     color: #3d2817;
     text-decoration: none;
     letter-spacing: 0.5px;
     transition: opacity 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 圖標導覽連結樣式（首頁） */
+.nav-link-icon {
+    padding: 2px;  /* 給圖標一點內邊距 */
+}
+
+.nav-icon {
+    width: 24px;  /* 增大圖標尺寸，首頁和日曆使用相同大小 */
+    height: 24px;
+    display: block;
+    transition: opacity 0.3s ease;
 }
 
 /* 導覽連結滑鼠懸停效果 */
 .nav-link:hover {
+    opacity: 0.7;
+}
+
+.nav-link-icon:hover .nav-icon {
     opacity: 0.7;
 }
 
@@ -159,6 +178,12 @@ body.calendar-page-body {
     opacity: 1;
     font-weight: 500;
     color: #8b6f47;
+}
+
+.nav-link-icon.is-active .nav-icon,
+.nav-link-icon[aria-current="page"] .nav-icon {
+    color: #8b6f47;
+    opacity: 1;
 }
 
 /* 導覽連結分隔符號（|） */
@@ -177,7 +202,7 @@ body.calendar-page-body {
 /* 語言切換按鈕 */
 .lang-btn {
     font-family: 'Inter', sans-serif;
-    font-size: 14px;
+    font-size: 16px;  /* 增大語言切換按鈕字體 */
     font-weight: 400;
     color: #3d2817;
     background: none;
@@ -200,7 +225,7 @@ body.calendar-page-body {
 /* 語言切換分隔符號 */
 .lang-separator {
     color: #3d2817;
-    font-size: 14px;
+    font-size: 16px;  /* 增大語言切換分隔符號字體 */
 }
 
 /* ============================================
@@ -401,6 +426,12 @@ body.calendar-page-body {
         letter-spacing: 0.1px;
     }
 
+    /* 手機端圖標大小 */
+    .nav-icon {
+        width: 20px;  /* 手機端也稍微增大 */
+        height: 20px;
+    }
+
     .nav {
         gap: 12px;  /* 適中的導覽連結之間的間距，自然分隔 */
         flex-wrap: nowrap;  /* 不換行 */
@@ -483,6 +514,12 @@ body.calendar-page-body {
     .nav-link {
         font-size: 14px;  /* 超小屏幕的導覽連結字體（再增大一點） */
         letter-spacing: 0.1px;
+    }
+
+    /* 超小屏幕圖標大小 */
+    .nav-icon {
+        width: 19px;  /* 超小屏幕也稍微增大 */
+        height: 19px;
     }
 
     .nav {
