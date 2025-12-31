@@ -6,7 +6,32 @@
   "main": "src/main.js",
   "scripts": {
     "start": "electron .",
-    "dist:win": "electron-builder --win --x64"
+    "dist:win": "electron-builder --win --x64",
+    "dist:win:portable": "electron-builder --win portable --x64"
+  },
+  "build": {
+    "appId": "com.lovelycakery.admin",
+    "productName": "Lovely Admin",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "ui/**/*",
+      "package.json",
+      "node_modules/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ]
+    },
+    "portable": {
+      "artifactName": "${productName}-${version}-portable.exe"
+    }
   },
   "dependencies": {
     "express": "^4.21.2",
