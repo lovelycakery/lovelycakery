@@ -372,7 +372,7 @@ body.calendar-page-body {
     }
 
     .container {
-        padding: 0 20px;
+        padding: 0 16px;  /* 稍微減少左右padding，讓導覽有更多空間 */
     }
 
     .main-headline {
@@ -396,18 +396,19 @@ body.calendar-page-body {
     }
 
     .nav-link {
-        font-size: 10px;  /* 手機上的導覽連結字型大小（從12px減小） */
-        letter-spacing: 0.3px;  /* 減少字母間距 */
+        font-size: 11px;  /* 手機上的導覽連結字型大小（調整為剛好佔滿寬度） */
+        letter-spacing: 0.2px;  /* 適中的字母間距 */
     }
 
     .nav-separator {
-        font-size: 10px;  /* 分隔符號也減小 */
-        margin: 0 2px;  /* 減少分隔符號的間距 */
+        font-size: 11px;  /* 分隔符號與導覽連結一致 */
+        margin: 0 3px;  /* 適中的分隔符號間距 */
     }
 
     .nav {
-        gap: 4px;  /* 減少導覽連結之間的間距（從8px減小） */
-        flex-wrap: wrap;  /* 允許換行但盡量不換 */
+        gap: 5px;  /* 適中的導覽連結之間的間距 */
+        flex-wrap: nowrap;  /* 不換行，讓導覽剛好佔滿寬度 */
+        justify-content: space-between;  /* 均勻分布 */
     }
 
     /* 手機版 header：更緊湊，且把社群 icon + 語言切換放同一行 */
@@ -429,7 +430,8 @@ body.calendar-page-body {
 
     .nav-right .nav {
         grid-area: nav;
-        justify-content: center;
+        justify-content: space-between;
+        width: 100%;  /* 確保導覽佔滿可用寬度 */
     }
 
     .nav-right .social-links {
@@ -481,17 +483,19 @@ body.calendar-page-body {
     }
 
     .nav-link {
-        font-size: 9px;  /* 進一步減小導覽連結字體 */
+        font-size: 10px;  /* 超小屏幕的導覽連結字體（稍微調大） */
         letter-spacing: 0.2px;
     }
 
     .nav-separator {
-        font-size: 9px;
-        margin: 0 1px;  /* 更緊湊的分隔符號間距 */
+        font-size: 10px;
+        margin: 0 2px;  /* 適中的分隔符號間距 */
     }
 
     .nav {
-        gap: 3px;  /* 更緊湊的導覽間距 */
+        gap: 4px;  /* 適中的導覽間距 */
+        flex-wrap: nowrap;  /* 不換行 */
+        justify-content: space-between;  /* 均勻分布 */
     }
 
     .cta-button {
@@ -614,6 +618,12 @@ body.calendar-page-body {
 .seasonal-page .gallery-image-tags {
     bottom: -8px;
     right: -8px;
+}
+
+/* 全部品項頁面：標籤位置調整，讓標籤部分超出圖片邊界 */
+.all-items-page .gallery-image-tags {
+    bottom: -6px;
+    right: -6px;
 }
 
 .gallery-image-tag {
@@ -950,6 +960,12 @@ body.calendar-page-body {
         font-size: 11px;
         padding: 5px 10px;
         border-radius: 6px 0 0 6px; /* 方形圓角（左側） */
+    }
+
+    /* 全部品項（手機）：標籤位置更靠近角落，部分露出圖片外 */
+    .all-items-page .gallery-image-tags {
+        bottom: -8px;
+        right: -8px;
     }
 
     .tag-legend-badge {
