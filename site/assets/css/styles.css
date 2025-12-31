@@ -376,30 +376,43 @@ body.calendar-page-body {
     }
 
     .main-headline {
-        font-size: 32px;  /* 手機上的主標題字型大小 */
+        font-size: 28px;  /* 手機上的主標題字型大小（從32px減小） */
+        line-height: 1.15;  /* 更緊湊的行高 */
     }
 
     .description {
-        font-size: 16px;  /* 手機上的描述文字字型大小 */
+        font-size: 15px;  /* 手機上的描述文字字型大小（從16px減小） */
+        line-height: 1.5;
     }
 
     .logo {
-        font-size: 24px;  /* 手機上的 Logo 字型大小 */
+        font-size: 22px;  /* 手機上的 Logo 字型大小（從24px減小） */
         margin-left: -6px;
     }
 
     .site-logo {
-        width: 57px;
-        height: 57px;
+        width: 50px;  /* 從57px減小 */
+        height: 50px;
     }
 
     .nav-link {
-        font-size: 12px;  /* 手機上的導覽連結字型大小 */
+        font-size: 10px;  /* 手機上的導覽連結字型大小（從12px減小） */
+        letter-spacing: 0.3px;  /* 減少字母間距 */
+    }
+
+    .nav-separator {
+        font-size: 10px;  /* 分隔符號也減小 */
+        margin: 0 2px;  /* 減少分隔符號的間距 */
+    }
+
+    .nav {
+        gap: 4px;  /* 減少導覽連結之間的間距（從8px減小） */
+        flex-wrap: wrap;  /* 允許換行但盡量不換 */
     }
 
     /* 手機版 header：更緊湊，且把社群 icon + 語言切換放同一行 */
     .nav-wrapper {
-        gap: 12px;
+        gap: 10px;  /* 從12px減小 */
     }
 
     .nav-right {
@@ -410,8 +423,8 @@ body.calendar-page-body {
             "social language";
         justify-content: center;
         align-items: center;
-        column-gap: 18px;
-        row-gap: 10px;
+        column-gap: 16px;  /* 從18px減小 */
+        row-gap: 8px;  /* 從10px減小 */
     }
 
     .nav-right .nav {
@@ -430,17 +443,69 @@ body.calendar-page-body {
     }
 
     .social-link {
-        width: 28px;
-        height: 28px;
+        width: 26px;  /* 從28px減小 */
+        height: 26px;
     }
 
     .social-icon {
-        width: 16px;
-        height: 16px;
+        width: 14px;  /* 從16px減小 */
+        height: 14px;
     }
 
     .lang-btn {
-        padding: 2px 6px;
+        padding: 2px 5px;  /* 從2px 6px減小 */
+        font-size: 12px;  /* 明確設定字體大小 */
+    }
+
+    .lang-separator {
+        font-size: 12px;
+    }
+
+    /* 按鈕樣式調整 */
+    .cta-button {
+        font-size: 14px;  /* 從16px減小 */
+        padding: 14px 32px;  /* 從16px 40px減小 */
+        letter-spacing: 0.3px;
+    }
+}
+
+/* 超小屏幕（480px 以下）：進一步優化英文界面 */
+@media (max-width: 480px) {
+    .main-headline {
+        font-size: 24px;  /* 更小的主標題 */
+        line-height: 1.2;
+    }
+
+    .description {
+        font-size: 14px;
+    }
+
+    .nav-link {
+        font-size: 9px;  /* 進一步減小導覽連結字體 */
+        letter-spacing: 0.2px;
+    }
+
+    .nav-separator {
+        font-size: 9px;
+        margin: 0 1px;  /* 更緊湊的分隔符號間距 */
+    }
+
+    .nav {
+        gap: 3px;  /* 更緊湊的導覽間距 */
+    }
+
+    .cta-button {
+        font-size: 13px;
+        padding: 12px 28px;  /* 更小的按鈕 */
+    }
+
+    .logo {
+        font-size: 20px;
+    }
+
+    .site-logo {
+        width: 45px;
+        height: 45px;
     }
 }
 
