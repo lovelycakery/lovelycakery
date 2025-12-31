@@ -396,12 +396,12 @@ body.calendar-page-body {
     }
 
     .nav-link {
-        font-size: 11px;  /* 手機上的導覽連結字型大小（調整為剛好佔滿寬度） */
+        font-size: 12px;  /* 手機上的導覽連結字型大小（調整為剛好佔滿寬度，支援中英文） */
         letter-spacing: 0.2px;  /* 適中的字母間距 */
     }
 
     .nav-separator {
-        font-size: 11px;  /* 分隔符號與導覽連結一致 */
+        font-size: 12px;  /* 分隔符號與導覽連結一致 */
         margin: 0 3px;  /* 適中的分隔符號間距 */
     }
 
@@ -471,7 +471,7 @@ body.calendar-page-body {
     }
 }
 
-/* 超小屏幕（480px 以下）：進一步優化英文界面 */
+/* 超小屏幕（480px 以下）：進一步優化中英文界面 */
 @media (max-width: 480px) {
     .main-headline {
         font-size: 24px;  /* 更小的主標題 */
@@ -483,12 +483,12 @@ body.calendar-page-body {
     }
 
     .nav-link {
-        font-size: 10px;  /* 超小屏幕的導覽連結字體（稍微調大） */
+        font-size: 11px;  /* 超小屏幕的導覽連結字體（調整為支援中英文） */
         letter-spacing: 0.2px;
     }
 
     .nav-separator {
-        font-size: 10px;
+        font-size: 11px;
         margin: 0 2px;  /* 適中的分隔符號間距 */
     }
 
