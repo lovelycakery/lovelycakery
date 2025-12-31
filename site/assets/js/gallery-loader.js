@@ -167,7 +167,7 @@
   const TAG_I18N = {
     '奶蛋素': { zh: '奶蛋素', en: 'Vegetarian' },
     '無咖啡因': { zh: '無咖啡因', en: 'Caffeine-Free' },
-    '含酒精': { zh: '含酒精', en: 'Contains Alcohol' },
+    '含酒精': { zh: '含酒精', en: 'Alcohol' },
   };
 
   // 尺寸選項中英文對應
