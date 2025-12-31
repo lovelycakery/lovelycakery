@@ -652,8 +652,8 @@ body.calendar-page-body {
 
 /* 全部品項頁面：標籤位置調整，讓標籤部分超出圖片邊界 */
 .all-items-page .gallery-image-tags {
-    bottom: -6px;
-    right: -6px;
+    bottom: 20px;  /* 進一步增加距離，讓標籤更靠近圖片中心，大部分在圖片內部 */
+    right: 20px;
 }
 
 .gallery-image-tag {
@@ -963,6 +963,10 @@ body.calendar-page-body {
         font-size: 14px;
     }
 
+    .all-items-page .gallery-item-info {
+        margin-top: 8px; /* 手機端增加間距，讓圖片名稱離圖片更遠一點 */
+    }
+
     .all-items-page .gallery-item-name {
         font-size: 14px;
     }
@@ -992,10 +996,10 @@ body.calendar-page-body {
         border-radius: 6px 0 0 6px; /* 方形圓角（左側） */
     }
 
-    /* 全部品項（手機）：標籤位置更靠近角落，部分露出圖片外 */
+    /* 全部品項（手機）：標籤位置在圖片內部 */
     .all-items-page .gallery-image-tags {
-        bottom: -8px;
-        right: -8px;
+        bottom: 8px;  /* 增加距離，讓標籤更深入圖片內部 */
+        right: 8px;
     }
 
     .tag-legend-badge {
