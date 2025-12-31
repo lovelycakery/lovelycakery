@@ -18,12 +18,20 @@ jobs:
           cache: 'npm'
           cache-dependency-path: admin/package-lock.json
       
+      - name: Install Wine (for Windows builds on Linux)
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update
+          sudo apt-get install -y wine64 wine32
+      
       - name: Install dependencies
         working-directory: ./admin
         run: npm ci
       
       - name: Build Windows portable
         working-directory: ./admin
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: false
         run: npm run dist:win:portable
       
       - name: Get version from package.json
