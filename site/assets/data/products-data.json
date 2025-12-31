@@ -29,7 +29,9 @@
       "name": "香草千層",
       "price": "2200",
       "description": "",
-      "tags": []
+      "tags": [
+        "奶蛋素"
+      ]
     },
     {
       "image": "assets/images/products/伯爵茶千層.jpg",
