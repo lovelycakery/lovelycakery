@@ -59,7 +59,7 @@
           escapeHtml(it.zh) +
           '</a>'
       );
-      if (idx !== items.length - 1) parts.push('<span class="nav-separator">|</span>');
+      // 移除分隔符，改用 CSS gap 來分隔
     });
     return parts.join('');
   }

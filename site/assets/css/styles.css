@@ -134,7 +134,7 @@ body.calendar-page-body {
 .nav {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 16px;  /* 增加間距來分隔導覽連結，取代分隔符 */
 }
 
 /* 導覽連結樣式 */
@@ -357,6 +357,7 @@ body.calendar-page-body {
     .nav {
         flex-wrap: wrap;
         justify-content: center;
+        gap: 14px;  /* 平板端適中的導覽間距 */
     }
 }
 
@@ -396,19 +397,14 @@ body.calendar-page-body {
     }
 
     .nav-link {
-        font-size: 13px;  /* 手機上的導覽連結字型大小（增大以讓中文導覽列佔滿寬度） */
-        letter-spacing: 0.1px;  /* 稍微減少字母間距以容納更多內容 */
-    }
-
-    .nav-separator {
-        font-size: 13px;  /* 分隔符號與導覽連結一致 */
-        margin: 0 2px;  /* 稍微減少分隔符號間距 */
+        font-size: 13px;  /* 手機上的導覽連結字型大小 */
+        letter-spacing: 0.1px;
     }
 
     .nav {
-        gap: 4px;  /* 稍微減少導覽連結之間的間距 */
-        flex-wrap: nowrap;  /* 不換行，讓導覽剛好佔滿寬度 */
-        justify-content: space-between;  /* 均勻分布 */
+        gap: 12px;  /* 適中的導覽連結之間的間距，自然分隔 */
+        flex-wrap: nowrap;  /* 不換行 */
+        justify-content: flex-start;  /* 左對齊，不刻意分到最開 */
     }
 
     /* 手機版 header：更緊湊，且把社群 icon + 語言切換放同一行 */
@@ -431,8 +427,8 @@ body.calendar-page-body {
 
     .nav-right .nav {
         grid-area: nav;
-        justify-content: space-between;
-        width: 100%;  /* 確保導覽佔滿可用寬度 */
+        justify-content: flex-start;  /* 左對齊，不刻意分到最開 */
+        width: 100%;  /* 確保導覽有足夠寬度 */
         min-width: 0;  /* 允許flex項目縮小 */
     }
 
@@ -485,19 +481,14 @@ body.calendar-page-body {
     }
 
     .nav-link {
-        font-size: 12px;  /* 超小屏幕的導覽連結字體（增大以讓中文導覽列佔滿寬度） */
+        font-size: 12px;  /* 超小屏幕的導覽連結字體 */
         letter-spacing: 0.1px;
     }
 
-    .nav-separator {
-        font-size: 12px;
-        margin: 0 2px;  /* 適中的分隔符號間距 */
-    }
-
     .nav {
-        gap: 3px;  /* 稍微減少導覽間距 */
+        gap: 10px;  /* 適中的導覽間距，自然分隔 */
         flex-wrap: nowrap;  /* 不換行 */
-        justify-content: space-between;  /* 均勻分布 */
+        justify-content: flex-start;  /* 左對齊，不刻意分到最開 */
     }
 
     .cta-button {
