@@ -124,7 +124,7 @@
 
     legend.innerHTML = `
       <div class="tag-legend-items">${legendItems}</div>
-      <button class="tag-legend-clear-btn" data-en="Clear All" data-zh="全部取消">全部取消</button>
+      <button class="tag-legend-clear-btn" data-en="Clear All" data-zh="取消選取">取消選取</button>
     `;
 
     // 插入到 page-header 下方，gallery-grid 上方
@@ -153,7 +153,7 @@
       });
     });
 
-    // 綁定「全部取消」按鈕事件
+    // 綁定「取消選取」按鈕事件
     const clearBtn = legend.querySelector('.tag-legend-clear-btn');
     if (clearBtn) {
       clearBtn.addEventListener('click', () => {
