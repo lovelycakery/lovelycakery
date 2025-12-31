@@ -833,6 +833,11 @@ body.calendar-page-body {
         width: 80%;
     }
 
+    .seasonal-page .gallery-item-info {
+        width: 80%;
+        text-align: center;
+    }
+
     /* 全部品項（手機）：一排兩張 */
     .all-items-page .gallery-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
