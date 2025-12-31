@@ -372,7 +372,7 @@ body.calendar-page-body {
     }
 
     .container {
-        padding: 0 16px;  /* 稍微減少左右padding，讓導覽有更多空間 */
+        padding: 0 12px;  /* 進一步減少左右padding，讓導覽有更多空間 */
     }
 
     .main-headline {
@@ -396,24 +396,24 @@ body.calendar-page-body {
     }
 
     .nav-link {
-        font-size: 12px;  /* 手機上的導覽連結字型大小（調整為剛好佔滿寬度，支援中英文） */
-        letter-spacing: 0.2px;  /* 適中的字母間距 */
+        font-size: 13px;  /* 手機上的導覽連結字型大小（增大以讓中文導覽列佔滿寬度） */
+        letter-spacing: 0.1px;  /* 稍微減少字母間距以容納更多內容 */
     }
 
     .nav-separator {
-        font-size: 12px;  /* 分隔符號與導覽連結一致 */
-        margin: 0 3px;  /* 適中的分隔符號間距 */
+        font-size: 13px;  /* 分隔符號與導覽連結一致 */
+        margin: 0 2px;  /* 稍微減少分隔符號間距 */
     }
 
     .nav {
-        gap: 5px;  /* 適中的導覽連結之間的間距 */
+        gap: 4px;  /* 稍微減少導覽連結之間的間距 */
         flex-wrap: nowrap;  /* 不換行，讓導覽剛好佔滿寬度 */
         justify-content: space-between;  /* 均勻分布 */
     }
 
     /* 手機版 header：更緊湊，且把社群 icon + 語言切換放同一行 */
     .nav-wrapper {
-        gap: 10px;  /* 從12px減小 */
+        gap: 8px;  /* 進一步減少間距 */
     }
 
     .nav-right {
@@ -422,16 +422,18 @@ body.calendar-page-body {
         grid-template-areas:
             "nav nav"
             "social language";
-        justify-content: center;
+        justify-content: stretch;  /* 讓導覽區域拉伸 */
         align-items: center;
-        column-gap: 16px;  /* 從18px減小 */
-        row-gap: 8px;  /* 從10px減小 */
+        column-gap: 16px;
+        row-gap: 8px;
+        width: 100%;  /* 確保導覽區域佔滿寬度 */
     }
 
     .nav-right .nav {
         grid-area: nav;
         justify-content: space-between;
         width: 100%;  /* 確保導覽佔滿可用寬度 */
+        min-width: 0;  /* 允許flex項目縮小 */
     }
 
     .nav-right .social-links {
@@ -483,17 +485,17 @@ body.calendar-page-body {
     }
 
     .nav-link {
-        font-size: 11px;  /* 超小屏幕的導覽連結字體（調整為支援中英文） */
-        letter-spacing: 0.2px;
+        font-size: 12px;  /* 超小屏幕的導覽連結字體（增大以讓中文導覽列佔滿寬度） */
+        letter-spacing: 0.1px;
     }
 
     .nav-separator {
-        font-size: 11px;
+        font-size: 12px;
         margin: 0 2px;  /* 適中的分隔符號間距 */
     }
 
     .nav {
-        gap: 4px;  /* 適中的導覽間距 */
+        gap: 3px;  /* 稍微減少導覽間距 */
         flex-wrap: nowrap;  /* 不換行 */
         justify-content: space-between;  /* 均勻分布 */
     }
