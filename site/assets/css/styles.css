@@ -397,14 +397,14 @@ body.calendar-page-body {
     }
 
     .nav-link {
-        font-size: 13px;  /* 手機上的導覽連結字型大小 */
+        font-size: 14px;  /* 手機上的導覽連結字型大小（稍微增大） */
         letter-spacing: 0.1px;
     }
 
     .nav {
         gap: 12px;  /* 適中的導覽連結之間的間距，自然分隔 */
         flex-wrap: nowrap;  /* 不換行 */
-        justify-content: flex-start;  /* 左對齊，不刻意分到最開 */
+        justify-content: center;  /* 居中對齊 */
     }
 
     /* 手機版 header：更緊湊，且把社群 icon + 語言切換放同一行 */
@@ -427,7 +427,7 @@ body.calendar-page-body {
 
     .nav-right .nav {
         grid-area: nav;
-        justify-content: flex-start;  /* 左對齊，不刻意分到最開 */
+        justify-content: center;  /* 居中對齊 */
         width: 100%;  /* 確保導覽有足夠寬度 */
         min-width: 0;  /* 允許flex項目縮小 */
     }
@@ -481,14 +481,14 @@ body.calendar-page-body {
     }
 
     .nav-link {
-        font-size: 12px;  /* 超小屏幕的導覽連結字體 */
+        font-size: 13px;  /* 超小屏幕的導覽連結字體（稍微增大） */
         letter-spacing: 0.1px;
     }
 
     .nav {
         gap: 10px;  /* 適中的導覽間距，自然分隔 */
         flex-wrap: nowrap;  /* 不換行 */
-        justify-content: flex-start;  /* 左對齊，不刻意分到最開 */
+        justify-content: center;  /* 居中對齊 */
     }
 
     .cta-button {
