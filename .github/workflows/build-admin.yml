@@ -3,6 +3,9 @@ name: Build Admin Tool
 on:
   workflow_dispatch:  # 只支持手动触发，不会自动构建
 
+permissions:
+  contents: write  # 需要写入权限来创建 Release
+
 jobs:
   build-windows:
     runs-on: ubuntu-latest
