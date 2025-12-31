@@ -134,7 +134,7 @@ body.calendar-page-body {
 .nav {
     display: flex;
     align-items: center;
-    gap: 20px;  /* 增加間距來分隔導覽連結，讓分頁文字分開一些 */
+    gap: 26px;  /* 增加間距來分隔導覽連結，讓分頁文字分開更多 */
 }
 
 /* 導覽連結樣式 */
