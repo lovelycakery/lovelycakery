@@ -418,18 +418,24 @@ class CalendarWidget {
         const daysInMonth = lastDay.getDate();
         const startingDayOfWeek = firstDay.getDay();
         
+        // 使用 shared 格式化函數
+        const shared = window.LovelyCalendarShared;
+        const formatDateKey = (y, m, d) => {
+            return shared ? shared.formatDateKey(y, m, d) : (new Date(y, m, d)).toISOString().split('T')[0];
+        };
+        
         // 上個月的日期
         const prevMonthLastDay = new Date(year, month, 0).getDate();
         for (let i = startingDayOfWeek - 1; i >= 0; i--) {
             const day = prevMonthLastDay - i;
-            const dateKey = this.formatDateKey(year, month - 1, day);
+            const dateKey = formatDateKey(year, month - 1, day);
             this.createDayElement(grid, day, true, dateKey);
         }
         
         // 當月的日期
         const today = new Date();
         for (let day = 1; day <= daysInMonth; day++) {
-            const dateKey = this.formatDateKey(year, month, day);
+            const dateKey = formatDateKey(year, month, day);
             const isToday = year === today.getFullYear() && 
                            month === today.getMonth() && 
                            day === today.getDate();
@@ -440,7 +446,7 @@ class CalendarWidget {
         const totalCells = grid.children.length;
         const remainingCells = 42 - totalCells; // 6 行 x 7 列
         for (let day = 1; day <= remainingCells; day++) {
-            const dateKey = this.formatDateKey(year, month + 1, day);
+            const dateKey = formatDateKey(year, month + 1, day);
             this.createDayElement(grid, day, true, dateKey);
         }
     }
@@ -484,12 +490,6 @@ class CalendarWidget {
         
         dayEl.addEventListener('click', () => this.openEventModal(dateKey));
         container.appendChild(dayEl);
-    }
-    
-    // 格式化日期鍵
-    formatDateKey(year, month, day) {
-        const shared = window.LovelyCalendarShared;
-        return shared ? shared.formatDateKey(year, month, day) : (new Date(year, month, day)).toISOString().split('T')[0];
     }
     
     // 打開事件編輯模態框

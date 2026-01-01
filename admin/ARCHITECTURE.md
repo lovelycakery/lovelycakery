@@ -1162,3 +1162,33 @@ if (!result || !result.ok) return;
 - **新增分頁**：更新 `index.html` → 更新 `app.js` 的 `switchTab()` → 更新 `reloadPreviewForCurrentTab()`
 - **新增資料類型**：定義 schema → 更新 `WRITE_ALLOWLIST` → 實作 IPC handlers → 更新 UI
 
+---
+
+## 程式碼優化建議
+
+### admin/src/main.js 模組化（可選重構）
+
+**目前狀態：**
+`admin/src/main.js` 檔案目前約有 1063 行，包含了多種不同的功能：
+- 檔案系統操作
+- 日曆資料管理 IPC handlers
+- 圖片管理 IPC handlers
+- 預檢（preflight）檢查
+- Git 操作
+- IPC 處理器註冊
+
+**未來可考慮的重構方向：**
+如果需要提高可維護性，可以考慮將 `main.js` 拆分成多個模組：
+
+- `admin/src/file-operations.js` - 檔案系統操作（`joinUnderSite`, `normalizePath`, `atomicWriteWithBackup` 等）
+- `admin/src/calendar-handler.js` - 日曆相關 IPC 處理器
+- `admin/src/image-handler.js` - 圖片相關 IPC 處理器
+- `admin/src/preflight.js` - 預檢檢查邏輯
+- `admin/src/git-operations.js` - Git 操作
+
+**注意：**
+這是一個較大的重構，目前程式碼運作良好，**只有在真正需要時才進行**。如果要進行此重構，必須：
+1. 充分測試所有 IPC 功能
+2. 確保安全規則在所有模組中都得到遵守
+3. 更新本文檔的相關章節
+

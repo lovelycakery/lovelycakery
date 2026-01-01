@@ -315,6 +315,46 @@ rg "setInterval\\(" assets/js || grep -R --line-number --fixed-string "setInterv
 
 ---
 
+## 程式碼優化與重構建議
+
+> 本節記錄已完成的優化與未來可考慮的重構方向，供維護者參考。
+
+### 已完成的優化 ✅
+
+1. **移除重複的函數定義**
+   - `gallery-loader.js` 中重複的 `getSizeText()` 函數定義已移除
+   - 兩個 calendar widget 類中多餘的 `formatDateKey()` 方法已移除，改為直接使用 `calendar-shared.js` 提供的函數
+
+### 未來可考慮的重構 ⚠️
+
+#### 1. Calendar Widget 類別重複邏輯（中優先級）
+
+**問題：**
+`calendar-widget.js`（可編輯版本）和 `calendar-widget-readonly.js`（只讀版本）中有大量重複的邏輯：
+
+- **`renderCalendar()` 方法** - 幾乎完全相同（只讀版本在最後調用 `notifyParentHeight()`）
+- **`createDayElement()` 方法** - 大量重複（差異：只讀版本使用 tooltip，可編輯版本使用 modal）
+- **`attachEventListeners()` 方法** - 月份導航部分完全相同
+- **`updateLanguage()` 方法** - 非常相似
+
+**建議解決方案：**
+- 創建一個基類 `CalendarWidgetBase`，包含共同的邏輯
+- 或者將共同邏輯提取到 `calendar-shared.js` 中作為工具函數
+
+**預估影響：**
+- 減少約 200+ 行重複代碼
+- 提高可維護性：日曆渲染邏輯的修改只需要在一處進行
+- 降低 bug 風險：避免兩個版本邏輯不一致
+
+**風險評估：** 中等風險，需要充分測試兩個版本的功能
+
+**測試重點：**
+進行此重構後需要測試：
+- Calendar Widget（可編輯版本）：日曆渲染、事件編輯、儲存功能、同步功能
+- Calendar Widget（只讀版本）：日曆渲染、Tooltip 顯示、高度回報
+
+---
+
 （本文件由 AI 生成，用於跨對話維護接力。）
 
 

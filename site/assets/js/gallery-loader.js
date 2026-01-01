@@ -189,12 +189,6 @@
     return SIZE_I18N[sizeKey] ? SIZE_I18N[sizeKey][normalized] : sizeKey;
   }
 
-  // 獲取尺寸的本地化文本
-  function getSizeText(sizeKey, lang) {
-    const normalized = lang === 'en' ? 'en' : 'zh';
-    return SIZE_I18N[sizeKey] ? SIZE_I18N[sizeKey][normalized] : sizeKey;
-  }
-
   // 篩選圖片
   function filterGallery(selectedTags) {
     const items = document.querySelectorAll('.gallery-item');
