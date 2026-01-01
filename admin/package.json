@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "description": "Local-only admin tool for Lovely Cakery (safe file writes + one-button publish).",
+  "author": "Lovely Cakery",
   "main": "src/main.js",
   "scripts": {
     "start": "electron .",
@@ -19,7 +20,13 @@
       "src/**/*",
       "ui/**/*",
       "package.json",
-      "node_modules/**/*"
+      "node_modules/**/*",
+      "!node_modules/**/*.{md,ts,map}",
+      "!node_modules/.bin"
+    ],
+    "asarUnpack": [
+      "node_modules/sharp/**/*",
+      "node_modules/@img/**/*"
     ],
     "win": {
       "target": [
@@ -27,7 +34,9 @@
           "target": "portable",
           "arch": ["x64"]
         }
-      ]
+      ],
+      "sign": null,
+      "signingHashAlgorithms": null
     },
     "portable": {
       "artifactName": "${productName}-${version}-portable.exe"
