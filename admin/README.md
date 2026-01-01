@@ -11,13 +11,60 @@ Non-negotiable rules are documented in `ADMIN_SAFETY_GUIDE.md`.
 
 ## Run (dev mode)
 
-From repo root:
+### 前置需求
 
-```bash
+1. **安裝 Node.js**（如果還沒安裝）
+   - 下載：https://nodejs.org/
+   - 建議安裝 LTS 版本
+   - 安裝後，重新開啟命令提示字元
+
+2. **確認 Node.js 已安裝**
+   - 開啟「命令提示字元」（CMD）或「PowerShell」
+   - 執行：`node --version` 和 `npm --version`
+   - 應該會顯示版本號碼
+
+### 執行步驟
+
+**在命令提示字元（CMD）或 PowerShell 中執行：**
+
+```cmd
 cd admin
 npm install
 npm start
 ```
+
+> **注意**：請使用「命令提示字元」（CMD）或 PowerShell），不要直接在檔案總管中雙擊檔案。
+
+### Windows 用戶注意事項
+
+如果在 Windows 上遇到 `sharp` 模組錯誤，請參考 `WINDOWS_FIX.md` 進行修復。
+
+**快速修復步驟：**
+
+1. 開啟「命令提示字元」（以系統管理員身分執行，如果需要的話）
+2. 切換到專案目錄：
+   ```cmd
+   cd C:\path\to\lovely\Cursor\admin
+   ```
+   （請將路徑改為您的實際專案路徑）
+
+3. 執行修復指令：
+   ```cmd
+   npm install --os=win32 --cpu=x64 sharp
+   npm start
+   ```
+
+**如果還是不行，請嘗試完整重新安裝：**
+
+```cmd
+cd admin
+rmdir /s /q node_modules
+del package-lock.json
+npm install
+npm start
+```
+
+> **提示**：在 Windows CMD 中，`rm -rf` 指令無效，請使用 `rmdir /s /q` 來刪除資料夾。
 
 ## How it works
 
