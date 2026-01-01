@@ -39,6 +39,27 @@ End If
 
 WshShell.CurrentDirectory = adminPath
 
+' 自動建立帶圖示的快捷方式（如果還沒有）
+desktopPath = WshShell.SpecialFolders("Desktop")
+shortcutPath = desktopPath & "\Lovely Admin.lnk"
+If Not fso.FileExists(shortcutPath) Then
+    Set shortcut = WshShell.CreateShortcut(shortcutPath)
+    shortcut.TargetPath = adminPath & "\start.vbs"
+    shortcut.WorkingDirectory = adminPath
+    
+    ' 使用自訂圖示（如果存在），否則使用系統圖示
+    iconPath = adminPath & "\icon.ico"
+    If fso.FileExists(iconPath) Then
+        shortcut.IconLocation = iconPath
+    Else
+        shortcut.IconLocation = "C:\Windows\System32\shell32.dll,137"
+    End If
+    
+    shortcut.Description = "Lovely Cakery Admin Tool"
+    shortcut.Save
+    Set shortcut = Nothing
+End If
+
 ' 檢查 node_modules 是否存在
 If Not fso.FolderExists(adminPath & "\node_modules") Then
     WshShell.Run "cmd /c cd /d """ & adminPath & """ && npm install", 1, True
