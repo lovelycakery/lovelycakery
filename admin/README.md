@@ -66,6 +66,21 @@ npm start
 
 > **提示**：在 Windows CMD 中，`rm -rf` 指令無效，請使用 `rmdir /s /q` 來刪除資料夾。
 
+### 快速啟動（Windows 推薦方式）
+
+**雙擊執行 `start.vbs` 即可啟動應用！**
+
+1. 在 `admin` 資料夾中找到 `start.vbs` 文件
+2. 雙擊執行即可自動啟動應用
+3. 如果還沒有安裝依賴，會自動執行 `npm install`
+
+**設定圖示（可選）：**
+- 右鍵 `start.vbs` →「建立捷徑」
+- 右鍵捷徑 →「內容」→「變更圖示」
+- 選擇您喜歡的圖示（例如：`C:\Windows\System32\shell32.dll`）
+
+> **注意**：`start.vbs` 會隱藏命令視窗，只顯示應用程式視窗。如果需要查看日誌或錯誤訊息，請使用命令提示字元執行 `npm start`。
+
 ## How it works
 
 ### Calendar tab
