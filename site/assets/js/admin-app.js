@@ -456,7 +456,8 @@
 
     $('selectedImage').textContent = '選取圖片：' + name;
     showSuccess('已儲存（本地）：' + name);
-    sendImageDataToPreview(type);
+    // 不重新渲染 gallery — 純文字修改不需要重建圖片元素，避免圖片閃爍/失效
+    // 只有排序、上傳、刪除才呼叫 sendImageDataToPreview
   }
 
   function deleteImage(type, index) {
