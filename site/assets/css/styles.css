@@ -676,10 +676,10 @@ body.calendar-page-body {
     right: -8px;
 }
 
-/* 全部品項頁面：標籤位置調整，讓標籤部分超出圖片邊界 */
+/* 全部品項頁面：標籤位置（圖片右下角內側） */
 .all-items-page .gallery-image-tags {
-    bottom: 20px;  /* 進一步增加距離，讓標籤更靠近圖片中心，大部分在圖片內部 */
-    right: 20px;
+    bottom: 10px;
+    right: 10px;
 }
 
 .gallery-image-tag {
@@ -870,33 +870,21 @@ body.calendar-page-body {
 }
 
 /* ============================================
-   全部品項（all-items）：圖片顯示縮小為原本 0.9 倍 + 版面微調（僅此頁）
+   全部品項（all-items）：圖片縮小 + 移除卡片感（僅此頁）
+   用 transform: scale 縮小圖片，保持元素邊界一致，選取框才能對齊
    ============================================ */
 .all-items-page .gallery-grid {
-    gap: 24px; /* 比預設 30px 稍緊湊，視覺更均衡 */
+    gap: 24px;
 }
 
 .all-items-page .gallery-image-wrapper {
-    /* 移除「框」感（陰影/外框），使用 padding 來控制圖片顯示大小 */
     box-shadow: none;
     border-radius: 0;
-    overflow: visible;
-    aspect-ratio: 1;
-    padding: 10% 10% 5% 10%; /* 上左右 10%，底部 5% 減少下方空白 */
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 .all-items-page .gallery-image {
-    transform: none; /* 移除 scale，改用 padding 控制 */
-    width: 100%;
-    height: 100%;
-    object-fit: contain; /* 保持圖片比例，完整顯示 */
-}
-
-.all-items-page .gallery-item-info {
-    margin-top: -8px; /* 使用負值讓文字更靠近圖片 */
+    transform: scale(0.85);
+    transform-origin: center;
 }
 
 .all-items-page .gallery-item-name {
@@ -975,11 +963,6 @@ body.calendar-page-body {
         gap: 14px;
     }
 
-    /* 全部品項（手機）：兩欄時可以調整 padding 讓圖片更大 */
-    .all-items-page .gallery-image-wrapper {
-        padding: 5%; /* 手機版減少 padding，讓圖片顯示更大 */
-    }
-
     /* 手機版：名稱和價格字體調整 */
     .gallery-item-name {
         font-size: 16px;
@@ -987,10 +970,6 @@ body.calendar-page-body {
 
     .gallery-item-price {
         font-size: 14px;
-    }
-
-    .all-items-page .gallery-item-info {
-        margin-top: 8px; /* 手機端增加間距，讓圖片名稱離圖片更遠一點 */
     }
 
     .all-items-page .gallery-item-name {
@@ -1022,11 +1001,7 @@ body.calendar-page-body {
         border-radius: 6px 0 0 6px; /* 方形圓角（左側） */
     }
 
-    /* 全部品項（手機）：標籤位置在圖片內部 */
-    .all-items-page .gallery-image-tags {
-        bottom: 8px;  /* 增加距離，讓標籤更深入圖片內部 */
-        right: 8px;
-    }
+    /* 全部品項標籤位置已在桌面版統一設定，手機版不需額外覆寫 */
 
     .tag-legend-badge {
         font-size: 12px;

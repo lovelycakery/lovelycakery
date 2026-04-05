@@ -667,10 +667,9 @@
     style.textContent = `
       .gallery-item.selected {
         position: relative;
-      }
-      .gallery-item.selected .gallery-image-wrapper {
-        box-shadow: 0 0 0 4px rgba(212, 165, 116, 0.8), 0 8px 24px rgba(212, 165, 116, 0.4);
-        transform: translateY(-2px);
+        outline: 3px solid rgba(212, 165, 116, 0.9);
+        outline-offset: 4px;
+        border-radius: 12px;
       }
       .gallery-item.selected::before {
         content: '${(localStorage.getItem("language") === "en") ? "Selected" : "已選取"}';
@@ -685,13 +684,6 @@
         font-weight: 600;
         z-index: 10;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-      }
-      .all-items-page .gallery-item.selected .gallery-image-wrapper {
-        box-shadow: none;
-      }
-      .all-items-page .gallery-item.selected .gallery-image {
-        box-shadow: 0 0 0 4px rgba(212, 165, 116, 0.8), 0 4px 16px rgba(212, 165, 116, 0.3);
-        border-radius: 8px;
       }
     `;
     document.head.appendChild(style);
