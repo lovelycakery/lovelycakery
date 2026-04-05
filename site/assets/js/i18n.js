@@ -50,10 +50,15 @@
       el.textContent = normalized === 'en' ? el.getAttribute('data-en') : el.getAttribute('data-zh');
     });
 
-    // Update <html lang> only when applying to the main document.
-    // (In iframes it's fine too, but this avoids surprises if root != document.)
+    // Update <html lang> and <title> only when applying to the main document.
     if (scope === document) {
       document.documentElement.lang = normalized === 'en' ? 'en' : 'zh-TW';
+
+      // Switch page title if data attributes are present on <title> or a meta helper
+      var titleEl = document.querySelector('title[data-en][data-zh]');
+      if (titleEl) {
+        document.title = normalized === 'en' ? titleEl.getAttribute('data-en') : titleEl.getAttribute('data-zh');
+      }
     }
   }
 

@@ -133,13 +133,19 @@
     }
     
     const closeModal = () => {
-      document.body.removeChild(modal);
+      if (modal.parentNode) document.body.removeChild(modal);
       document.body.style.overflow = '';
+      document.removeEventListener('keydown', escHandler);
     };
-    
+
+    const escHandler = (e) => {
+      if (e.key === 'Escape') closeModal();
+    };
+
     modal.querySelector('.image-modal__overlay').addEventListener('click', closeModal);
     modal.querySelector('.image-modal__close').addEventListener('click', closeModal);
-    
+    document.addEventListener('keydown', escHandler);
+
     document.body.appendChild(modal);
     document.body.style.overflow = 'hidden';
   }
@@ -351,10 +357,10 @@
       const imageSrc = item.image;
       
       // 根據語言獲取名稱
-      const imageNameZh = item.name || '未命名';
-      const imageNameEn = item.name_en || item.name || 'Untitled';
+      const imageNameZh = item.name || '手工千層蛋糕';
+      const imageNameEn = item.name_en || item.name || 'Handmade Mille Crepe Cake';
       const imageName = currentLang === 'en' ? imageNameEn : imageNameZh;
-      const imageAlt = imageName;
+      const imageAlt = imageName + (currentLang === 'en' ? ' - Lovely Cakery' : ' - Lovely Cakery 手工千層');
       
       // 將標籤儲存到 data 屬性中，用於篩選
       if (item.tags && Array.isArray(item.tags) && item.tags.length > 0) {
@@ -595,7 +601,7 @@
           animation: dragPulse 1.5s ease-in-out infinite;
         }
         .admin-draggable.drag-over::after {
-          content: '放置這裡';
+          content: '${(localStorage.getItem("language") === "en") ? "Drop here" : "放置這裡"}';
           position: absolute;
           top: 50%;
           left: 50%;
@@ -635,8 +641,14 @@
   async function initGallery(type) {
     const container = document.querySelector('.gallery-grid');
     if (!container) return;
-    
+
     const items = await loadGalleryData(type);
+    if (!items || items.length === 0) {
+      const lang = localStorage.getItem('language') || 'zh';
+      container.innerHTML = '<p style="text-align:center;padding:40px;color:#6b5d4f;font-size:16px;" data-en="Unable to load content. Please try again later." data-zh="無法載入內容，請稍後再試。">' +
+        (lang === 'en' ? 'Unable to load content. Please try again later.' : '無法載入內容，請稍後再試。') + '</p>';
+      return;
+    }
     renderGallery(items, container);
   }
 
@@ -655,7 +667,7 @@
         transform: translateY(-2px);
       }
       .gallery-item.selected::before {
-        content: '已選取';
+        content: '${(localStorage.getItem("language") === "en") ? "Selected" : "已選取"}';
         position: absolute;
         top: 8px;
         right: 8px;

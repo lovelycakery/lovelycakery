@@ -30,12 +30,6 @@
       e.preventDefault();
       return false;
     }
-    
-    // Ctrl+S - 儲存網頁 (某些情況下)
-    if (e.ctrlKey && e.key === 'S') {
-      e.preventDefault();
-      return false;
-    }
   });
 
   // 禁用圖片拖拽

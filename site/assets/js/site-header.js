@@ -132,10 +132,24 @@
     );
   }
 
+  function ensureSkipLink() {
+    if (document.querySelector('.skip-to-content')) return;
+    const main = document.querySelector('.main-content');
+    if (main && !main.id) main.id = 'main-content';
+    const link = document.createElement('a');
+    link.className = 'skip-to-content';
+    link.href = '#' + (main ? main.id : 'main-content');
+    link.textContent = 'Skip to content';
+    document.body.insertBefore(link, document.body.firstChild);
+  }
+
   function renderIntoHeader() {
     const header = document.getElementById('site-header');
     if (!header) return;
-    
+
+    // 插入 skip-to-content 連結
+    ensureSkipLink();
+
     // 檢查是否為編輯模式
     const urlParams = new URLSearchParams(window.location.search);
     const isAdminMode = urlParams.get('adminPreview') === '1';
@@ -157,7 +171,38 @@
     }
   }
 
+  function ensureGoogleFonts() {
+    if (document.querySelector('link[href*="fonts.googleapis.com/css2"]')) return;
+    var fontsUrl = 'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500&display=swap';
+    // preconnect
+    ['https://fonts.googleapis.com', 'https://fonts.gstatic.com'].forEach(function (origin) {
+      if (document.querySelector('link[href="' + origin + '"]')) return;
+      var pc = document.createElement('link');
+      pc.rel = 'preconnect';
+      pc.href = origin;
+      if (origin.includes('gstatic')) pc.crossOrigin = '';
+      document.head.appendChild(pc);
+    });
+    // async load (media=print trick)
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = fontsUrl;
+    link.media = 'print';
+    link.onload = function () { this.media = 'all'; };
+    document.head.appendChild(link);
+    // noscript fallback
+    var ns = document.createElement('noscript');
+    var fb = document.createElement('link');
+    fb.rel = 'stylesheet';
+    fb.href = fontsUrl;
+    ns.appendChild(fb);
+    document.head.appendChild(ns);
+  }
+
   function init() {
+    // Ensure Google Fonts are loaded (single source, no duplication across pages)
+    ensureGoogleFonts();
+
     // If called late, render immediately; otherwise render on DOMContentLoaded.
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', renderIntoHeader);

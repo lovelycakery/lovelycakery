@@ -7,6 +7,32 @@
     box-sizing: border-box;
 }
 
+/* 無障礙：鍵盤焦點樣式 */
+:focus-visible {
+    outline: 2px solid #c8a24a;
+    outline-offset: 2px;
+}
+
+/* 無障礙：跳到主內容連結 */
+.skip-to-content {
+    position: absolute;
+    top: -100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #3d2817;
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 0 0 8px 8px;
+    z-index: 9999;
+    font-size: 14px;
+    text-decoration: none;
+    transition: top 0.2s ease;
+}
+
+.skip-to-content:focus {
+    top: 0;
+}
+
 /* 整體頁面樣式 */
 body {
     font-family: 'Inter', sans-serif;
@@ -1014,11 +1040,12 @@ body.calendar-page-body {
    ============================================ */
 
 /* 日曆頁面專用樣式：不要鎖定一屏，不要縮放；維持水平置中、可清楚閱讀 */
-.calendar-page {
-    padding: 0 !important;
+/* 使用 .main-content.calendar-page 提高特異性，取代 !important */
+.main-content.calendar-page {
+    padding: 0;
     /* 由 JS 寫入 --header-h，以確保不同裝置/字型下準確扣掉 header 高度 */
-    margin-top: var(--header-h, 100px) !important;
-    min-height: auto !important; /* 覆蓋 .main-content 的 min-height */
+    margin-top: var(--header-h, 100px);
+    min-height: auto; /* 覆蓋 .main-content 的 min-height */
     height: auto;
     overflow: visible;
     box-sizing: border-box;
@@ -1281,9 +1308,9 @@ body.calendar-page-body {
 }
 
 /* 地圖頁面的容器需要更大的寬度 */
-.contact-container {
-    max-width: 1600px !important;
-    padding: 0 20px !important;
+.container.contact-container {
+    max-width: 1600px;
+    padding: 0 20px;
 }
 
 .contact-header {
@@ -1310,8 +1337,7 @@ body.calendar-page-body {
 
 .map-wrapper {
     width: 100%;
-    max-width: 600px !important;
-    min-width: 600px !important;
+    max-width: 600px;
     margin: 0 auto;
     border-radius: 16px;
     overflow: hidden;
@@ -1343,8 +1369,6 @@ body.calendar-page-body {
 
     .map-wrapper {
         border-radius: 12px;
-        max-width: 100% !important;
-        min-width: auto !important;
     }
 }
 
@@ -1369,8 +1393,6 @@ body.calendar-page-body {
 
     .map-wrapper {
         border-radius: 8px;
-        max-width: 100% !important;
-        min-width: auto !important;
     }
 }
 

@@ -442,6 +442,14 @@ if grep -R --line-number --fixed-string "github-config.js" \
 fi
 pass "No legacy github-config.js references"
 
+# 4.5) Ensure essential web files exist (favicon, robots.txt, sitemap.xml, 404.html)
+for essential_file in favicon.ico robots.txt sitemap.xml 404.html; do
+  if [ ! -f "$SITE_DIR/$essential_file" ]; then
+    fail "Missing $SITE_DIR/$essential_file"
+  fi
+done
+pass "Essential web files exist (favicon, robots.txt, sitemap.xml, 404.html)"
+
 # 5) Prevent accidental committing of local secret config
 if [ -d ".git" ]; then
   if git ls-files --error-unmatch site/assets/js/github-config.local.js >/dev/null 2>&1; then

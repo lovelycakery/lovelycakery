@@ -151,10 +151,12 @@ class CalendarWidgetReadonly {
             } else {
                 console.warn('⚠️ 無法載入日曆資料檔案');
                 this.events = {};
+                this._loadFailed = true;
             }
         } catch (error) {
             console.error('載入日曆資料時發生錯誤:', error);
             this.events = {};
+            this._loadFailed = true;
         }
         // 不在這裡調用 renderCalendar，由 init() 統一調用
     }
@@ -219,10 +221,19 @@ class CalendarWidgetReadonly {
             this.createDayElement(grid, day, true, dateKey);
         }
         
+        // 如果資料載入失敗，顯示提示
+        if (this._loadFailed) {
+            const hint = document.createElement('p');
+            hint.style.cssText = 'text-align:center;padding:12px;color:#6b5d4f;font-size:14px;';
+            const lang = localStorage.getItem('language') || 'zh';
+            hint.textContent = lang === 'en' ? 'Calendar data unavailable. Please try again later.' : '日曆資料暫時無法載入，請稍後再試。';
+            grid.parentNode.insertBefore(hint, grid.nextSibling);
+        }
+
         // 渲染完成後回報高度（由 ResizeObserver 觸發；這裡再送一次保險）
         this.notifyParentHeight();
     }
-    
+
     // 創建日期元素（只讀模式）
     createDayElement(container, day, isOtherMonth, dateKey, isToday = false) {
         const dayEl = document.createElement('div');
