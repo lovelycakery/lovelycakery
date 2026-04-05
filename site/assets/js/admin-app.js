@@ -841,9 +841,11 @@
       if (key.trim()) {
         AdminTranslate.setApiKey(key.trim());
         logStatus('✅ Claude API Key 已儲存');
+        alert('Claude API Key 已設定成功！');
       } else {
         AdminTranslate.clearApiKey();
         logStatus('已清除 Claude API Key');
+        alert('已清除 Claude API Key');
       }
     });
 
