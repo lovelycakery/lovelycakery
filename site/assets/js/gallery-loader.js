@@ -642,7 +642,10 @@
         var style = document.createElement('style');
         style.id = 'coming-soon-styles';
         style.textContent =
-          '.gallery-coming-soon{text-align:center;padding:80px 40px;color:#d4809a;letter-spacing:1px;font-size:28px;font-family:"Playfair Display",serif;font-weight:400;}' +
+          '.main-content:has(.gallery-coming-soon){display:flex;flex-direction:column;}' +
+          '.main-content:has(.gallery-coming-soon) .container{flex:1;display:flex;flex-direction:column;}' +
+          '.gallery-grid:has(.gallery-coming-soon){flex:1;display:flex;align-items:center;justify-content:center;}' +
+          '.gallery-coming-soon{text-align:center;padding:40px;color:#d4809a;letter-spacing:1px;font-size:28px;font-family:"Playfair Display",serif;font-weight:400;}' +
           'html[lang="en"] .gallery-coming-soon{font-size:36px;font-family:"Dancing Script",cursive;font-weight:600;}';
         document.head.appendChild(style);
       }

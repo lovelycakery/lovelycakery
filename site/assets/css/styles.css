@@ -47,6 +47,7 @@ body {
    ============================================ */
 html {
     overflow-x: hidden;
+    scrollbar-gutter: stable;
 }
 
 /* 日曆頁面專用：允許自然捲動（避免手機視口/縮放抖動與位置漂移） */
@@ -256,9 +257,13 @@ body.calendar-page-body {
     margin-top: var(--header-h, 100px);
     padding: 60px 0;
     min-height: calc(100vh - 200px);
+    background-color: #f0ede8;  /* 下層米色背景 */
+}
+
+/* 首頁：垂直置中內容 */
+.home-page .main-content {
     display: flex;
     align-items: center;
-    background-color: #f0ede8;  /* 下層米色背景 */
 }
 
 /* 內容網格：左右兩欄版面配置 */
@@ -614,7 +619,7 @@ img {
 /* 圖片網格布局 */
 .gallery-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 30px;
     padding-bottom: 60px;
 }
@@ -912,7 +917,7 @@ img {
     }
 
     .gallery-grid {
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
         gap: 24px;
     }
 }
