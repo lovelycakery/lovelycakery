@@ -2,34 +2,6 @@
   "schema_version": 1,
   "items": [
     {
-      "image": "assets/images/products/檸檬千層.jpg",
-      "name": "檸檬千層",
-      "name_en": "Lemon Mille Crepe",
-      "prices": {
-        "size6": "2000",
-        "size8": "2200",
-        "slice": "200"
-      },
-      "description": "新鮮檸檬的清新酸香與香滑卡士達完美融合，層層薄餅皮帶來豐富的口感層次，酸甜平衡的滋味清爽不膩，是夏日裡最令人心曠神怡的選擇。",
-      "description_en": "Fresh lemon's zesty aroma perfectly blends with smooth custard cream. Multiple layers of delicate crepe create rich textural complexity. The balanced sweet and tangy flavor is refreshing and never cloying, making it the perfect choice for any season.",
-      "tags": []
-    },
-    {
-      "image": "assets/images/products/焦糖千層.jpg",
-      "name": "焦糖千層",
-      "name_en": "Caramel Mille Crepe",
-      "prices": {
-        "size6": "2000",
-        "size8": "2200",
-        "slice": "200"
-      },
-      "description": "濃郁的焦糖香氣與柔滑奶油交織出溫暖的甜蜜滋味，層層薄餅皮帶來豐富的口感體驗，焦糖的焦香與奶香的完美平衡，是令人回味無窮的經典口味。",
-      "description_en": "Rich caramel aroma interweaves with smooth cream to create a warm, sweet delight. Layers of delicate crepe offer a rich textural experience. The perfect balance between caramel's toasty notes and creamy sweetness makes this a classic, unforgettable flavor.",
-      "tags": [
-        "奶蛋素"
-      ]
-    },
-    {
       "image": "assets/images/products/藍莓千層.jpg",
       "name": "藍莓千層",
       "name_en": "Blueberry Mille Crepe",
@@ -41,21 +13,6 @@
       "description": "選用優質藍莓製成的千層蛋糕，藍莓的酸甜與香滑卡士達完美結合，層層疊疊的薄餅皮帶來豐富的口感層次，每一口都能感受到藍莓的天然果香。",
       "description_en": "Made with premium blueberries, the sweet and tangy flavor of blueberries perfectly combines with smooth custard cream. Layers of delicate crepe create rich textural complexity, and every bite offers the natural fruity aroma of blueberries.",
       "tags": []
-    },
-    {
-      "image": "assets/images/products/香草千層.jpg",
-      "name": "香草千層",
-      "name_en": "Vanilla Mille Crepe",
-      "prices": {
-        "size6": "2000",
-        "size8": "2200",
-        "slice": "200"
-      },
-      "description": "經典香草口味的千層蛋糕，選用天然香草豆製成的香滑奶油，層層薄餅皮與香草奶油的完美融合，帶來純粹而優雅的味覺享受，是永遠不會出錯的經典選擇。",
-      "description_en": "A classic vanilla mille crepe made with natural vanilla beans. Smooth vanilla cream perfectly blends with layers of delicate crepe, offering a pure and elegant taste experience. A timeless classic that never fails to delight.",
-      "tags": [
-        "奶蛋素"
-      ]
     },
     {
       "image": "assets/images/products/伯爵茶千層.jpg",
@@ -86,6 +43,32 @@
       ]
     },
     {
+      "image": "assets/images/products/咖啡千層.jpg",
+      "name": "咖啡千層",
+      "name_en": "Coffee Mille Crepe",
+      "prices": {
+        "size6": "2000",
+        "size8": "2200",
+        "slice": "200"
+      },
+      "description": "採用優質咖啡豆製成的千層蛋糕，濃郁的咖啡香氣與香滑奶油完美結合，層層薄餅皮帶來豐富的口感層次，咖啡的微苦與甜味平衡，是咖啡愛好者不容錯過的選擇。",
+      "description_en": "Made with premium coffee beans, the rich coffee aroma perfectly blends with smooth cream. Layers of delicate crepe create rich textural complexity. The balanced bitter-sweet coffee flavor makes this a must-try for coffee enthusiasts.",
+      "tags": []
+    },
+    {
+      "image": "assets/images/products/檸檬千層.jpg",
+      "name": "檸檬千層",
+      "name_en": "Lemon Mille Crepe",
+      "prices": {
+        "size6": "2000",
+        "size8": "2200",
+        "slice": "200"
+      },
+      "description": "新鮮檸檬的清新酸香與香滑卡士達完美融合，層層薄餅皮帶來豐富的口感層次，酸甜平衡的滋味清爽不膩，是夏日裡最令人心曠神怡的選擇。",
+      "description_en": "Fresh lemon's zesty aroma perfectly blends with smooth custard cream. Multiple layers of delicate crepe create rich textural complexity. The balanced sweet and tangy flavor is refreshing and never cloying, making it the perfect choice for any season.",
+      "tags": []
+    },
+    {
       "image": "assets/images/products/紅茶千層.jpg",
       "name": "紅茶千層",
       "name_en": "Black Tea Mille Crepe",
@@ -99,17 +82,34 @@
       "tags": []
     },
     {
-      "image": "assets/images/products/咖啡千層.jpg",
-      "name": "咖啡千層",
-      "name_en": "Coffee Mille Crepe",
+      "image": "assets/images/products/焦糖千層.jpg",
+      "name": "焦糖千層",
+      "name_en": "Caramel Mille Crepe",
       "prices": {
         "size6": "2000",
         "size8": "2200",
         "slice": "200"
       },
-      "description": "採用優質咖啡豆製成的千層蛋糕，濃郁的咖啡香氣與香滑奶油完美結合，層層薄餅皮帶來豐富的口感層次，咖啡的微苦與甜味平衡，是咖啡愛好者不容錯過的選擇。",
-      "description_en": "Made with premium coffee beans, the rich coffee aroma perfectly blends with smooth cream. Layers of delicate crepe create rich textural complexity. The balanced bitter-sweet coffee flavor makes this a must-try for coffee enthusiasts.",
-      "tags": []
+      "description": "濃郁的焦糖香氣與柔滑奶油交織出溫暖的甜蜜滋味，層層薄餅皮帶來豐富的口感體驗，焦糖的焦香與奶香的完美平衡，是令人回味無窮的經典口味。",
+      "description_en": "Rich caramel aroma interweaves with smooth cream to create a warm, sweet delight. Layers of delicate crepe offer a rich textural experience. The perfect balance between caramel's toasty notes and creamy sweetness makes this a classic, unforgettable flavor.",
+      "tags": [
+        "奶蛋素"
+      ]
+    },
+    {
+      "image": "assets/images/products/香草千層.jpg",
+      "name": "香草千層",
+      "name_en": "Vanilla Mille Crepe",
+      "prices": {
+        "size6": "2000",
+        "size8": "2200",
+        "slice": "200"
+      },
+      "description": "經典香草口味的千層蛋糕，選用天然香草豆製成的香滑奶油，層層薄餅皮與香草奶油的完美融合，帶來純粹而優雅的味覺享受，是永遠不會出錯的經典選擇。",
+      "description_en": "A classic vanilla mille crepe made with natural vanilla beans. Smooth vanilla cream perfectly blends with layers of delicate crepe, offering a pure and elegant taste experience. A timeless classic that never fails to delight.",
+      "tags": [
+        "奶蛋素"
+      ]
     }
   ]
 }

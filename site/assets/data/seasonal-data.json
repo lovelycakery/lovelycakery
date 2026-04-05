@@ -2,21 +2,6 @@
   "schema_version": 1,
   "items": [
     {
-      "image": "assets/images/seasonal/草莓千層3.jpg",
-      "name": "草莓千層3",
-      "name_en": "Strawberry Mille Crepe 3",
-      "prices": {
-        "size6": "1800",
-        "size8": "2000",
-        "slice": "180"
-      },
-      "description": "選用當季新鮮草莓，層層疊疊的薄餅皮與香滑卡士達醬交織出清新甜美的滋味，每一口都能感受到草莓的鮮甜與蛋糕的柔軟，是春日限定的美好饗宴。",
-      "description_en": "Made with fresh seasonal strawberries, delicate layers of crepe and smooth custard cream create a refreshing and sweet delight. Each bite offers the natural sweetness of strawberries and the soft texture of the cake, a perfect springtime treat.",
-      "tags": [
-        "奶蛋素"
-      ]
-    },
-    {
       "image": "assets/images/seasonal/抹茶水果千層.jpg",
       "name": "抹茶水果千層",
       "name_en": "Matcha Fruit Mille Crepe",
@@ -34,21 +19,6 @@
       ]
     },
     {
-      "image": "assets/images/seasonal/巧克力千層.jpg",
-      "name": "巧克力千層",
-      "name_en": "Chocolate Mille Crepe",
-      "prices": {
-        "size6": "2200",
-        "size8": "2500",
-        "slice": "220"
-      },
-      "description": "選用頂級可可製成的濃郁巧克力千層，層層疊疊的薄餅皮與香濃巧克力奶油交織，濃郁而不甜膩，每一口都充滿巧克力的香醇，是巧克力愛好者的完美選擇。",
-      "description_en": "Made with premium cocoa, this rich chocolate mille crepe features delicate layers of crepe interwoven with luxurious chocolate cream. Rich yet not overly sweet, every bite is filled with the aromatic richness of chocolate, perfect for chocolate lovers.",
-      "tags": [
-        "無咖啡因"
-      ]
-    },
-    {
       "image": "assets/images/seasonal/草莓千層2.jpg",
       "name": "草莓千層2",
       "name_en": "Strawberry Mille Crepe 2",
@@ -61,6 +31,36 @@
       "description_en": "A delightful combination of fresh strawberries layered with delicate crepe sheets and smooth custard cream. This perfectly balanced treat offers a sweet yet not overwhelming flavor, with each layer crafted by hand to create an artisanal masterpiece.",
       "tags": [
         "含酒精"
+      ]
+    },
+    {
+      "image": "assets/images/seasonal/草莓千層3.jpg",
+      "name": "草莓千層3",
+      "name_en": "Strawberry Mille Crepe 3",
+      "prices": {
+        "size6": "1800",
+        "size8": "2000",
+        "slice": "180"
+      },
+      "description": "選用當季新鮮草莓，層層疊疊的薄餅皮與香滑卡士達醬交織出清新甜美的滋味，每一口都能感受到草莓的鮮甜與蛋糕的柔軟，是春日限定的美好饗宴。",
+      "description_en": "Made with fresh seasonal strawberries, delicate layers of crepe and smooth custard cream create a refreshing and sweet delight. Each bite offers the natural sweetness of strawberries and the soft texture of the cake, a perfect springtime treat.",
+      "tags": [
+        "奶蛋素"
+      ]
+    },
+    {
+      "image": "assets/images/seasonal/巧克力千層.jpg",
+      "name": "巧克力千層",
+      "name_en": "Chocolate Mille Crepe",
+      "prices": {
+        "size6": "2200",
+        "size8": "2500",
+        "slice": "220"
+      },
+      "description": "選用頂級可可製成的濃郁巧克力千層，層層疊疊的薄餅皮與香濃巧克力奶油交織，濃郁而不甜膩，每一口都充滿巧克力的香醇，是巧克力愛好者的完美選擇。",
+      "description_en": "Made with premium cocoa, this rich chocolate mille crepe features delicate layers of crepe interwoven with luxurious chocolate cream. Rich yet not overly sweet, every bite is filled with the aromatic richness of chocolate, perfect for chocolate lovers.",
+      "tags": [
+        "無咖啡因"
       ]
     }
   ]
