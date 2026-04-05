@@ -654,7 +654,8 @@
           '.main-content:has(.gallery-coming-soon) .container{flex:1;display:flex;flex-direction:column;}' +
           '.gallery-grid:has(.gallery-coming-soon){flex:1;display:flex;align-items:center;justify-content:center;}' +
           '.gallery-coming-soon{text-align:center;padding:40px;color:#d4809a;letter-spacing:1px;font-size:28px;font-family:"Playfair Display",serif;font-weight:400;}' +
-          'html[lang="en"] .gallery-coming-soon{font-size:36px;font-family:"Dancing Script",cursive;font-weight:600;}';
+          'html[lang="en"] .gallery-coming-soon{font-size:36px;font-family:"Dancing Script",cursive;font-weight:600;}' +
+          '@media(max-width:768px){.gallery-coming-soon{font-size:20px;padding:24px;}html[lang="en"] .gallery-coming-soon{font-size:24px;}}';
         document.head.appendChild(style);
       }
       // 文字由 i18n.js 透過 data-en/data-zh 自動切換，這裡只需設定初始值
