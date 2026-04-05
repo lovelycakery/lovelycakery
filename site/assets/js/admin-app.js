@@ -566,7 +566,7 @@
         });
 
         // Version bump
-        var targets = ['calendar.html', 'calendar-widget-readonly.html'];
+        var targets = ['calendar.html', 'calendar-widget-readonly.html', 'calendar-widget.html', 'calendar-manager-local.html'];
         var curV = null;
         for (var i = 0; i < targets.length; i++) {
           try {
