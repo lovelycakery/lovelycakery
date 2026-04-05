@@ -667,9 +667,10 @@
     style.textContent = `
       .gallery-item.selected {
         position: relative;
+      }
+      .gallery-item.selected .gallery-image {
         outline: 3px solid rgba(212, 165, 116, 0.9);
-        outline-offset: 4px;
-        border-radius: 12px;
+        outline-offset: 2px;
       }
       .gallery-item.selected::before {
         content: '${(localStorage.getItem("language") === "en") ? "Selected" : "已選取"}';
