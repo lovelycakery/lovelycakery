@@ -1,6 +1,10 @@
 # Lovely Admin Tool — Architecture & Safety Documentation
 
-本文檔詳細說明管理工具（`admin/`）的完整程式架構與安全規則，供未來開發者與 AI 參考。**在修改任何程式碼之前，請務必閱讀本文檔。**
+> **⚠️ 此文件描述的是舊版 Electron 管理工具。**
+> 目前推薦使用 Web Admin（`site/admin.html`），透過 GitHub API 直接操作。
+> 請參考 `site/AI_MAINTENANCE_GUIDE.md` 取得最新架構說明。
+
+本文檔詳細說明舊版 Electron 管理工具（`admin/`）的程式架構與安全規則，僅供歷史參考。
 
 > **⚠️ 安全規則（MUST FOLLOW）**：本工具的核心要求是「不能意外破壞網站」。所有安全規則定義在[安全架構](#安全架構)章節，**必須嚴格遵守**。
 

@@ -1,13 +1,13 @@
-# Lovely Admin (Local-only)
+# Lovely Admin (Electron — 已被 Web Admin 取代)
 
-This folder contains the collaborator-facing **local admin tool**.
+> **此工具已過時。** 推薦使用 Web Admin：
+> - 網址：`https://lovelycakery.github.io/lovelycakery/admin.html`
+> - 不需安裝，瀏覽器直接操作
+> - 使用 GitHub API + Personal Access Token
+>
+> 以下是舊版 Electron 工具的說明，僅供參考。
 
-Goals:
-- Preview should match the visitor website (loads `site/` pages directly).
-- Admin tool can safely edit the website content by writing allowlisted files under `site/`.
-- “One-button publish”: local preflight checks → commit+push → CI deploy gate.
-
-Non-negotiable rules are documented in `ADMIN_SAFETY_GUIDE.md`.
+This folder contains the legacy Electron-based **local admin tool**.
 
 ## Run (dev mode)
 

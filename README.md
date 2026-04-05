@@ -4,17 +4,21 @@
 
 ## 專案資料夾結構（重要）
 
-- `site/`：**網站本體（會部署到 GitHub Pages）**
-- `admin/`：本機管理工具（不會被部署；給合作者用）
+- `site/`：**網站本體（會部署到 GitHub Pages）**，包含 Web Admin 管理介面
+- `admin/`：舊版 Electron 管理工具（已被 Web Admin 取代，僅保留供參考）
 
-## 文件入口（建議從這裡開始）
+## 管理網站內容
 
-- **網站本體（`site/`）**
-  - `site/README.md`：網站頁面/資產結構、如何本機預覽、如何更新內容
-  - `site/AI_MAINTENANCE_GUIDE.md`：網站架構真相（檔案職責、日曆 iframe、快取版本、踩雷點）
-- **管理工具（`admin/`）**
-  - `admin/README.md`：如何啟動/使用管理工具
-  - `admin/ARCHITECTURE.md`：管理工具架構與安全規則（必讀）
+合作者直接打開 Web Admin 即可編輯：**`site/admin.html`**（部署後為 GitHub Pages 網址）
+
+- 不需安裝任何工具，瀏覽器直接操作
+- 使用 GitHub Personal Access Token 認證
+- 支援日曆、季節限定、全部品項的編輯
+
+## 文件入口
+
+- `site/README.md`：網站頁面結構、預覽、部署
+- `site/AI_MAINTENANCE_GUIDE.md`：完整架構說明（檔案職責、日曆 iframe、快取版本、維護操作）
 
 ## 部署到 GitHub Pages
 

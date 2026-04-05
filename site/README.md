@@ -26,12 +26,13 @@ This folder is the **deployable static website** (HTML/CSS/JS). GitHub Pages pub
 - The widget reads `assets/data/calendar-data.json` and renders the calendar.
 - Cache-busting is done via `?v=YYYYMMDD-N` on calendar-related pages/assets.
 
-## How to edit the calendar
+## How to edit content (calendar, products, seasonal)
 
-Recommended: use the **local admin tool** in `admin/` (it writes `assets/data/calendar-data.json` directly and bumps `?v=` safely).
+Use the **Web Admin** interface: open `admin.html` in your browser.
 
-Legacy pages:
-- `calendar-widget.html` / `calendar-manager-local.html` exist for historical reasons but are **not** the recommended workflow anymore.
+- Works on GitHub Pages — no installation needed
+- Uses GitHub API with Personal Access Token
+- Local edit with instant preview → batch commit via「一鍵發布」
 
 ## Deploy
 
