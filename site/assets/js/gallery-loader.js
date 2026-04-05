@@ -689,8 +689,52 @@
         z-index: 10;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
       }
+      .batch-mode .gallery-item {
+        cursor: pointer;
+        position: relative;
+      }
+      .batch-mode .gallery-item::after {
+        content: '';
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        width: 24px;
+        height: 24px;
+        border: 2px solid rgba(255,255,255,0.6);
+        border-radius: 6px;
+        background: rgba(0,0,0,0.3);
+        z-index: 10;
+        pointer-events: none;
+      }
+      .batch-mode .gallery-item.batch-selected::after {
+        content: '✓';
+        background: rgba(226, 106, 90, 0.95);
+        border-color: rgba(226, 106, 90, 0.95);
+        color: #fff;
+        font-size: 16px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+      }
+      .batch-mode .gallery-item.batch-selected .gallery-image {
+        outline: 3px solid rgba(226, 106, 90, 0.9);
+        outline-offset: 2px;
+      }
     `;
     document.head.appendChild(style);
+  }
+
+  // 點擊空白處取消選取（僅 admin 編輯模式）
+  if (isAdminMode && urlParams.get('mode') === 'edit') {
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.gallery-item')) {
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage({ type: 'gallery-deselect' }, '*');
+        }
+      }
+    });
   }
 
   // 監聽來自父窗口的消息（滾動、選取狀態、語言切換）
@@ -804,7 +848,37 @@
         currentSelectedIndex = -1;
       }
     }
+
+    // 批次刪除模式
+    if (e.data && e.data.type === 'batch-mode') {
+      const container = document.querySelector('.gallery-grid');
+      if (!container) return;
+      if (e.data.enabled) {
+        container.classList.add('batch-mode');
+        // 在批次模式下，點擊切換勾選
+        container.addEventListener('click', batchClickHandler, true);
+      } else {
+        container.classList.remove('batch-mode');
+        container.removeEventListener('click', batchClickHandler, true);
+        container.querySelectorAll('.gallery-item').forEach(function (el) {
+          el.classList.remove('batch-selected');
+        });
+      }
+    }
   });
+
+  function batchClickHandler(e) {
+    var itemEl = e.target.closest('.gallery-item');
+    if (!itemEl) return;
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+    itemEl.classList.toggle('batch-selected');
+    var index = Array.from(itemEl.parentElement.querySelectorAll('.gallery-item')).indexOf(itemEl);
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({ type: 'batch-toggle', index: index }, '*');
+    }
+  }
 
   window.LovelyGalleryLoader = {
     init: initGallery,

@@ -371,7 +371,33 @@
 
   // ── Image edit panel ──────────────────────────────────────────────
 
+  function hasUnsavedChanges() {
+    if (state.editingImageIndex < 0) return false;
+    var type = state.currentTab === 'seasonal' ? 'seasonal' : 'products';
+    var item = state.imageData[type].items[state.editingImageIndex];
+    if (!item) return false;
+    var prices = (item.prices && typeof item.prices === 'object') ? item.prices : {};
+    var tags = [];
+    document.querySelectorAll('.tag-checkboxes input[type="checkbox"]:checked').forEach(function (cb) { tags.push(cb.value); });
+    var origTags = item.tags || [];
+    if ($('imageNameInput').value.trim() !== (item.name || '').trim()) return true;
+    if ($('imageNameEnInput').value.trim() !== (item.name_en || '').trim()) return true;
+    if ($('imagePriceSize6Input').value.trim() !== (prices.size6 || '').toString().trim()) return true;
+    if ($('imagePriceSize8Input').value.trim() !== (prices.size8 || '').toString().trim()) return true;
+    if ($('imagePriceSliceInput').value.trim() !== (prices.slice || '').toString().trim()) return true;
+    if ($('imageDescInput').value.trim() !== (item.description || '').trim()) return true;
+    if ($('imageDescEnInput').value.trim() !== (item.description_en || '').trim()) return true;
+    if (tags.length !== origTags.length || tags.some(function (t) { return origTags.indexOf(t) === -1; })) return true;
+    return false;
+  }
+
+  function confirmDiscardChanges() {
+    if (!hasUnsavedChanges()) return true;
+    return confirm('目前有未儲存的修改，確定要放棄嗎？');
+  }
+
   function openImageEditPanel(type, index) {
+    if (state.editingImageIndex >= 0 && state.editingImageIndex !== index && !confirmDiscardChanges()) return;
     clearError(); clearSuccess();
     var item = state.imageData[type].items[index];
     if (!item) return;
@@ -460,6 +486,64 @@
 
     clearImageEditPanel();
     showSuccess('已刪除（本地）：' + item.name);
+    sendImageDataToPreview(type);
+  }
+
+  // ── Batch delete ──────────────────────────────────────────────────
+
+  var batchMode = false;
+  var batchSelected = new Set();
+
+  function enterBatchMode() {
+    if (state.editingImageIndex >= 0 && !confirmDiscardChanges()) return;
+    batchMode = true;
+    batchSelected.clear();
+    clearImageEditPanel();
+    $('batchDeleteBtn').style.display = 'none';
+    $('batchDeleteActions').style.display = 'block';
+    $('imageEditForm').style.display = 'none';
+    updateBatchDeleteButton();
+    var iframe = $('previewFrame');
+    if (iframe && iframe.contentWindow) iframe.contentWindow.postMessage({ type: 'batch-mode', enabled: true }, '*');
+    logStatus('進入批次刪除模式，點擊圖片勾選');
+  }
+
+  function exitBatchMode() {
+    batchMode = false;
+    batchSelected.clear();
+    $('batchDeleteBtn').style.display = '';
+    $('batchDeleteActions').style.display = 'none';
+    var iframe = $('previewFrame');
+    if (iframe && iframe.contentWindow) iframe.contentWindow.postMessage({ type: 'batch-mode', enabled: false }, '*');
+  }
+
+  function updateBatchDeleteButton() {
+    var btn = $('batchDeleteConfirmBtn');
+    var count = batchSelected.size;
+    btn.textContent = '刪除已選 (' + count + ')';
+    btn.disabled = count === 0;
+  }
+
+  function executeBatchDelete() {
+    var type = state.currentTab === 'seasonal' ? 'seasonal' : 'products';
+    var count = batchSelected.size;
+    if (count === 0) return;
+    if (!confirm('確定要刪除 ' + count + ' 個品項嗎？')) return;
+
+    // Sort indices descending so splicing doesn't shift later indices
+    var indices = Array.from(batchSelected).sort(function (a, b) { return b - a; });
+    indices.forEach(function (idx) {
+      var item = state.imageData[type].items[idx];
+      if (item) {
+        dirty.pendingDeletes.push(SITE + '/' + item.image);
+        state.imageData[type].items.splice(idx, 1);
+      }
+    });
+
+    dirty[type] = true;
+    updatePublishButton();
+    exitBatchMode();
+    showSuccess('已刪除（本地）：' + count + ' 個品項');
     sendImageDataToPreview(type);
   }
 
@@ -743,6 +827,7 @@
   // ── Tab / Mode switching ──────────────────────────────────────────
 
   function switchTab(tabName) {
+    if (batchMode) exitBatchMode();
     state.currentTab = tabName;
     if (tabName !== 'calendar' && state.hookTimer) { clearInterval(state.hookTimer); state.hookTimer = 0; state.clickHookInstalled = false; }
     document.querySelectorAll('.tab-btn').forEach(function (btn) { btn.classList.toggle('active', btn.dataset.tab === tabName); });
@@ -789,6 +874,13 @@
       var type2 = state.currentTab === 'seasonal' ? 'seasonal' : 'products';
       var items = state.imageData[type2] && state.imageData[type2].items;
       if (typeof e.data.index === 'number' && items && e.data.index < items.length) openImageEditPanel(type2, e.data.index);
+    } else if (e.data.type === 'gallery-deselect') {
+      if (!batchMode && confirmDiscardChanges()) clearImageEditPanel();
+    } else if (e.data.type === 'batch-toggle') {
+      var idx = e.data.index;
+      if (batchSelected.has(idx)) batchSelected.delete(idx);
+      else batchSelected.add(idx);
+      updateBatchDeleteButton();
     }
   });
 
@@ -831,6 +923,11 @@
       if (!state.imageData.products.items.length && !dirty.products) loadImageData('products');
       setTimeout(checkAllFields, 300);
     });
+
+    // Batch delete
+    $('batchDeleteBtn').addEventListener('click', enterBatchMode);
+    $('batchDeleteCancelBtn').addEventListener('click', exitBatchMode);
+    $('batchDeleteConfirmBtn').addEventListener('click', executeBatchDelete);
 
     // Claude API key
     $('claudeKeyBtn').addEventListener('click', function () {
