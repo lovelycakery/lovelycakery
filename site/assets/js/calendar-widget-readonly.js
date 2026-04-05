@@ -14,9 +14,9 @@ class CalendarWidgetReadonly {
         this.currentDate = new Date();
         this.events = {};
         this.selectedDate = null;
-        this._tooltipEls = [];
         this._tooltipOpen = false;
         this._tooltipAnchorEl = null;
+        this._tooltipEl = null;
         this._resizeObserver = null;
         this._resizeRaf = 0;
         // Shared config (dataFile + cacheVersion)
@@ -182,44 +182,50 @@ class CalendarWidgetReadonly {
         grid.innerHTML = '';
         // 移除 tooltip（避免月份切換後 tooltip 漂在空中）
         this.hideTooltip();
-        
+
         // 獲取月份的第一天和最後一天
         const firstDay = new Date(year, month, 1);
         const lastDay = new Date(year, month + 1, 0);
         const daysInMonth = lastDay.getDate();
         const startingDayOfWeek = firstDay.getDay();
-        
+
         // 使用 shared 格式化函數
         const shared = window.LovelyCalendarShared;
         const formatDateKey = (y, m, d) => {
             return shared ? shared.formatDateKey(y, m, d) : (new Date(y, m, d)).toISOString().split('T')[0];
         };
-        
+
+        // 使用 DocumentFragment 批次建立所有日期格，最後一次性插入 DOM（減少 reflow）
+        const fragment = document.createDocumentFragment();
+
         // 上個月的日期
         const prevMonthLastDay = new Date(year, month, 0).getDate();
         for (let i = startingDayOfWeek - 1; i >= 0; i--) {
             const day = prevMonthLastDay - i;
             const dateKey = formatDateKey(year, month - 1, day);
-            this.createDayElement(grid, day, true, dateKey);
+            this.createDayElement(fragment, day, true, dateKey);
         }
-        
+
         // 當月的日期
         const today = new Date();
         for (let day = 1; day <= daysInMonth; day++) {
             const dateKey = formatDateKey(year, month, day);
-            const isToday = year === today.getFullYear() && 
-                           month === today.getMonth() && 
+            const isToday = year === today.getFullYear() &&
+                           month === today.getMonth() &&
                            day === today.getDate();
-            this.createDayElement(grid, day, false, dateKey, isToday);
+            this.createDayElement(fragment, day, false, dateKey, isToday);
         }
-        
+
         // 下個月的日期（填滿網格）
-        const totalCells = grid.children.length;
+        const totalCells = fragment.children.length;
         const remainingCells = 42 - totalCells;
         for (let day = 1; day <= remainingCells; day++) {
             const dateKey = formatDateKey(year, month + 1, day);
-            this.createDayElement(grid, day, true, dateKey);
+            this.createDayElement(fragment, day, true, dateKey);
         }
+
+        // 一次性插入所有日期格
+        grid.appendChild(fragment);
         
         // 如果資料載入失敗，顯示提示
         if (this._loadFailed) {
@@ -321,7 +327,7 @@ class CalendarWidgetReadonly {
         document.body.appendChild(tooltip);
         this._tooltipOpen = true;
         this._tooltipAnchorEl = event.currentTarget;
-        this._tooltipEls = [tooltip];
+        this._tooltipEl = tooltip;
         
         // 計算位置（在日期框右上角）
         const rect = event.currentTarget.getBoundingClientRect();
@@ -330,8 +336,6 @@ class CalendarWidgetReadonly {
         // 顯示在右上角，tooltip 的右邊緣對齊日期格子的右邊緣
         let left = rect.right - tooltipRect.width;
         let top = rect.top - tooltipRect.height - 12;
-        let showBelow = false;
-        
         // 確保 tooltip 不會超出視窗左側
         if (left < 10) {
             left = 10;
@@ -343,7 +347,6 @@ class CalendarWidgetReadonly {
         // 如果上方空間不足，顯示在下方
         if (top < 10) {
             top = rect.bottom + 12;
-            showBelow = true;
             tooltip.classList.add('tooltip-below');
         }
         
@@ -356,19 +359,20 @@ class CalendarWidgetReadonly {
         }, 10);
     }
     
-    // 隱藏提示框
+    // 隱藏提示框（直接操作追蹤的元素，避免 querySelectorAll 搜尋）
     hideTooltip() {
-        const tooltips = document.querySelectorAll('.event-tooltip');
-        tooltips.forEach(tooltip => {
+        const tooltip = this._tooltipEl;
+        if (tooltip) {
             tooltip.classList.remove('show');
             setTimeout(() => {
                 if (tooltip.parentNode) {
                     tooltip.parentNode.removeChild(tooltip);
                 }
             }, 200);
-        });
+        }
         this._tooltipOpen = false;
         this._tooltipAnchorEl = null;
+        this._tooltipEl = null;
     }
     
     // 附加事件監聽器

@@ -74,9 +74,6 @@
       const langButtons = document.querySelectorAll('.lang-btn');
       // No language switcher on this page (e.g., iframe widgets) — do nothing.
       if (!langButtons || langButtons.length === 0) {
-        // Still keep header height var updated for pages that have a fixed header but no switcher.
-        // (e.g., future minimal pages)
-        scheduleHeaderMeasure();
         return;
       }
       const currentLang = localStorage.getItem('language') || 'zh';

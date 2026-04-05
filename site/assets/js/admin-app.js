@@ -89,7 +89,7 @@
   function validateImageData(data) {
     if (!data || typeof data !== 'object') throw new Error('Data must be an object');
     if (!Array.isArray(data.items)) throw new Error('Data must contain items array');
-    var allowedTags = ['無', '奶蛋素', '無咖啡因', '含酒精'];
+    var allowedTags = ['奶蛋素', '無咖啡因', '含酒精'];
     for (var i = 0; i < data.items.length; i++) {
       var item = data.items[i];
       if (!item || typeof item !== 'object') throw new Error('Each item must be an object');
@@ -379,15 +379,10 @@
     $('selectedImage').textContent = '選取圖片：' + (item.name || '未命名');
     $('imageNameInput').value = item.name || '';
     $('imageNameEnInput').value = item.name_en || '';
-    if (item.prices && typeof item.prices === 'object') {
-      $('imagePriceSize6Input').value = item.prices.size6 || '';
-      $('imagePriceSize8Input').value = item.prices.size8 || '';
-      $('imagePriceSliceInput').value = item.prices.slice || '';
-    } else {
-      $('imagePriceSize6Input').value = '';
-      $('imagePriceSize8Input').value = item.price || '';
-      $('imagePriceSliceInput').value = '';
-    }
+    var prices = (item.prices && typeof item.prices === 'object') ? item.prices : {};
+    $('imagePriceSize6Input').value = prices.size6 || '';
+    $('imagePriceSize8Input').value = prices.size8 || '';
+    $('imagePriceSliceInput').value = prices.slice || '';
     $('imageDescInput').value = item.description || '';
     $('imageDescEnInput').value = item.description_en || '';
     document.querySelectorAll('.tag-checkboxes input[type="checkbox"]').forEach(function (cb) { cb.checked = false; });
@@ -435,8 +430,8 @@
     if (s6) prices.size6 = s6;
     if (s8) prices.size8 = s8;
     if (sl) prices.slice = sl;
-    if (Object.keys(prices).length > 0) { item.prices = prices; delete item.price; }
-    else { delete item.prices; delete item.price; }
+    if (Object.keys(prices).length > 0) { item.prices = prices; }
+    else { delete item.prices; }
     item.description = $('imageDescInput').value.trim();
     item.description_en = $('imageDescEnInput').value.trim();
     var tags = [];
@@ -713,7 +708,7 @@
         if (!item.name || !item.name.trim()) mr.push('名稱');
         if (!item.name_en || !item.name_en.trim()) mf.push('名稱 (英文)');
         var hasPrices = item.prices && (item.prices.size6 || item.prices.size8 || item.prices.slice);
-        if (!hasPrices && !(item.price && item.price.trim())) mf.push('價格');
+        if (!hasPrices) mf.push('價格');
         if (!item.description || !item.description.trim()) mf.push('描述');
         if (!item.description_en || !item.description_en.trim()) mf.push('描述 (英文)');
         if (!item.tags || item.tags.length === 0) mf.push('標籤');

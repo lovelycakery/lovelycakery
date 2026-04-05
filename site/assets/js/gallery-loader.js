@@ -4,13 +4,16 @@
   if (window.LovelyGalleryLoader) return;
 
   async function loadGalleryData(type) {
-    // 優先使用本地 JSON 檔案（無論是 file:// 還是 http://）
-    let dataFile = `assets/data/${type}-data.json`;
+    // file:// 協議下 fetch 本地檔案會被瀏覽器阻擋，改用 GitHub raw URL
+    const isLocalFile = window.location.protocol === 'file:';
+    let dataFile = isLocalFile
+      ? `https://raw.githubusercontent.com/lovelycakery/lovelycakery/main/site/assets/data/${type}-data.json`
+      : `assets/data/${type}-data.json`;
 
     // Admin 預覽模式：加上時間戳避免瀏覽器快取舊 JSON
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('adminPreview') === '1') {
-      dataFile += '?ts=' + Date.now();
+      dataFile += (dataFile.includes('?') ? '&' : '?') + 'ts=' + Date.now();
     }
 
     try {
@@ -19,18 +22,8 @@
       const data = await response.json();
       return data && Array.isArray(data.items) ? data.items : [];
     } catch (e) {
-      console.warn(`Failed to load ${type} data from local file, trying GitHub...`, e);
-      // 如果本地載入失敗（例如在 GitHub Pages），嘗試從 GitHub 載入
-      try {
-        const githubFile = `https://raw.githubusercontent.com/lovelycakery/lovelycakery/main/site/assets/data/${type}-data.json`;
-        const response = await fetch(githubFile);
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const data = await response.json();
-        return data && Array.isArray(data.items) ? data.items : [];
-      } catch (e2) {
-        console.warn(`Failed to load ${type} data from GitHub:`, e2);
-        return [];
-      }
+      console.warn(`Failed to load ${type} data:`, e);
+      return [];
     }
   }
 
@@ -102,9 +95,6 @@
           </div>
         `;
       }
-    } else if (item.price) {
-      // 向後兼容：如果還有舊的 price 欄位
-      priceHTML = `<p class="image-modal__price">NT$ ${item.price}</p>`;
     }
     
     modal.innerHTML = `
@@ -379,20 +369,29 @@
       
       const imageWrapper = document.createElement('div');
       imageWrapper.className = 'gallery-image-wrapper';
-      imageWrapper.innerHTML = `
-          <img src="${imageSrc}" alt="${imageAlt}" class="gallery-image" loading="lazy" decoding="async" width="1600" height="1600">
-      `;
-      
+      const img = document.createElement('img');
+      img.src = imageSrc;
+      img.alt = imageAlt;
+      img.className = 'gallery-image';
+      img.loading = 'lazy';
+      img.decoding = 'async';
+      img.width = 1600;
+      img.height = 1600;
+      imageWrapper.appendChild(img);
+
       // 如果有標籤，在圖片上顯示標籤
       if (item.tags && Array.isArray(item.tags) && item.tags.length > 0) {
         renderImageTags(imageWrapper, item.tags);
       }
-      
+
       const itemInfo = document.createElement('div');
       itemInfo.className = 'gallery-item-info';
-      itemInfo.innerHTML = `
-          <div class="gallery-item-name" data-en="${imageNameEn}" data-zh="${imageNameZh}">${imageName}</div>
-      `;
+      const nameDiv = document.createElement('div');
+      nameDiv.className = 'gallery-item-name';
+      nameDiv.setAttribute('data-en', imageNameEn);
+      nameDiv.setAttribute('data-zh', imageNameZh);
+      nameDiv.textContent = imageName;
+      itemInfo.appendChild(nameDiv);
       
       itemEl.appendChild(imageWrapper);
       itemEl.appendChild(itemInfo);
@@ -411,8 +410,8 @@
         itemEl.dataset.index = index;
         itemEl.classList.add('admin-draggable');
         // 禁用 IMG 原生拖曳，確保拖曳事件由父元素 itemEl 觸發
-        var img = itemEl.querySelector('img');
-        if (img) img.draggable = false;
+        var imgEl = itemEl.querySelector('img');
+        if (imgEl) imgEl.draggable = false;
         
         // 拖曳狀態追蹤：用於區分拖曳和點擊操作
         let dragStartTime = 0;  // 拖曳開始時間戳
@@ -707,55 +706,11 @@
     }
     
     // 處理語言切換消息
+    // 所有可翻譯元素（標籤、名稱、modal、價格選單）都帶 data-en/data-zh，
+    // 一次 applyLanguage 即可全部處理
     if (e.data && e.data.type === 'lovely-language') {
-      const lang = e.data.lang;
-      if (window.LovelyI18n && lang) {
-        const legend = document.querySelector('.tag-legend');
-        if (legend) {
-          window.LovelyI18n.applyLanguage(lang, legend);
-        }
-        // 更新所有圖片上的標籤
-        const imageTags = document.querySelectorAll('.gallery-image-tag[data-tag-key]');
-        imageTags.forEach(tagEl => {
-          const tagKey = tagEl.getAttribute('data-tag-key');
-          if (tagKey && TAG_I18N[tagKey]) {
-            const normalized = lang === 'en' ? 'en' : 'zh';
-            tagEl.textContent = TAG_I18N[tagKey][normalized];
-          }
-        });
-        // 更新所有圖片名稱
-        const itemNames = document.querySelectorAll('.gallery-item-name[data-en][data-zh]');
-        itemNames.forEach(nameEl => {
-          window.LovelyI18n.applyLanguage(lang, nameEl);
-        });
-        // 更新 modal 中的標籤（如果 modal 存在）
-        const modalTags = document.querySelectorAll('.image-modal__tag[data-tag-key]');
-        modalTags.forEach(tagEl => {
-          const tagKey = tagEl.getAttribute('data-tag-key');
-          if (tagKey && TAG_I18N[tagKey]) {
-            const normalized = lang === 'en' ? 'en' : 'zh';
-            tagEl.textContent = TAG_I18N[tagKey][normalized];
-          }
-        });
-        // 更新 modal 中的名稱和說明（如果 modal 存在）
-        const modalName = document.querySelector('.image-modal__name[data-en][data-zh]');
-        if (modalName) {
-          window.LovelyI18n.applyLanguage(lang, modalName);
-        }
-        const modalDescription = document.querySelector('.image-modal__description[data-en][data-zh]');
-        if (modalDescription) {
-          window.LovelyI18n.applyLanguage(lang, modalDescription);
-        }
-        // 更新 modal 中的價格選單選項（如果 modal 存在）
-        const priceSelect = document.querySelector('#modalPriceSelect');
-        if (priceSelect) {
-          const normalized = lang === 'en' ? 'en' : 'zh';
-          Array.from(priceSelect.options).forEach(option => {
-            if (option.hasAttribute('data-en') && option.hasAttribute('data-zh')) {
-              option.textContent = normalized === 'en' ? option.getAttribute('data-en') : option.getAttribute('data-zh');
-            }
-          });
-        }
+      if (window.LovelyI18n && e.data.lang) {
+        window.LovelyI18n.applyLanguage(e.data.lang, document);
       }
       return;
     }
@@ -854,5 +809,21 @@
   window.LovelyGalleryLoader = {
     init: initGallery,
   };
+
+  // Auto-init: detect gallery type from data attribute on .gallery-grid
+  // This allows using defer on the script tag without needing an inline script.
+  // Usage: <div class="gallery-grid" data-gallery-type="seasonal">
+  function autoInit() {
+    var container = document.querySelector('.gallery-grid[data-gallery-type]');
+    if (container) {
+      initGallery(container.getAttribute('data-gallery-type'));
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', autoInit);
+  } else {
+    autoInit();
+  }
 })();
 
