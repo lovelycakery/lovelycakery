@@ -410,6 +410,9 @@
         itemEl.draggable = true;
         itemEl.dataset.index = index;
         itemEl.classList.add('admin-draggable');
+        // 禁用 IMG 原生拖曳，確保拖曳事件由父元素 itemEl 觸發
+        var img = itemEl.querySelector('img');
+        if (img) img.draggable = false;
         
         // 拖曳狀態追蹤：用於區分拖曳和點擊操作
         let dragStartTime = 0;  // 拖曳開始時間戳
@@ -420,8 +423,9 @@
         itemEl.addEventListener('dragstart', (e) => {
           dragStartTime = Date.now();
           hasDragged = false; // 重置：拖曳剛開始，還沒有移動
+          e.stopPropagation(); // 防止 image-protection.js 攔截拖曳
           e.dataTransfer.effectAllowed = 'move';
-          e.dataTransfer.setData('text/plain', index.toString());
+          e.dataTransfer.setData('text/plain', (itemEl.dataset.index || index).toString());
           itemEl.classList.add('dragging');
           container.classList.add('dragging-active');
           
@@ -494,7 +498,7 @@
           hasDragged = true; // 確保標記為拖曳操作
           
           const fromIndex = parseInt(e.dataTransfer.getData('text/plain'), 10);
-          const toIndex = index;
+          const toIndex = parseInt(itemEl.dataset.index, 10) || index;
           
           // 驗證：確保索引有效且不同
           if (isNaN(fromIndex) || isNaN(toIndex)) {

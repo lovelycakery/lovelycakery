@@ -10,13 +10,15 @@
 
 > 本文件後續提到的「網站檔案路徑」若未特別註明，一律以 `site/` 內為準（例如 `assets/js/i18n.js` 實際位置是 `site/assets/js/i18n.js`）。
 
-## 架構總覽（你要先知道的 5 件事）
+## 架構總覽（你要先知道的 7 件事）
 
-1. **主站頁面**：`index.html`, `calendar.html`, `seasonal.html`, `all-items.html`, `order.html`, `contact.html`
+1. **主站頁面**：`index.html`, `calendar.html`, `seasonal.html`, `all-items.html`, `order.html`, `contact.html`（另有 `404.html` 為 GitHub Pages 錯誤頁）
 2. **共用導覽列/header**：`assets/js/site-header.js`（主站 6 頁共用，避免 6 份 HTML 重複）
 3. **共用語言切換**：`assets/js/i18n.js`（唯一語言模組；頁面有 `.lang-btn` 時自動初始化）
 4. **日曆採 iframe 隔離**：`calendar.html` 內嵌 `calendar-widget-readonly.html`
 5. **日曆資料來源**：`assets/data/calendar-data.json`（訪客端讀；管理端會直接更新此檔案）
+6. **商品/季節圖片動態載入**：`assets/js/gallery-loader.js` 從 JSON 資料檔（`products-data.json` / `seasonal-data.json`）動態產生相簿
+7. **圖片防護**：`assets/js/image-protection.js` 載入於所有頁面，禁用右鍵、開發者工具快捷鍵與圖片拖曳
 
 ---
 
@@ -25,8 +27,13 @@
 ### HTML（頁面）
 - `index.html`：首頁
 - `calendar.html`：日曆頁（iframe 嵌入只讀日曆）
+- `seasonal.html`：季節限定頁（由 gallery-loader.js 動態載入圖片）
+- `all-items.html`：全部品項頁（由 gallery-loader.js 動態載入圖片）
+- `order.html`：訂購方式頁
+- `contact.html`：聯絡/地圖頁
 - `calendar-widget-readonly.html`：只讀日曆 widget 頁（iframe 內）
 - `admin.html`：Web Admin 管理頁面（透過 GitHub API 直接編輯資料）
+- `404.html`：GitHub Pages 自訂 404 錯誤頁
 
 > **目前建議的管理方式**：使用 `admin.html`（Web Admin），透過瀏覽器直接操作 GitHub API 修改資料，不需安裝任何工具。
 
@@ -34,6 +41,7 @@
 - `assets/css/styles.css`：主站共用樣式（header/nav、各分頁版面）
 - `assets/css/calendar-widget.css`：日曆 widget 專用樣式（iframe 內隔離）
 - `assets/css/calendar-frame.css`：日曆裝飾外框（可選；目前未預設啟用）
+- `assets/css/admin.css`：Web Admin 管理頁面專用樣式
 
 ### JS（核心）
 - `assets/js/site-header.js`
@@ -63,6 +71,15 @@
   - 只讀：不提供編輯，只提供 hover tooltip（有 description 才顯示）
   - render 後會 `postMessage({type:'calendar-resize', height})` 讓父頁調整 iframe 高度
   - 另外：每個日期格會帶 `data-date="YYYY-MM-DD"`（提供管理工具點擊對應日期用；對訪客端無影響）
+- `assets/js/gallery-loader.js`
+  - **相簿動態載入器**（`seasonal.html` 和 `all-items.html` 共用）
+  - 從 JSON 資料檔（`assets/data/products-data.json` / `assets/data/seasonal-data.json`）動態載入商品圖片
+  - 支援 Admin 預覽模式（URL 帶 `?adminPreview=1` 時加 cache-busting）
+  - 提供圖片彈窗、拖曳排序（Admin 預覽用）、尺寸文字等功能
+- `assets/js/image-protection.js`
+  - **圖片防護**（防止一般使用者透過右鍵下載圖片）
+  - 禁用右鍵選單、開發者工具快捷鍵（F12、Ctrl+Shift+I 等）、圖片拖曳與選取
+  - 載入於所有主站頁面與日曆 widget 頁
 
 ---
 
@@ -75,11 +92,13 @@ repo-root/
 │   ├── calendar.html              # 日曆頁（嵌入只讀 widget）
 │   ├── calendar-widget-readonly.html # 只讀日曆 widget（iframe 內）
 │   ├── admin.html                    # Web Admin 管理頁面
+│   ├── 404.html                      # GitHub Pages 自訂 404 錯誤頁
 │   └── assets/                    # 靜態資源
 │       ├── css/
 │       │   ├── styles.css
 │       │   ├── calendar-widget.css
-│       │   └── calendar-frame.css
+│       │   ├── calendar-frame.css
+│       │   └── admin.css              # Web Admin 專用樣式
 │       ├── js/
 │       │   ├── site-header.js
 │       │   ├── i18n.js
@@ -88,11 +107,22 @@ repo-root/
 │       │   ├── calendar-widget-readonly.js
 │       │   ├── admin-github-api.js      # Web Admin: GitHub API 封裝
 │       │   ├── admin-image-compress.js  # Web Admin: 圖片壓縮
-│       │   └── admin-app.js             # Web Admin: UI 邏輯
+│       │   ├── admin-app.js             # Web Admin: UI 邏輯
+│       │   ├── gallery-loader.js        # 相簿動態載入（seasonal / all-items 共用）
+│       │   └── image-protection.js      # 圖片防護（禁右鍵/拖曳）
 │       ├── data/
-│       │   └── calendar-data.json
+│       │   ├── calendar-data.json
+│       │   ├── products-data.json       # 全部品項資料（gallery-loader.js 讀取）
+│       │   └── seasonal-data.json       # 季節限定資料（gallery-loader.js 讀取）
 │       └── images/
-│           └── ...
+│           ├── logo/                # Logo 圖片
+│           ├── calendar/            # 日曆頁面圖片
+│           │   └── frames/          # 日曆外框圖片
+│           ├── seasonal/            # 季節限定頁面圖片
+│           ├── products/            # 全部品項頁面圖片
+│           ├── order/               # 訂購方式頁面圖片
+│           ├── contact/             # 地圖頁面圖片
+│           └── _originals/          # 原始圖片備份
 ├── admin/                         # 已刪除
 ├── check.sh                       # 部署/CI 檢查（會檢查 site/）
 ├── bump-calendar-cache.sh         # 更新日曆相關頁面 cache-busting（寫入 site/）
@@ -144,6 +174,7 @@ repo-root/
 3. **保留**底部共用腳本載入順序：
    - `assets/js/site-header.js`
    - `assets/js/i18n.js`（語言切換會在 `.lang-btn` 存在時自動初始化；`.lang-btn` 由 header 產生）
+   - `assets/js/image-protection.js`（圖片防護，放在最後載入）
 3. 文案要支援雙語：用 `data-en` / `data-zh`
 
 ### B) 修改導覽列（header/nav）
@@ -180,9 +211,10 @@ repo-root/
 ## 容易踩雷的點（請新的對話特別注意）
 
 - **script 載入順序**
-  - 主站頁：`site-header.js` → `i18n.js`
-  - 日曆嵌入頁 `calendar.html`：`site-header.js` → `i18n.js` → `calendar-embed.js`
-  - 日曆 widget 頁：`i18n.js` + `calendar-shared.js` 再載入各自的 widget 腳本
+  - 主站頁：`site-header.js` → `i18n.js` → `image-protection.js`
+  - 相簿頁（`seasonal.html` / `all-items.html`）：`site-header.js` → `i18n.js` → `gallery-loader.js` → `image-protection.js`
+  - 日曆嵌入頁 `calendar.html`：`site-header.js` → `i18n.js` → `calendar-embed.js` → `image-protection.js`
+  - 日曆 widget 頁：`i18n.js` + `calendar-shared.js` 再載入各自的 widget 腳本 → `image-protection.js`
 - **不要重新加回 setInterval 輪詢語言**
   - 目前語言同步用 postMessage（事件驅動），更不容易出 bug
 - **GitHub Token**
@@ -315,6 +347,6 @@ rg "setInterval\\(" assets/js || grep -R --line-number --fixed-string "setInterv
 
 ---
 
-（本文件由 AI 生成，用於跨對話維護接力。最後更新：2026-04。）
+（本文件由 AI 生成，用於跨對話維護接力。最後更新：2026-04-05。）
 
 
