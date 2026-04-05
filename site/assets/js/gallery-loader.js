@@ -753,6 +753,20 @@
       return;
     }
     
+    // Admin instant preview: receive updated gallery data and re-render
+    if (e.data && e.data.type === 'admin-gallery-update' && Array.isArray(e.data.items)) {
+      var container = document.querySelector('.gallery-grid');
+      if (container) {
+        renderGallery(e.data.items, container);
+        // Re-apply language if i18n is available
+        if (window.LovelyI18n) {
+          var lang = localStorage.getItem('language') || 'zh';
+          window.LovelyI18n.applyLanguage(lang);
+        }
+      }
+      return;
+    }
+
     // 處理滾動到指定索引的消息
     if (e.data && e.data.type === 'gallery-scroll-to') {
       const { index } = e.data;

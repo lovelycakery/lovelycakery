@@ -426,6 +426,15 @@ document.addEventListener('DOMContentLoaded', () => {
             // Wait for next paint so measurements reflect the final layout (fonts/images/etc).
             requestAnimationFrame(() => window.calendarWidgetReadonly.notifyParentHeight());
         }
+        // Admin instant preview: receive updated calendar data and re-render
+        if (e && e.data && e.data.type === 'admin-calendar-update' && e.data.data) {
+            const shared = window.LovelyCalendarShared;
+            window.calendarWidgetReadonly.events = (shared && typeof shared.eventsArrayToMap === 'function')
+                ? shared.eventsArrayToMap(e.data.data)
+                : {};
+            window.calendarWidgetReadonly._loadFailed = false;
+            window.calendarWidgetReadonly.renderCalendar();
+        }
     });
 });
 
