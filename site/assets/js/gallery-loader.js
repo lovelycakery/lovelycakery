@@ -350,7 +350,7 @@
       
       // 處理圖片路徑：在 file:// 協議下，中文字符需要正確編碼
       // 但瀏覽器通常會自動處理，所以直接使用路徑即可
-      const imageSrc = item.image;
+      const imageSrc = item._previewUrl || item.image;
       
       // 根據語言獲取名稱
       const imageNameZh = item.name || '手工千層蛋糕';
