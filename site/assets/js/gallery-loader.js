@@ -48,7 +48,9 @@
         const tagText = getTagText(tag, currentLang);
         const tagTextZh = TAG_I18N[tag] ? TAG_I18N[tag].zh : tag;
         const tagTextEn = TAG_I18N[tag] ? TAG_I18N[tag].en : tag;
-        return `<span class="image-modal__tag" data-en="${tagTextEn}" data-zh="${tagTextZh}" data-tag-key="${tag}">${tagText}</span>`;
+        const color = TAG_COLORS[tag];
+        const colorStyle = color ? `background-color: ${color.bg}; color: ${color.text}; box-shadow: 0 2px 8px ${color.shadow}; --tag-bg-color: ${color.bg};` : '';
+        return `<span class="tag-badge image-modal__tag" data-en="${tagTextEn}" data-zh="${tagTextZh}" data-tag-key="${tag}" style="${colorStyle}">${tagText}</span>`;
       }).join('');
       tagsHTML = `<div class="image-modal__tags">${tags}</div>`;
     }
@@ -119,21 +121,26 @@
 
   // 標籤顏色定義（精緻可愛風格 - 單色）
   const TAG_COLORS = {
-    '奶蛋素': { 
-      bg: '#8fc4a3', 
+    '奶蛋素': {
+      bg: '#6aab88',
       text: '#ffffff',
-      shadow: 'rgba(143, 196, 163, 0.4)'
-    },      // 柔和綠色
-    '無咖啡因': { 
-      bg: '#9bc4d9', 
+      shadow: 'rgba(106, 171, 136, 0.4)'
+    },      // 柔和綠色（加深）
+    '無咖啡因': {
+      bg: '#7aadc5',
       text: '#ffffff',
-      shadow: 'rgba(155, 196, 217, 0.4)'
-    },    // 柔和藍色
-    '含酒精': { 
-      bg: '#e8a689', 
+      shadow: 'rgba(122, 173, 197, 0.4)'
+    },    // 柔和藍色（加深）
+    '含酒精': {
+      bg: '#d4876a',
       text: '#ffffff',
-      shadow: 'rgba(232, 166, 137, 0.4)'
-    },      // 柔和橙粉色
+      shadow: 'rgba(212, 135, 106, 0.4)'
+    },      // 柔和橙粉色（加深）
+    '可宅配': {
+      bg: '#d4b35e',
+      text: '#ffffff',
+      shadow: 'rgba(212, 179, 94, 0.4)'
+    },      // 柔和蜂蜜金（加深）
   };
 
   // 標籤中英文對應
@@ -141,6 +148,7 @@
     '奶蛋素': { zh: '奶蛋素', en: 'Vegetarian' },
     '無咖啡因': { zh: '無咖啡因', en: 'Caffeine-Free' },
     '含酒精': { zh: '含酒精', en: 'Alcohol' },
+    '可宅配': { zh: '可宅配', en: 'Delivery' },
   };
 
   // 尺寸選項中英文對應
@@ -206,7 +214,7 @@
         <div class="tag-legend-item">
           <label class="tag-legend-checkbox-label">
             <input type="checkbox" class="tag-legend-checkbox" value="${tag}" data-tag="${tag}">
-            <span class="tag-legend-badge" data-en="${tagTextEn}" data-zh="${tagTextZh}" style="background-color: ${color.bg}; color: ${color.text}; box-shadow: 0 2px 8px ${color.shadow}; --tag-bg-color: ${color.bg};">${tagText}</span>
+            <span class="tag-badge tag-legend-badge" data-en="${tagTextEn}" data-zh="${tagTextZh}" style="background-color: ${color.bg}; color: ${color.text}; box-shadow: 0 2px 8px ${color.shadow}; --tag-bg-color: ${color.bg};">${tagText}</span>
           </label>
         </div>
       `;
@@ -283,7 +291,7 @@
       const tagTextZh = TAG_I18N[tag] ? TAG_I18N[tag].zh : tag;
       const tagTextEn = TAG_I18N[tag] ? TAG_I18N[tag].en : tag;
       const tagBadge = document.createElement('span');
-      tagBadge.className = 'gallery-image-tag';
+      tagBadge.className = 'tag-badge gallery-image-tag';
       tagBadge.textContent = tagText;
       tagBadge.setAttribute('data-en', tagTextEn);
       tagBadge.setAttribute('data-zh', tagTextZh);

@@ -199,15 +199,37 @@
     document.head.appendChild(ns);
   }
 
+  function renderFooter() {
+    // 如果頁面已有 footer 或是編輯模式就不注入
+    if (document.querySelector('.site-footer')) return;
+    var urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('adminPreview') === '1' && urlParams.get('mode') === 'edit') return;
+
+    var footer = document.createElement('footer');
+    footer.className = 'site-footer';
+    footer.innerHTML =
+      '<div class="container">' +
+      '  <div class="footer-content">' +
+      '    <span class="footer-brand">Lovely Cakery</span>' +
+      '    <span class="footer-copy">&copy; ' + new Date().getFullYear() + ' Lovely Cakery. All rights reserved.</span>' +
+      '  </div>' +
+      '</div>';
+    document.body.appendChild(footer);
+  }
+
   function init() {
     // Ensure Google Fonts are loaded (single source, no duplication across pages)
     ensureGoogleFonts();
 
     // If called late, render immediately; otherwise render on DOMContentLoaded.
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', renderIntoHeader);
+      document.addEventListener('DOMContentLoaded', function () {
+        renderIntoHeader();
+        renderFooter();
+      });
     } else {
       renderIntoHeader();
+      renderFooter();
     }
   }
 
