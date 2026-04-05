@@ -330,11 +330,29 @@ body.calendar-page-body {
 
 /* 圖片外層容器 */
 .image-wrapper {
+    position: relative;
     width: 100%;
     max-width: 100%;  /* 讓圖片可以佔滿右欄的寬度 */
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 8px 24px rgba(61, 40, 23, 0.1);
+}
+
+/* 圖片保護：透明遮罩防止右鍵/長按直接存圖 */
+.image-wrapper::after,
+.gallery-image-wrapper::after,
+.image-modal__image-wrapper::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+}
+
+/* 圖片保護：禁止拖曳、選取、長按存圖 */
+img {
+    -webkit-user-drag: none;
+    user-select: none;
+    -webkit-touch-callout: none;
 }
 
 /* 圖片樣式 */

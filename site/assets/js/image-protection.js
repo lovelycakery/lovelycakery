@@ -30,6 +30,18 @@
       e.preventDefault();
       return false;
     }
+
+    // Ctrl+S / Cmd+S - 儲存頁面
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+      e.preventDefault();
+      return false;
+    }
+
+    // Ctrl+P / Cmd+P - 列印頁面
+    if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+      e.preventDefault();
+      return false;
+    }
   });
 
   // 禁用圖片拖拽
