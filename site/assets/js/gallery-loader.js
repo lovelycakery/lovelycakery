@@ -23,7 +23,7 @@
       return data && Array.isArray(data.items) ? data.items : [];
     } catch (e) {
       console.warn(`Failed to load ${type} data:`, e);
-      return [];
+      return null;
     }
   }
 
@@ -652,10 +652,16 @@
     if (!container) return;
 
     const items = await loadGalleryData(type);
-    if (!items || items.length === 0) {
+    if (items === null) {
       const lang = localStorage.getItem('language') || 'zh';
       container.innerHTML = '<p style="text-align:center;padding:40px;color:#6b5d4f;font-size:16px;" data-en="Unable to load content. Please try again later." data-zh="無法載入內容，請稍後再試。">' +
         (lang === 'en' ? 'Unable to load content. Please try again later.' : '無法載入內容，請稍後再試。') + '</p>';
+      return;
+    }
+    if (items.length === 0) {
+      const lang = localStorage.getItem('language') || 'zh';
+      container.innerHTML = '<p style="text-align:center;padding:40px;color:#6b5d4f;font-size:16px;" data-en="Coming Soon — Stay Tuned!" data-zh="新品籌備中，敬請期待">' +
+        (lang === 'en' ? 'Coming Soon — Stay Tuned!' : '新品籌備中，敬請期待') + '</p>';
       return;
     }
     renderGallery(items, container);
