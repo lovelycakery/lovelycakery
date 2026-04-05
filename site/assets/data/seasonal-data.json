@@ -3,7 +3,7 @@
   "items": [
     {
       "image": "assets/images/seasonal/抹茶水果千層.jpg",
-      "name": "抹茶水果千層",
+      "name": "抹茶水果千層aa",
       "name_en": "Matcha Fruit Mille Crepe",
       "prices": {
         "size6": "2000",
@@ -20,7 +20,7 @@
     },
     {
       "image": "assets/images/seasonal/草莓千層2.jpg",
-      "name": "草莓千層2",
+      "name": "草莓千層2ad",
       "name_en": "Strawberry Mille Crepe 2",
       "prices": {
         "size6": "2100",
@@ -35,7 +35,7 @@
     },
     {
       "image": "assets/images/seasonal/草莓千層3.jpg",
-      "name": "草莓千層3",
+      "name": "草莓千層3333",
       "name_en": "Strawberry Mille Crepe 3",
       "prices": {
         "size6": "1800",
