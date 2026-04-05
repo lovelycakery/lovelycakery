@@ -1,4 +1,4 @@
-/* global GitHubAPI, ImageCompress */
+/* global GitHubAPI, ImageCompress, AdminTranslate */
 
 // Lovely Admin — Web-based admin application logic
 // Local-edit mode: changes are kept in memory with instant preview.
@@ -831,6 +831,48 @@
       if (!state.imageData.seasonal.items.length && !dirty.seasonal) loadImageData('seasonal');
       if (!state.imageData.products.items.length && !dirty.products) loadImageData('products');
       setTimeout(checkAllFields, 300);
+    });
+
+    // Claude API key
+    $('claudeKeyBtn').addEventListener('click', function () {
+      var current = AdminTranslate.hasApiKey() ? '（已設定）' : '（未設定）';
+      var key = prompt('請輸入 Claude API Key ' + current + '\n留空可清除設定：', '');
+      if (key === null) return; // cancelled
+      if (key.trim()) {
+        AdminTranslate.setApiKey(key.trim());
+        logStatus('✅ Claude API Key 已儲存');
+      } else {
+        AdminTranslate.clearApiKey();
+        logStatus('已清除 Claude API Key');
+      }
+    });
+
+    // Translate button
+    $('translateBtn').addEventListener('click', async function () {
+      if (!AdminTranslate.hasApiKey()) {
+        alert('請先點右上角「AI」按鈕設定 Claude API Key');
+        return;
+      }
+      var zhName = $('imageNameInput').value.trim();
+      var zhDesc = $('imageDescInput').value.trim();
+      if (!zhName && !zhDesc) { alert('請先填寫中文名稱或描述'); return; }
+
+      var btn = $('translateBtn');
+      var origText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = '翻譯中…';
+      try {
+        var result = await AdminTranslate.translate(zhName, zhDesc);
+        if (result.name_en) $('imageNameEnInput').value = result.name_en;
+        if (result.description_en) $('imageDescEnInput').value = result.description_en;
+        logStatus('✅ AI 翻譯完成：' + (result.name_en || ''));
+      } catch (e) {
+        alert('翻譯失敗：' + (e.message || String(e)));
+        logStatus('❌ 翻譯失敗：' + (e.message || String(e)));
+      } finally {
+        btn.disabled = false;
+        btn.textContent = origText;
+      }
     });
 
     // Publish button

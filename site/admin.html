@@ -45,6 +45,7 @@
             <div class="topbar__right">
                 <button id="publishBtn" class="btn btn-sm btn-primary" type="button" disabled>一鍵發布</button>
                 <span class="topbar__user" id="userInfo"></span>
+                <button id="claudeKeyBtn" class="btn btn-sm btn-secondary" type="button" title="設定 Claude API Key">AI</button>
                 <button id="logoutBtn" class="btn btn-sm btn-secondary" type="button">登出</button>
             </div>
         </header>
@@ -99,7 +100,10 @@
                         </div>
 
                         <div class="panel__section">
-                            <label class="label" for="imageNameEnInput">名稱 (英文)</label>
+                            <div class="label-row">
+                                <label class="label" for="imageNameEnInput">名稱 (英文)</label>
+                                <button id="translateBtn" class="btn btn-translate" type="button" title="用 Claude AI 自動翻譯">AI 翻譯</button>
+                            </div>
                             <input type="text" id="imageNameEnInput" class="input" placeholder="例如：Strawberry Mille Crepe">
                         </div>
 
@@ -188,6 +192,7 @@
 
     <script src="assets/js/admin-github-api.js"></script>
     <script src="assets/js/admin-image-compress.js"></script>
+    <script src="assets/js/admin-translate.js"></script>
     <script src="assets/js/admin-app.js"></script>
 </body>
 </html>
