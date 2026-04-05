@@ -131,6 +131,8 @@ repo-root/
 - 每次儲存為本地編輯（即時預覽），點「一鍵發布」才 commit 到 GitHub
 - 相關檔案：`assets/js/admin-github-api.js`、`assets/js/admin-app.js`、`assets/js/admin-image-compress.js`、`assets/css/admin.css`
 
+> **完整技術文件**：`WEB_ADMIN_GUIDE.md`（認證、資料流、postMessage 協定、修改指引等）
+
 ---
 
 ## 常見維護任務（照做最不容易出 bug）
