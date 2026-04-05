@@ -6,7 +6,7 @@
 ## 重要：專案資料夾結構（2025-12 起）
 
 - `site/`：**網站本體**（GitHub Pages 會部署這個資料夾）
-- `admin/`：舊版本機管理工具（Electron；已被 Web Admin 取代，待清除）
+- `admin/`：已刪除（舊版 Electron 管理工具，已被 Web Admin 完全取代）
 
 > 本文件後續提到的「網站檔案路徑」若未特別註明，一律以 `site/` 內為準（例如 `assets/js/i18n.js` 實際位置是 `site/assets/js/i18n.js`）。
 
@@ -55,7 +55,7 @@
 - `assets/js/admin-github-api.js`
   - Web Admin 用：GitHub API 封裝（token 管理、Contents API、Git Data API 多檔原子 commit）
 - `assets/js/admin-image-compress.js`
-  - Web Admin 用：瀏覽器端圖片壓縮（Canvas API，取代 Electron 的 sharp）
+  - Web Admin 用：瀏覽器端圖片壓縮（Canvas API）
 - `assets/js/admin-app.js`
   - Web Admin 用：主要 UI 邏輯（本地編輯 + 即時預覽 + 一鍵發布）
 - `assets/js/calendar-widget-readonly.js`
@@ -93,7 +93,7 @@ repo-root/
 │       │   └── calendar-data.json
 │       └── images/
 │           └── ...
-├── admin/                         # ⚠️ 舊版 Electron 管理工具（已被 Web Admin 取代，待清除）
+├── admin/                         # 已刪除
 ├── check.sh                       # 部署/CI 檢查（會檢查 site/）
 ├── bump-calendar-cache.sh         # 更新日曆相關頁面 cache-busting（寫入 site/）
 └── deploy.sh                      # 手動部署腳本（主要用於 push；Pages 由 Actions 部署）

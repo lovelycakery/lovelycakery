@@ -5,7 +5,7 @@
 ## 專案資料夾結構（重要）
 
 - `site/`：**網站本體（會部署到 GitHub Pages）**，包含 Web Admin 管理介面
-- `admin/`：舊版 Electron 管理工具（已被 Web Admin 取代，僅保留供參考）
+- `admin/`：已刪除（舊版 Electron 管理工具，已被 Web Admin 完全取代）
 
 ## 管理網站內容
 
