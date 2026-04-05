@@ -241,6 +241,23 @@
     return { ok: true };
   }
 
+  // ── Workflow runs (deployment status) ───────────────────────────────
+
+  async function getLatestWorkflowRun() {
+    try {
+      const data = await apiFetch(
+        `/repos/${OWNER}/${REPO}/actions/runs?branch=${BRANCH}&per_page=1`
+      );
+      if (data && data.workflow_runs && data.workflow_runs.length > 0) {
+        const run = data.workflow_runs[0];
+        return { status: run.status, conclusion: run.conclusion, url: run.html_url };
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
   // ── Export ─────────────────────────────────────────────────────────
 
   window.GitHubAPI = {
@@ -261,6 +278,9 @@
     commitMultipleFiles,
     createBlob,
     getLatestCommit,
+
+    // Deployment status
+    getLatestWorkflowRun,
 
     // Constants
     OWNER,

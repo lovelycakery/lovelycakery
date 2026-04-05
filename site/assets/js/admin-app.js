@@ -625,7 +625,8 @@
       await loadImageData('seasonal');
       await loadImageData('products');
 
-      showSuccess('已發布！網站將在約 30 秒後更新。');
+      showSuccess('已發布！等待部署中…');
+      watchDeployment();
     } catch (e) {
       showError('發布失敗：' + (e.message || String(e)));
     } finally {
@@ -633,6 +634,59 @@
       setButtonLoading(btn, false);
       updatePublishButton();
     }
+  }
+
+  // ── Deployment status watcher ─────────────────────────────────────
+
+  function watchDeployment() {
+    var startTime = Date.now();
+    var maxWait = 180000; // 3 minutes
+    var interval = 5000;  // poll every 5 seconds
+    var timer = null;
+
+    function updateHint(msg) {
+      var el = $('deployHint');
+      if (el) { el.textContent = msg; el.style.display = 'flex'; }
+    }
+
+    function clearHint() {
+      var el = $('deployHint');
+      if (el) el.style.display = 'none';
+    }
+
+    updateHint('⏳ 部署中…');
+
+    timer = setInterval(async function () {
+      try {
+        var elapsed = Math.round((Date.now() - startTime) / 1000);
+        updateHint('⏳ 部署中… (' + elapsed + '秒)');
+
+        var data = await GitHubAPI.getLatestWorkflowRun();
+        if (!data) return;
+
+        if (data.status === 'completed') {
+          clearInterval(timer);
+          if (data.conclusion === 'success') {
+            updateHint('✅ 部署完成！網站已更新。');
+            showSuccess('部署完成！網站已更新。');
+            // Auto-reload preview after successful deployment
+            setTimeout(function () { reloadPreview(); clearHint(); }, 2000);
+          } else {
+            updateHint('❌ 部署失敗（' + data.conclusion + '）。請檢查 GitHub Actions。');
+            logStatus('❌ 部署失敗：' + data.conclusion);
+          }
+          return;
+        }
+
+        // Timeout
+        if (Date.now() - startTime > maxWait) {
+          clearInterval(timer);
+          updateHint('⚠️ 等待超時。請到 GitHub Actions 頁面查看部署狀態。');
+        }
+      } catch (e) {
+        // Silently ignore polling errors
+      }
+    }, interval);
   }
 
   // Remove internal fields before committing
