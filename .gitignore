@@ -23,8 +23,4 @@ assets/js/admin-password-config.local.js
 # Original high-res images (backup only; do not deploy / do not commit by default)
 site/assets/images/_originals/
 
-# AI/開發用維護文件（本機參考用，不部署）
-CLAUDE.md
-WEB_GUIDE.md
-ADMIN_GUIDE.md
 
