@@ -53,44 +53,30 @@
       tagsHTML = `<div class="image-modal__tags">${tags}</div>`;
     }
     
-    // 處理價格顯示
+    // 處理價格顯示（直接列出所有尺寸價格）
     let priceHTML = '';
     if (item.prices && typeof item.prices === 'object') {
       const prices = item.prices;
       const size6 = prices.size6 || '';
       const size8 = prices.size8 || '';
       const slice = prices.slice || '';
-      
-      // 如果有任何價格，顯示價格選單
+
       if (size6 || size8 || slice) {
-        const sizeOptions = [];
+        const priceItems = [];
         if (size6) {
-          const size6TextZh = getSizeText('size6', 'zh');
-          const size6TextEn = getSizeText('size6', 'en');
-          sizeOptions.push(`<option value="size6" data-price="${size6}" data-en="${size6TextEn}" data-zh="${size6TextZh}">${getSizeText('size6', currentLang)}</option>`);
+          priceItems.push(`<span class="image-modal__price-item"><span class="image-modal__price-label" data-en="${getSizeText('size6', 'en')}" data-zh="${getSizeText('size6', 'zh')}">${getSizeText('size6', currentLang)}</span><span class="image-modal__price-value">NT$ ${size6}</span></span>`);
         }
         if (size8) {
-          const size8TextZh = getSizeText('size8', 'zh');
-          const size8TextEn = getSizeText('size8', 'en');
-          sizeOptions.push(`<option value="size8" data-price="${size8}" data-en="${size8TextEn}" data-zh="${size8TextZh}">${getSizeText('size8', currentLang)}</option>`);
+          priceItems.push(`<span class="image-modal__price-item"><span class="image-modal__price-label" data-en="${getSizeText('size8', 'en')}" data-zh="${getSizeText('size8', 'zh')}">${getSizeText('size8', currentLang)}</span><span class="image-modal__price-value">NT$ ${size8}</span></span>`);
         }
         if (slice) {
-          const sliceTextZh = getSizeText('slice', 'zh');
-          const sliceTextEn = getSizeText('slice', 'en');
-          sizeOptions.push(`<option value="slice" data-price="${slice}" data-en="${sliceTextEn}" data-zh="${sliceTextZh}">${getSizeText('slice', currentLang)}</option>`);
+          priceItems.push(`<span class="image-modal__price-item"><span class="image-modal__price-label" data-en="${getSizeText('slice', 'en')}" data-zh="${getSizeText('slice', 'zh')}">${getSizeText('slice', currentLang)}</span><span class="image-modal__price-value">NT$ ${slice}</span></span>`);
         }
-        
-        // 預設選擇第一個選項
-        const defaultSize = size6 ? 'size6' : (size8 ? 'size8' : 'slice');
-        const defaultPrice = prices[defaultSize] || '';
-        
+
         priceHTML = `
           <div class="image-modal__price-section">
-            <div class="image-modal__price-select-wrapper">
-              <select class="image-modal__price-select" id="modalPriceSelect">
-                ${sizeOptions.join('')}
-              </select>
-              <span class="image-modal__price-display">NT$ <span id="modalPriceValue">${defaultPrice}</span></span>
+            <div class="image-modal__price-list">
+              ${priceItems.join('')}
             </div>
           </div>
         `;
@@ -112,21 +98,6 @@
         </div>
       </div>
     `;
-    
-    // 綁定價格選單變更事件
-    if (priceHTML && item.prices) {
-      const priceSelect = modal.querySelector('#modalPriceSelect');
-      const priceValue = modal.querySelector('#modalPriceValue');
-      if (priceSelect && priceValue) {
-        priceSelect.addEventListener('change', (e) => {
-          const selectedOption = e.target.options[e.target.selectedIndex];
-          const price = selectedOption.getAttribute('data-price');
-          if (priceValue) {
-            priceValue.textContent = price;
-          }
-        });
-      }
-    }
     
     const closeModal = () => {
       if (modal.parentNode) document.body.removeChild(modal);

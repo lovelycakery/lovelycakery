@@ -215,19 +215,12 @@ body {
     color: var(--skin-text);
 }
 
-.image-modal__price,
-.image-modal__price-display {
+.image-modal__price-label {
+    color: var(--skin-text-secondary);
+}
+
+.image-modal__price-value {
     color: var(--skin-accent);
-}
-
-.image-modal__price-select {
-    background: var(--skin-bg-white);
-    color: var(--skin-text);
-}
-
-.image-modal__price-select:focus {
-    border-color: var(--skin-accent);
-    box-shadow: 0 0 0 2px rgba(200, 162, 74, 0.2);
 }
 
 .image-modal__description {
