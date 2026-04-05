@@ -14,6 +14,76 @@
       "date": "2025-12-24",
       "status": "available",
       "description": ""
+    },
+    {
+      "date": "2026-04-01",
+      "status": "available",
+      "description": "本週切片口味: 花生OREO/ 檸檬草莓/ 抹茶乳酪/ 芝麻花園"
+    },
+    {
+      "date": "2026-04-03",
+      "status": "closed",
+      "description": ""
+    },
+    {
+      "date": "2026-04-04",
+      "status": "closed",
+      "description": ""
+    },
+    {
+      "date": "2026-04-05",
+      "status": "closed",
+      "description": ""
+    },
+    {
+      "date": "2026-04-06",
+      "status": "closed",
+      "description": ""
+    },
+    {
+      "date": "2026-04-11",
+      "status": "available",
+      "description": "10am -2pm"
+    },
+    {
+      "date": "2026-04-12",
+      "status": "available",
+      "description": "10am -2pm"
+    },
+    {
+      "date": "2026-04-13",
+      "status": "closed",
+      "description": ""
+    },
+    {
+      "date": "2026-04-18",
+      "status": "available",
+      "description": "10am -2pm"
+    },
+    {
+      "date": "2026-04-19",
+      "status": "available",
+      "description": "10am -2pm"
+    },
+    {
+      "date": "2026-04-20",
+      "status": "closed",
+      "description": ""
+    },
+    {
+      "date": "2026-04-25",
+      "status": "available",
+      "description": "10am -2pm"
+    },
+    {
+      "date": "2026-04-26",
+      "status": "available",
+      "description": "10am -2pm"
+    },
+    {
+      "date": "2026-04-27",
+      "status": "closed",
+      "description": ""
     }
   ]
 }
