@@ -443,13 +443,12 @@
     document.querySelectorAll('.tag-checkboxes input[type="checkbox"]:checked').forEach(function (cb) { tags.push(cb.value); });
     item.tags = tags;
 
-    // Handle filename: update the image path to match name
+    // Track rename intent — don't change item.image now (preview still needs old path)
+    // The actual rename happens on publish
     var expectedFilename = getImageFilename(name);
-    var currentFilename = item.image.split('/').pop();
+    var currentFilename = (item._oldImage || item.image).split('/').pop();
     if (currentFilename !== expectedFilename) {
-      var imageDir = type === 'seasonal' ? 'assets/images/seasonal' : 'assets/images/products';
-      item._oldImage = item.image; // track rename for publish
-      item.image = imageDir + '/' + expectedFilename;
+      if (!item._oldImage) item._oldImage = item.image; // remember original path
     }
 
     dirty[type] = true;
@@ -603,16 +602,55 @@
       }
       if (dirty.pendingImages.length > 0) parts.push(dirty.pendingImages.length + ' 張圖片');
 
-      // 5. Handle renames (_oldImage)
+      // 5. Handle renames (_oldImage → new filename based on item.name)
       var renameDeletes = [];
-      ['seasonal', 'products'].forEach(function (type) {
-        state.imageData[type].items.forEach(function (item) {
-          if (item._oldImage) {
-            renameDeletes.push(SITE + '/' + item._oldImage);
-            delete item._oldImage;
+      for (var ri = 0; ri < ['seasonal', 'products'].length; ri++) {
+        var rType = ['seasonal', 'products'][ri];
+        for (var rj = 0; rj < state.imageData[rType].items.length; rj++) {
+          var rItem = state.imageData[rType].items[rj];
+          if (rItem._oldImage) {
+            var rImageDir = rType === 'seasonal' ? 'assets/images/seasonal' : 'assets/images/products';
+            var rNewFilename = getImageFilename(rItem.name);
+            var rNewPath = rImageDir + '/' + rNewFilename;
+            // Copy old file to new path
+            try {
+              var rOldRepoPath = SITE + '/' + rItem._oldImage;
+              var rFileData = await fetch(
+                'https://api.github.com/repos/' + GitHubAPI.OWNER + '/' + GitHubAPI.REPO + '/contents/' + rOldRepoPath + '?ref=' + GitHubAPI.BRANCH,
+                { headers: { Authorization: 'token ' + GitHubAPI.getToken(), Accept: 'application/vnd.github+json' } }
+              ).then(function (r) { return r.json(); });
+              changes.push({ path: SITE + '/' + rNewPath, content: rFileData.content.replace(/\n/g, ''), encoding: 'base64' });
+              renameDeletes.push(rOldRepoPath);
+            } catch (e) {
+              logStatus('⚠️ 無法讀取舊圖片進行重命名：' + e.message);
+            }
+            // Update item.image to new path
+            rItem.image = rNewPath;
+            delete rItem._oldImage;
           }
-        });
-      });
+        }
+      }
+
+      // Re-generate JSON data after renames applied
+      if (dirty.seasonal) {
+        var sData2 = { schema_version: 1, items: cleanItemsForCommit(state.imageData.seasonal.items) };
+        // Find and replace the seasonal JSON in changes
+        for (var ci = 0; ci < changes.length; ci++) {
+          if (changes[ci].path === SITE + '/assets/data/seasonal-data.json') {
+            changes[ci].content = JSON.stringify(sData2, null, 2) + '\n';
+            break;
+          }
+        }
+      }
+      if (dirty.products) {
+        var pData2 = { schema_version: 1, items: cleanItemsForCommit(state.imageData.products.items) };
+        for (var ci2 = 0; ci2 < changes.length; ci2++) {
+          if (changes[ci2].path === SITE + '/assets/data/products-data.json') {
+            changes[ci2].content = JSON.stringify(pData2, null, 2) + '\n';
+            break;
+          }
+        }
+      }
 
       // Commit all changes
       if (changes.length > 0) {
