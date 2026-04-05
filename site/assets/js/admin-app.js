@@ -533,7 +533,11 @@
     dirty[type] = true;
     updatePublishButton();
     showSuccess('已重新排序（本地）');
-    sendImageDataToPreview(type);
+    // 用 DOM 移動元素而非重新渲染，避免圖片重載失效
+    var iframe = $('previewFrame');
+    if (iframe && iframe.contentWindow) {
+      iframe.contentWindow.postMessage({ type: 'admin-gallery-reorder-dom', fromIndex: fromIndex, toIndex: toIndex }, '*');
+    }
   }
 
   // ── PUBLISH — commit all pending changes to GitHub ────────────────

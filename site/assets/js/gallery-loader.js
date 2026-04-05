@@ -763,15 +763,38 @@
       return;
     }
     
-    // Admin instant preview: receive updated gallery data and re-render
-    if (e.data && e.data.type === 'admin-gallery-update' && Array.isArray(e.data.items)) {
+    // Admin: reorder by moving DOM elements (avoids full re-render which breaks images)
+    if (e.data && e.data.type === 'admin-gallery-reorder-dom') {
       var container = document.querySelector('.gallery-grid');
-      if (container) {
-        renderGallery(e.data.items, container);
-        // Re-apply language if i18n is available
+      if (!container) return;
+      var items = container.querySelectorAll('.gallery-item');
+      var from = e.data.fromIndex;
+      var to = e.data.toIndex;
+      if (typeof from !== 'number' || typeof to !== 'number') return;
+      if (from < 0 || to < 0 || from >= items.length || to >= items.length) return;
+      var movedEl = items[from];
+      // Remove and re-insert at the correct position
+      container.removeChild(movedEl);
+      var newItems = container.querySelectorAll('.gallery-item');
+      if (to >= newItems.length) {
+        container.appendChild(movedEl);
+      } else {
+        container.insertBefore(movedEl, newItems[to]);
+      }
+      // Update data-index attributes
+      container.querySelectorAll('.gallery-item').forEach(function (el, i) {
+        el.dataset.index = i;
+      });
+      return;
+    }
+
+    // Admin: full re-render (for upload/delete — use sparingly)
+    if (e.data && e.data.type === 'admin-gallery-update' && Array.isArray(e.data.items)) {
+      var container2 = document.querySelector('.gallery-grid');
+      if (container2) {
+        renderGallery(e.data.items, container2);
         if (window.LovelyI18n) {
-          var lang = localStorage.getItem('language') || 'zh';
-          window.LovelyI18n.applyLanguage(lang);
+          window.LovelyI18n.applyLanguage(localStorage.getItem('language') || 'zh');
         }
       }
       return;
