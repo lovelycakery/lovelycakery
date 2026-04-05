@@ -711,7 +711,6 @@
         if (!hasPrices) mf.push('價格');
         if (!item.description || !item.description.trim()) mf.push('描述');
         if (!item.description_en || !item.description_en.trim()) mf.push('描述 (英文)');
-        if (!item.tags || item.tags.length === 0) mf.push('標籤');
         if (mr.length > 0 || mf.length > 0) missing.push({ type: type === 'seasonal' ? '季節限定' : '全部品項', name: item.name || '未命名', required: mr, fields: mf });
       });
     });
