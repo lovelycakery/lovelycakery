@@ -5,8 +5,14 @@
 
   async function loadGalleryData(type) {
     // 優先使用本地 JSON 檔案（無論是 file:// 還是 http://）
-    const dataFile = `assets/data/${type}-data.json`;
-    
+    let dataFile = `assets/data/${type}-data.json`;
+
+    // Admin 預覽模式：加上時間戳避免瀏覽器快取舊 JSON
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('adminPreview') === '1') {
+      dataFile += '?ts=' + Date.now();
+    }
+
     try {
       const response = await fetch(dataFile);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
