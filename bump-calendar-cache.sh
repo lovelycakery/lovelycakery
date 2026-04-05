@@ -10,8 +10,6 @@ set -euo pipefail
 # Pages that carry the version:
 # - calendar.html
 # - calendar-widget-readonly.html
-# - calendar-widget.html
-# - calendar-manager-local.html
 #
 # What triggers a bump:
 # - Any change to these files (staged/unstaged/untracked):
@@ -21,13 +19,10 @@ set -euo pipefail
 #   - site/assets/js/i18n.js
 #   - site/assets/js/calendar-embed.js
 #   - site/assets/js/calendar-shared.js
-#   - site/assets/js/calendar-widget.js
 #   - site/assets/js/calendar-widget-readonly.js
 #   - site/assets/data/calendar-data.json
 #   - site/calendar.html
-#   - site/calendar-widget.html
 #   - site/calendar-widget-readonly.html
-#   - site/calendar-manager-local.html
 
 ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$ROOT_DIR"
@@ -49,7 +44,7 @@ collect_changed_files() {
 should_bump=0
 while IFS= read -r f; do
   case "$f" in
-    site/assets/css/styles.css|site/assets/css/calendar-widget.css|site/assets/css/calendar-frame.css|site/assets/js/i18n.js|site/assets/js/calendar-embed.js|site/assets/js/calendar-shared.js|site/assets/js/calendar-widget.js|site/assets/js/calendar-widget-readonly.js|site/assets/data/calendar-data.json|site/calendar.html|site/calendar-widget.html|site/calendar-widget-readonly.html|site/calendar-manager-local.html)
+    site/assets/css/styles.css|site/assets/css/calendar-widget.css|site/assets/css/calendar-frame.css|site/assets/js/i18n.js|site/assets/js/calendar-embed.js|site/assets/js/calendar-shared.js|site/assets/js/calendar-widget-readonly.js|site/assets/data/calendar-data.json|site/calendar.html|site/calendar-widget-readonly.html)
       should_bump=1
       break
       ;;
@@ -96,8 +91,6 @@ new_v = "${new_v}"
 targets = [
   Path("site/calendar.html"),
   Path("site/calendar-widget-readonly.html"),
-  Path("site/calendar-widget.html"),
-  Path("site/calendar-manager-local.html"),
 ]
 
 pat = re.compile(r"\?v=([0-9]{8}-[0-9]+)")
@@ -110,6 +103,6 @@ for p in targets:
         p.write_text(new_text, encoding="utf-8")
 PY
 
-echo "✅ bump-calendar-cache: updated ?v= to ${new_v} (calendar.html + calendar-widget-readonly.html + calendar-widget.html + calendar-manager-local.html)"
+echo "✅ bump-calendar-cache: updated ?v= to ${new_v} (calendar.html + calendar-widget-readonly.html)"
 
 

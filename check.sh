@@ -276,16 +276,6 @@ for f in html_files:
         except ValueError:
             pass
 
-    if f.name == 'calendar-widget.html':
-        required = ['assets/js/i18n.js', 'assets/js/calendar-shared.js', 'assets/js/calendar-widget.js']
-        for r in required:
-            if r not in srcs:
-                errors.append(f"calendar-widget.html: missing {r}")
-        try:
-            if srcs.index('assets/js/calendar-shared.js') > srcs.index('assets/js/calendar-widget.js'):
-                errors.append("calendar-widget.html: calendar-shared.js must be before calendar-widget.js")
-        except ValueError:
-            pass
 
 if errors:
     print("SCRIPT ORDER ERRORS:")
@@ -314,7 +304,7 @@ if [ -d ".git" ]; then
   needs_bump=0
   while IFS= read -r f; do
     case "$f" in
-      site/assets/css/styles.css|site/assets/css/calendar-widget.css|site/assets/css/calendar-frame.css|site/assets/js/i18n.js|site/assets/js/calendar-embed.js|site/assets/js/calendar-shared.js|site/assets/js/calendar-widget.js|site/assets/js/calendar-widget-readonly.js|site/calendar.html|site/calendar-widget.html|site/calendar-widget-readonly.html|site/calendar-manager-local.html|site/assets/data/calendar-data.json)
+      site/assets/css/styles.css|site/assets/css/calendar-widget.css|site/assets/css/calendar-frame.css|site/assets/js/i18n.js|site/assets/js/calendar-embed.js|site/assets/js/calendar-shared.js|site/assets/js/calendar-widget-readonly.js|site/calendar.html|site/calendar-widget-readonly.html|site/assets/data/calendar-data.json)
         needs_bump=1
         break
         ;;
@@ -329,8 +319,6 @@ from pathlib import Path
 targets = [
     Path("site/calendar.html"),
     Path("site/calendar-widget-readonly.html"),
-    Path("site/calendar-widget.html"),
-    Path("site/calendar-manager-local.html"),
 ]
 pat = re.compile(r"\?v=([0-9]{8}-[0-9]+)")
 
@@ -366,7 +354,7 @@ PY
 import re, subprocess, sys
 from pathlib import Path
 
-targets = ["site/calendar.html", "site/calendar-widget-readonly.html", "site/calendar-widget.html", "site/calendar-manager-local.html"]
+targets = ["site/calendar.html", "site/calendar-widget-readonly.html"]
 pat = re.compile(r"\?v=([0-9]{8}-[0-9]+)")
 
 def extract_from_text(text: str) -> str | None:

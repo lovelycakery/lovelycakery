@@ -6,7 +6,7 @@
 ## 重要：專案資料夾結構（2025-12 起）
 
 - `site/`：**網站本體**（GitHub Pages 會部署這個資料夾）
-- `admin/`：本機管理工具（不部署；給合作者用）
+- `admin/`：舊版本機管理工具（Electron；已被 Web Admin 取代，待清除）
 
 > 本文件後續提到的「網站檔案路徑」若未特別註明，一律以 `site/` 內為準（例如 `assets/js/i18n.js` 實際位置是 `site/assets/js/i18n.js`）。
 
@@ -26,10 +26,9 @@
 - `index.html`：首頁
 - `calendar.html`：日曆頁（iframe 嵌入只讀日曆）
 - `calendar-widget-readonly.html`：只讀日曆 widget 頁（iframe 內）
-- `calendar-widget.html`：可編輯日曆 widget 頁（**舊管理流程**；目前不建議使用）
-- `calendar-manager-local.html`：舊管理工具頁（**舊管理流程**；目前不建議使用）
+- `admin.html`：Web Admin 管理頁面（透過 GitHub API 直接編輯資料）
 
-> **目前建議的日曆管理方式**：使用 `admin/` 的本機管理工具（Electron），直接寫入 `assets/data/calendar-data.json`，並自動 bump `?v=...`，避免 GitHub token 與 localStorage 同步問題。
+> **目前建議的管理方式**：使用 `admin.html`（Web Admin），透過瀏覽器直接操作 GitHub API 修改資料，不需安裝任何工具。
 
 ### CSS
 - `assets/css/styles.css`：主站共用樣式（header/nav、各分頁版面）
@@ -53,10 +52,12 @@
 - `assets/js/calendar-embed.js`
   - `calendar.html` 專用：負責 iframe 高度同步（不做 transform 縮放）
   - 監聽 iframe `postMessage({type:'calendar-resize', height})`
-- `assets/js/calendar-widget.js`
-  - 可編輯日曆 widget（管理端 iframe 內）
-  - 這是 **舊管理流程** 的編輯器（localStorage +（可選）GitHub API token 同步）。
-  - 目前主流程已改為 `admin/` 本機工具「直接寫入檔案」。
+- `assets/js/admin-github-api.js`
+  - Web Admin 用：GitHub API 封裝（token 管理、Contents API、Git Data API 多檔原子 commit）
+- `assets/js/admin-image-compress.js`
+  - Web Admin 用：瀏覽器端圖片壓縮（Canvas API，取代 Electron 的 sharp）
+- `assets/js/admin-app.js`
+  - Web Admin 用：主要 UI 邏輯（本地編輯 + 即時預覽 + 一鍵發布）
 - `assets/js/calendar-widget-readonly.js`
   - 只讀日曆（訪客端）
   - 只讀：不提供編輯，只提供 hover tooltip（有 description 才顯示）
@@ -73,8 +74,7 @@ repo-root/
 │   ├── index.html                 # 首頁
 │   ├── calendar.html              # 日曆頁（嵌入只讀 widget）
 │   ├── calendar-widget-readonly.html # 只讀日曆 widget（iframe 內）
-│   ├── calendar-widget.html          # 可編輯日曆 widget（舊管理用；訪客不會用到）
-│   ├── calendar-manager-local.html   # 舊日曆管理頁（訪客不會用到）
+│   ├── admin.html                    # Web Admin 管理頁面
 │   └── assets/                    # 靜態資源
 │       ├── css/
 │       │   ├── styles.css
@@ -86,14 +86,14 @@ repo-root/
 │       │   ├── calendar-embed.js
 │       │   ├── calendar-shared.js
 │       │   ├── calendar-widget-readonly.js
-│       │   └── calendar-widget.js
+│       │   ├── admin-github-api.js      # Web Admin: GitHub API 封裝
+│       │   ├── admin-image-compress.js  # Web Admin: 圖片壓縮
+│       │   └── admin-app.js             # Web Admin: UI 邏輯
 │       ├── data/
 │       │   └── calendar-data.json
 │       └── images/
 │           └── ...
-├── admin/                         # ✅ 本機管理工具（不部署）
-│   ├── ADMIN_SAFETY_GUIDE.md
-│   └── ...
+├── admin/                         # ⚠️ 舊版 Electron 管理工具（已被 Web Admin 取代，待清除）
 ├── check.sh                       # 部署/CI 檢查（會檢查 site/）
 ├── bump-calendar-cache.sh         # 更新日曆相關頁面 cache-busting（寫入 site/）
 └── deploy.sh                      # 手動部署腳本（主要用於 push；Pages 由 Actions 部署）
@@ -123,26 +123,13 @@ repo-root/
 <img src="assets/images/products/matcha-cake.jpg" alt="Matcha Cake">
 ```
 
-## 「本機私密設定」規範（非常重要）
+## Web Admin 管理介面
 
-- GitHub API Token **不要**提交到 repo
-- 本機建立：`site/assets/js/github-config.local.js`（被 `.gitignore` 忽略）
-- 內容格式（範例）：
-
-```javascript
-const GITHUB_CONFIG = {
-  token: 'ghp_xxx',
-  owner: 'lovelycakery',
-  repo: 'lovelycakery',
-  filePath: 'assets/data/calendar-data.json',
-  enabled: true
-};
-function checkGitHubConfig() { /* calendar-widget.js 會呼叫 */ }
-```
-
-> 這段是 **舊管理流程** 的說明：`calendar-widget.html` / `calendar-manager-local.html` 會嘗試載入 `github-config.local.js`。
-> 目前建議改用 `admin/` 管理工具（不需要 token）。
-> 補充：目前「下載 JSON」沒有做成 UI 按鈕；若要走手動流程，建議直接編輯 `assets/data/calendar-data.json` 後部署，或自行加一個下載按鈕呼叫 `downloadJSON()`。
+- 入口：`admin.html`（部署在 GitHub Pages 上）
+- 合作者打開網址 → 輸入 GitHub Personal Access Token → 即可編輯
+- Token 存在瀏覽器 `localStorage`，只需輸入一次
+- 每次儲存為本地編輯（即時預覽），點「一鍵發布」才 commit 到 GitHub
+- 相關檔案：`assets/js/admin-github-api.js`、`assets/js/admin-app.js`、`assets/js/admin-image-compress.js`、`assets/css/admin.css`
 
 ---
 
@@ -164,8 +151,7 @@ function checkGitHubConfig() { /* calendar-widget.js 會呼叫 */ }
 
 ### C) 修改日曆 UI / 規則
 - 只讀端：改 `calendar-widget-readonly.html/.js` + `assets/css/calendar-widget.css`
-- 管理端（新）：改 `admin/` 管理工具（不會部署到網站）
-- 管理端（舊）：改 `calendar-widget.html` / `calendar-manager-local.html` / `assets/js/calendar-widget.js`
+- 管理端：改 `admin.html` + `assets/js/admin-app.js`
 - **不要**把主站 `styles.css` 拿去改日曆格子的樣式（日曆在 iframe 內）
 
 ### C.1) 日曆外框（可每月更換、可一鍵關閉）
