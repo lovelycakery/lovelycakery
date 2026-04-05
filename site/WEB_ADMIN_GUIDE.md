@@ -245,6 +245,9 @@ const dirty = {
 
 **拖曳排序**（`reorderImages`）：
 1. `gallery-loader.js` 在編輯模式下啟用 HTML5 drag-and-drop
+   - 設定 `img.draggable = false`（避免 IMG 原生拖曳被 `image-protection.js` 攔截）
+   - `dragstart` 加 `e.stopPropagation()` 防止事件冒泡被攔截
+   - `fromIndex` / `toIndex` 使用 `itemEl.dataset.index` 取得即時索引（DOM 重排後閉包變數會過期）
 2. drop 後 → `postMessage({type: 'gallery-reorder', fromIndex, toIndex})`
 3. admin 收到 → 修改 items 陣列順序
 4. 發送 `{type: 'admin-gallery-reorder-dom', fromIndex, toIndex}` → gallery-loader 直接在 DOM 層面移動元素（不重新渲染，避免圖片失效）

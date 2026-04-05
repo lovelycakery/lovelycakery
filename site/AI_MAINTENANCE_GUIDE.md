@@ -222,6 +222,13 @@ repo-root/
 - **iframe 高度/縮放**
   - 只改 `assets/js/calendar-embed.js`
   - widget 內高度回報在 `calendar-widget-readonly.js` 的 postMessage
+- **`image-protection.js` 與編輯模式拖曳衝突**
+  - `image-protection.js` 會攔截 IMG 元素的 `dragstart` 事件，這會與 `gallery-loader.js` 的拖曳排序功能衝突
+  - 目前已在 `gallery-loader.js` 做了三項防護：
+    1. 編輯模式下設定 `img.draggable = false`，確保拖曳事件由父元素 `.gallery-item` 觸發
+    2. `dragstart` handler 加上 `e.stopPropagation()`，阻止事件冒泡到 document 被攔截
+    3. `fromIndex` / `toIndex` 使用 `itemEl.dataset.index`（而非閉包變數），避免 DOM 重排後索引過期
+  - **不要把 `image-protection.js` 裡的 dragstart 攔截移除**（那是訪客端的圖片防護），正確做法是在 `gallery-loader.js` 編輯模式內處理
 
 ---
 
@@ -344,6 +351,10 @@ rg "setInterval\\(" assets/js || grep -R --line-number --fixed-string "setInterv
 1. **移除重複的函數定義**
    - `gallery-loader.js` 中重複的 `getSizeText()` 函數定義已移除
    - 兩個 calendar widget 類中多餘的 `formatDateKey()` 方法已移除，改為直接使用 `calendar-shared.js` 提供的函數
+
+2. **修正拖曳排序功能**（2026-04-05）
+   - 修正 `image-protection.js` 攔截 IMG dragstart 導致編輯模式無法拖曳的問題
+   - 修正 DOM 重排後閉包捕獲的 `index` 過期，改用 `data-index` 屬性取得即時索引
 
 ---
 
