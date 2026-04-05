@@ -1,0 +1,240 @@
+/* ============================================
+   Lovely Cakery — Skin（視覺皮膚）
+   ============================================
+   只覆蓋顏色、字體等視覺屬性，不動佈局結構。
+   想恢復原樣？把 HTML 裡的 <link> 註解掉即可。
+
+   用法：在 styles.css 之後載入
+   <link rel="stylesheet" href="assets/css/skin.css">
+   ============================================ */
+
+:root {
+    /* ── 主色 ── */
+    --skin-text:             #3d2817;   /* 主文字（深棕） */
+    --skin-text-secondary:   #8b6f47;   /* 次要文字（中棕） */
+    --skin-text-muted:       #6b5d4f;   /* 輔助文字（灰棕） */
+
+    /* ── 背景 ── */
+    --skin-bg:               #f5f3f0;   /* 頁面背景（淺米） */
+    --skin-bg-white:         #ffffff;   /* Header / 卡片背景 */
+    --skin-bg-section:       #f0ede8;   /* 區塊背景（米灰） */
+
+    /* ── 強調 / 互動 ── */
+    --skin-accent:           #c8a24a;   /* 強調色（金） */
+    --skin-button:           #e8d5c4;   /* 按鈕（淡棕） */
+    --skin-button-hover:     #d4c0a8;   /* 按鈕 hover（深米） */
+
+    /* ── 邊框 / 陰影 ── */
+    --skin-border:           rgba(61, 40, 23, 0.08);
+    --skin-shadow:           rgba(61, 40, 23, 0.1);
+    --skin-shadow-hover:     rgba(61, 40, 23, 0.15);
+
+    /* ── 字體 ── */
+    --skin-font-body:        'Inter', sans-serif;
+    --skin-font-heading:     'Playfair Display', serif;
+}
+
+/* ============================================
+   基礎覆蓋
+   ============================================ */
+:focus-visible {
+    outline-color: var(--skin-accent);
+}
+
+.skip-to-content {
+    background: var(--skin-text);
+}
+
+body {
+    font-family: var(--skin-font-body);
+    color: var(--skin-text);
+    background-color: var(--skin-bg);
+}
+
+/* ============================================
+   Header / 導覽
+   ============================================ */
+.header {
+    background-color: var(--skin-bg-white);
+    border-bottom-color: var(--skin-border);
+}
+
+.social-link {
+    color: var(--skin-text);
+}
+
+.logo {
+    font-family: var(--skin-font-heading);
+    color: var(--skin-text);
+}
+
+.nav-link {
+    font-family: var(--skin-font-body);
+    color: var(--skin-text);
+}
+
+.nav-link[aria-current="page"],
+.nav-link.is-active {
+    color: var(--skin-text-secondary);
+}
+
+.nav-link-icon.is-active .nav-icon,
+.nav-link-icon[aria-current="page"] .nav-icon {
+    color: var(--skin-text-secondary);
+}
+
+.lang-btn {
+    color: var(--skin-text);
+}
+
+.lang-btn.active {
+    color: var(--skin-text-secondary);
+}
+
+.lang-separator {
+    color: var(--skin-text);
+}
+
+/* ============================================
+   主內容區域
+   ============================================ */
+.main-content {
+    background-color: var(--skin-bg-section);
+}
+
+.main-headline {
+    font-family: var(--skin-font-heading);
+    color: var(--skin-text);
+}
+
+.description {
+    color: var(--skin-text);
+}
+
+.cta-button {
+    color: var(--skin-text);
+    background-color: var(--skin-button);
+}
+
+.cta-button:hover {
+    background-color: var(--skin-button-hover);
+    box-shadow: 0 4px 12px var(--skin-shadow-hover);
+}
+
+.image-wrapper {
+    box-shadow: 0 8px 24px var(--skin-shadow);
+}
+
+/* ============================================
+   分頁（季節限定 / 全部品項）
+   ============================================ */
+.page-title {
+    font-family: var(--skin-font-heading);
+    color: var(--skin-text);
+}
+
+.page-subtitle {
+    color: var(--skin-text);
+}
+
+.gallery-image-wrapper {
+    box-shadow: 0 4px 16px var(--skin-shadow);
+}
+
+.gallery-image-wrapper:hover {
+    box-shadow: 0 8px 24px var(--skin-shadow-hover);
+}
+
+.gallery-item-name {
+    font-family: var(--skin-font-heading);
+    color: var(--skin-text);
+}
+
+.tag-legend-label {
+    font-family: var(--skin-font-heading);
+    color: var(--skin-text);
+}
+
+.tag-legend-clear-btn {
+    color: #6b6b6b;
+}
+
+/* ============================================
+   訂購說明頁面
+   ============================================ */
+.order-card {
+    background-color: var(--skin-bg-white);
+    box-shadow: 0 8px 32px var(--skin-shadow);
+}
+
+.order-card:hover {
+    box-shadow: 0 12px 40px var(--skin-shadow-hover);
+}
+
+.order-divider {
+    background: linear-gradient(to right, transparent, var(--skin-button), transparent);
+}
+
+.order-description {
+    color: var(--skin-text);
+}
+
+.order-social-hint {
+    color: var(--skin-text);
+}
+
+.order-social-link {
+    background-color: var(--skin-button);
+}
+
+/* ============================================
+   地圖頁面
+   ============================================ */
+.contact-subtitle {
+    color: var(--skin-text);
+}
+
+.map-wrapper {
+    box-shadow: 0 8px 32px var(--skin-shadow-hover);
+    background-color: var(--skin-bg);
+}
+
+/* ============================================
+   圖片 Modal
+   ============================================ */
+.image-modal__content {
+    background: var(--skin-bg-white);
+}
+
+.image-modal__close {
+    color: var(--skin-text);
+}
+
+.image-modal__name {
+    font-family: var(--skin-font-heading);
+    color: var(--skin-text);
+}
+
+.image-modal__price,
+.image-modal__price-display {
+    color: var(--skin-accent);
+}
+
+.image-modal__price-select {
+    background: var(--skin-bg-white);
+    color: var(--skin-text);
+}
+
+.image-modal__price-select:focus {
+    border-color: var(--skin-accent);
+    box-shadow: 0 0 0 2px rgba(200, 162, 74, 0.2);
+}
+
+.image-modal__description {
+    color: var(--skin-text);
+}
+
+.image-modal__tag {
+    background: var(--skin-bg);
+    color: var(--skin-text);
+}

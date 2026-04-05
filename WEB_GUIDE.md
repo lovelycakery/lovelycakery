@@ -35,6 +35,7 @@ site/
 └── assets/
     ├── css/
     │   ├── styles.css                 # 主站共用樣式
+    │   ├── skin.css                   # 視覺皮膚（CSS 變數覆蓋配色/字體，可替換）
     │   ├── calendar-widget.css        # 日曆 widget 專用（iframe 內隔離）
     │   ├── calendar-frame.css         # 日曆裝飾外框（可選）
     │   └── admin.css                  # Web Admin 專用樣式
@@ -83,6 +84,7 @@ site/
 ### CSS
 
 - `assets/css/styles.css`：主站共用樣式（header/nav、各分頁版面）
+- `assets/css/skin.css`：視覺皮膚，載入於 `styles.css` 之後，用 CSS 變數覆蓋全站配色與字體。換膚只需修改 `:root` 變數值；移除 `<link>` 即恢復原樣
 - `assets/css/calendar-widget.css`：日曆 widget 專用樣式（iframe 內隔離）
 - `assets/css/calendar-frame.css`：日曆裝飾外框（可選；目前未預設啟用）
 - `assets/css/admin.css`：Web Admin 管理頁面專用樣式
@@ -171,6 +173,43 @@ Admin 相關 JS 的詳細說明見 `ADMIN_GUIDE.md`：
 ### D) 語言切換
 
 只改 `assets/js/i18n.js`（不要在各頁重複寫切換程式）
+
+### E) 視覺皮膚（skin.css）
+
+`assets/css/skin.css` 是獨立的視覺覆蓋層，載入於 `styles.css` 之後，用 CSS 變數覆蓋全站配色與字體。
+
+**架構設計**：
+- `styles.css` 保持不動（所有原始樣式硬編碼在此）
+- `skin.css` 在 `:root` 定義 CSS 變數，再用這些變數覆蓋 `styles.css` 的對應屬性
+- 已載入到 6 個訪客頁面（index / calendar / seasonal / all-items / order / contact），admin.html 不載入
+
+**CSS 變數一覽**：
+| 變數 | 用途 | 預設值 |
+|------|------|--------|
+| `--skin-text` | 主文字 | `#3d2817` |
+| `--skin-text-secondary` | 次要文字、active 狀態 | `#8b6f47` |
+| `--skin-text-muted` | 輔助文字 | `#6b5d4f` |
+| `--skin-bg` | 頁面背景 | `#f5f3f0` |
+| `--skin-bg-white` | Header / 卡片背景 | `#ffffff` |
+| `--skin-bg-section` | 區塊背景 | `#f0ede8` |
+| `--skin-accent` | 強調色（價格、focus） | `#c8a24a` |
+| `--skin-button` | 按鈕背景 | `#e8d5c4` |
+| `--skin-button-hover` | 按鈕 hover | `#d4c0a8` |
+| `--skin-border` | 邊框色 | `rgba(61,40,23,0.08)` |
+| `--skin-shadow` | 陰影 | `rgba(61,40,23,0.1)` |
+| `--skin-shadow-hover` | 陰影 hover | `rgba(61,40,23,0.15)` |
+| `--skin-font-body` | 內文字體 | `'Inter', sans-serif` |
+| `--skin-font-heading` | 標題字體 | `'Playfair Display', serif` |
+
+**換膚方式**：
+- 改配色：修改 `:root` 裡的變數值即可，整站自動套用
+- 做多套皮膚：複製成 `skin-dark.css` 等，換 HTML 裡的 `<link>` 即可切換
+- 恢復原樣：把 `<link rel="stylesheet" href="assets/css/skin.css">` 註解掉或移除
+
+**注意事項**：
+- 只覆蓋視覺屬性（顏色、字體、陰影），不要動佈局（間距、grid、flex）
+- 社群平台品牌色（Facebook 藍、Instagram 漸層）不納入變數，保持品牌一致性
+- 日曆 widget 在 iframe 內，不受 skin.css 影響
 
 ---
 

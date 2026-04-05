@@ -659,9 +659,26 @@
       return;
     }
     if (items.length === 0) {
-      const lang = localStorage.getItem('language') || 'zh';
-      container.innerHTML = '<p style="text-align:center;padding:40px;color:#6b5d4f;font-size:16px;" data-en="Coming Soon — Stay Tuned!" data-zh="新品籌備中，敬請期待">' +
-        (lang === 'en' ? 'Coming Soon — Stay Tuned!' : '新品籌備中，敬請期待') + '</p>';
+      // 載入手寫字體（英文用，display=swap 不阻塞渲染）
+      if (!document.querySelector('link[href*="Dancing+Script"]')) {
+        var fontLink = document.createElement('link');
+        fontLink.rel = 'stylesheet';
+        fontLink.href = 'https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;700&display=swap';
+        document.head.appendChild(fontLink);
+      }
+      // 注入樣式：透過 html[lang] 自動跟隨 i18n 語言切換
+      if (!document.getElementById('coming-soon-styles')) {
+        var style = document.createElement('style');
+        style.id = 'coming-soon-styles';
+        style.textContent =
+          '.gallery-coming-soon{text-align:center;padding:80px 40px;color:#d4809a;letter-spacing:1px;font-size:28px;font-family:"Playfair Display",serif;font-weight:400;}' +
+          'html[lang="en"] .gallery-coming-soon{font-size:36px;font-family:"Dancing Script",cursive;font-weight:600;}';
+        document.head.appendChild(style);
+      }
+      // 文字由 i18n.js 透過 data-en/data-zh 自動切換，這裡只需設定初始值
+      var lang = localStorage.getItem('language') || 'zh';
+      container.innerHTML = '<p class="gallery-coming-soon" data-en="Coming Soon — Stay Tuned!" data-zh="🍰 新品籌備中，敬請期待～ ✨">' +
+        (lang === 'en' ? 'Coming Soon — Stay Tuned!' : '🍰 新品籌備中，敬請期待～ ✨') + '</p>';
       return;
     }
     renderGallery(items, container);
