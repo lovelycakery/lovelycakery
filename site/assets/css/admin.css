@@ -12,6 +12,10 @@
   --danger: #e26a5a;
 }
 
+.cal-item-color::-webkit-color-swatch-wrapper { padding: 2px; }
+.cal-item-color::-webkit-color-swatch { border: none; border-radius: 50%; }
+.cal-item-color::-moz-color-swatch { border: none; border-radius: 50%; }
+
 *, *::before, *::after {
   box-sizing: border-box;
 }
