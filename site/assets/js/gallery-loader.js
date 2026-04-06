@@ -222,7 +222,7 @@
 
     legend.innerHTML = `
       <div class="tag-legend-items">${legendItems}</div>
-      <button class="tag-legend-clear-btn" data-en="Clear All" data-zh="取消選取">取消選取</button>
+      <span class="tag-legend-hint" data-en="clickable" data-zh="可勾選">可勾選</span>
     `;
 
     // 插入到 page-header 下方，gallery-grid 上方
@@ -250,19 +250,6 @@
         filterGallery(selectedTags);
       });
     });
-
-    // 綁定「取消選取」按鈕事件
-    const clearBtn = legend.querySelector('.tag-legend-clear-btn');
-    if (clearBtn) {
-      clearBtn.addEventListener('click', () => {
-        // 取消所有 checkbox 的選取
-        checkboxes.forEach(checkbox => {
-          checkbox.checked = false;
-        });
-        // 顯示所有圖片
-        filterGallery([]);
-      });
-    }
 
     // 應用語言（如果 i18n 已載入）
     if (window.LovelyI18n) {

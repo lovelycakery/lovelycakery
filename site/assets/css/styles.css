@@ -837,30 +837,11 @@ img {
     z-index: 10;
 }
 
-.tag-legend-clear-btn {
-    padding: 6px 14px;
-    border-radius: 18px;
+.tag-legend-hint {
     font-size: 12px;
-    font-weight: 500;
-    font-family: 'Inter', sans-serif;
-    color: #6b6b6b;
-    background-color: rgba(107, 107, 107, 0.1);
-    border: 1px solid rgba(107, 107, 107, 0.3);
-    cursor: pointer;
-    transition: all 0.3s ease;
+    color: #999;
     white-space: nowrap;
-    letter-spacing: 0.3px;
-}
-
-.tag-legend-clear-btn:hover {
-    background-color: rgba(107, 107, 107, 0.2);
-    border-color: rgba(107, 107, 107, 0.5);
-    transform: translateY(-1px);
-    box-shadow: 0 2px 6px rgba(107, 107, 107, 0.2);
-}
-
-.tag-legend-clear-btn:active {
-    transform: translateY(0);
+    margin-left: 4px;
 }
 
 /* ============================================
