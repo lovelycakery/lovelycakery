@@ -94,7 +94,7 @@
   function validateImageData(data) {
     if (!data || typeof data !== 'object') throw new Error('Data must be an object');
     if (!Array.isArray(data.items)) throw new Error('Data must contain items array');
-    var allowedTags = ['奶蛋素', '無咖啡因', '含酒精'];
+    var allowedTags = ['奶蛋素', '無咖啡因', '含酒精', '可宅配'];
     for (var i = 0; i < data.items.length; i++) {
       var item = data.items[i];
       if (!item || typeof item !== 'object') throw new Error('Each item must be an object');
@@ -601,7 +601,7 @@
     document.querySelectorAll('.tag-checkboxes input[type="checkbox"]').forEach(function (cb) { cb.checked = false; });
     if (item.tags && Array.isArray(item.tags)) {
       item.tags.forEach(function (tag) {
-        var id = tag === '奶蛋素' ? 'tag-vegetarian' : (tag === '無咖啡因' ? 'tag-caffeine-free' : (tag === '含酒精' ? 'tag-alcohol' : ''));
+        var id = tag === '奶蛋素' ? 'tag-vegetarian' : (tag === '無咖啡因' ? 'tag-caffeine-free' : (tag === '含酒精' ? 'tag-alcohol' : (tag === '可宅配' ? 'tag-delivery' : '')));
         if (id && $(id)) $(id).checked = true;
       });
     }
