@@ -2,88 +2,157 @@
   "events": [
     {
       "date": "2025-12-10",
-      "description": "機哩瓜拉機哩瓜拉",
-      "status": "closed"
+      "items": [
+        {
+          "text": "機哩瓜拉機哩瓜拉",
+          "color": "#d66555"
+        }
+      ]
     },
     {
       "date": "2025-12-23",
-      "status": "available",
-      "description": ""
+      "items": [
+        {
+          "text": "available",
+          "color": "#79b06c"
+        }
+      ]
     },
     {
       "date": "2025-12-24",
-      "status": "available",
-      "description": ""
+      "items": [
+        {
+          "text": "available",
+          "color": "#79b06c"
+        }
+      ]
     },
     {
       "date": "2026-04-01",
-      "status": "available",
-      "description": "本週切片口味: 花生OREO/ 檸檬草莓/ 抹茶乳酪/ 芝麻花園"
+      "items": [
+        {
+          "text": "本週切片口味: 花生OREO/ 檸檬草莓/ 抹茶乳酪/ 芝麻花園",
+          "color": "#1a8a1a"
+        }
+      ]
     },
     {
       "date": "2026-04-03",
-      "status": "closed",
-      "description": ""
+      "items": [
+        {
+          "text": "closed",
+          "color": "#cc0000"
+        }
+      ]
     },
     {
       "date": "2026-04-04",
-      "status": "closed",
-      "description": ""
+      "items": [
+        {
+          "text": "closed",
+          "color": "#cc0000"
+        }
+      ]
     },
     {
       "date": "2026-04-05",
-      "status": "closed",
-      "description": ""
+      "items": [
+        {
+          "text": "closed",
+          "color": "#cc0000"
+        }
+      ]
     },
     {
       "date": "2026-04-06",
-      "status": "closed",
-      "description": ""
+      "items": [
+        {
+          "text": "closed",
+          "color": "#cc0000"
+        }
+      ]
     },
     {
       "date": "2026-04-11",
-      "status": "available",
-      "description": "10am -2pm"
+      "items": [
+        {
+          "text": "10am -2pm",
+          "color": "#1a8a1a"
+        }
+      ]
     },
     {
       "date": "2026-04-12",
-      "status": "available",
-      "description": "10am -2pm"
+      "items": [
+        {
+          "text": "10am -2pm",
+          "color": "#1a8a1a"
+        }
+      ]
     },
     {
       "date": "2026-04-13",
-      "status": "closed",
-      "description": ""
+      "items": [
+        {
+          "text": "closed",
+          "color": "#cc0000"
+        }
+      ]
     },
     {
       "date": "2026-04-18",
-      "status": "available",
-      "description": "10am -2pm"
+      "items": [
+        {
+          "text": "10am -2pm",
+          "color": "#1a8a1a"
+        }
+      ]
     },
     {
       "date": "2026-04-19",
-      "status": "available",
-      "description": "10am -2pm"
+      "items": [
+        {
+          "text": "10am -2pm",
+          "color": "#1a8a1a"
+        }
+      ]
     },
     {
       "date": "2026-04-20",
-      "status": "closed",
-      "description": ""
+      "items": [
+        {
+          "text": "closed",
+          "color": "#cc0000"
+        }
+      ]
     },
     {
       "date": "2026-04-25",
-      "status": "available",
-      "description": "10am -2pm"
+      "items": [
+        {
+          "text": "10am -2pm",
+          "color": "#1a8a1a"
+        }
+      ]
     },
     {
       "date": "2026-04-26",
-      "status": "available",
-      "description": "10am -2pm"
+      "items": [
+        {
+          "text": "10am -2pm",
+          "color": "#1a8a1a"
+        }
+      ]
     },
     {
       "date": "2026-04-27",
-      "status": "closed",
-      "description": ""
+      "items": [
+        {
+          "text": "closed",
+          "color": "#cc0000"
+        }
+      ]
     }
-  ]
+  ],
+  "maxItems": 3
 }
