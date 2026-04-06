@@ -9,7 +9,7 @@
     --cal-surface: #ffffff;
     --cal-ink: #2f1f14;
     --cal-ink-muted: rgba(47, 31, 20, 0.62);
-    --cal-line: rgba(47, 31, 20, 0.10);
+    --cal-line: rgba(47, 31, 20, 0.22);
     --cal-line-soft: rgba(47, 31, 20, 0.06);
     --cal-gold: #c8a24a;
     --cal-gold-soft: rgba(200, 162, 74, 0.18);
@@ -127,12 +127,12 @@ body {
 
 .calendar-day {
     aspect-ratio: 1;
-    min-height: 45px;
+    min-height: 70px;
     background: rgba(255, 255, 255, 0.92);
     border: 1px solid var(--cal-line);
     border-radius: 12px;
-    padding: 8px;
-    cursor: pointer;
+    padding: 6px 7px;
+    cursor: default;
     transition: background-color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
     display: flex;
     flex-direction: column;
@@ -140,13 +140,12 @@ body {
     box-sizing: border-box;
     width: 100%;
     max-width: 100%;
+    overflow: hidden;
 }
 
-.calendar-day:hover {
+.calendar-day.has-event:hover {
     border-color: rgba(200, 162, 74, 0.55);
     background-color: rgba(255, 250, 243, 0.92);
-    transform: translateY(-1px);
-    box-shadow: var(--cal-shadow-hover);
 }
 
 .calendar-day.other-month {
@@ -173,81 +172,57 @@ body {
 
 /* 只讀模式的日期樣式 */
 .calendar-day.read-only {
+    cursor: default;
+}
+
+.calendar-day.read-only.has-detail {
     cursor: pointer;
 }
 
-.calendar-day.read-only:hover {
-    border-color: rgba(200, 162, 74, 0.55);
-    background-color: rgba(255, 250, 243, 0.92);
-    transform: translateY(-1px);
-    box-shadow: var(--cal-shadow-hover);
-}
-
-/* 事件狀態指示器 - 右下角圓點 */
-.event-indicator {
-    position: absolute;
-    right: 8px;
-    bottom: 8px;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    margin-top: 0;
-    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.85);
-}
-
-/* 有說明的事件指示器 - 緊靠在圓圈旁邊的星形 */
-.event-description-indicator {
-    position: absolute;
-    right: 22px;
-    bottom: 6px;
-    width: 16px;
-    height: 16px;
+/* 格內文字項目 */
+.event-items {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--cal-gold);
-    font-size: 13px;
-    font-weight: bold;
-    line-height: 1;
-    opacity: 0.9;
-    text-shadow: 0 1px 0 rgba(47, 31, 20, 0.08);
+    flex-direction: column;
+    gap: 1px;
+    margin-top: 1px;
+    overflow: hidden;
+    flex: 1;
+    min-height: 0;
 }
 
-.event-indicator.available {
-    background-color: #79b06c;
-}
-
-.event-indicator.unavailable {
-    background-color: #d29a55;
-}
-
-.event-indicator.closed {
-    background-color: #d66555;
+.event-item {
+    font-size: 11.5px;
+    line-height: 1.35;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 600;
 }
 
 /* 事件提示框（只讀模式） */
 .event-tooltip {
     position: fixed;
     background: rgba(255, 255, 255, 0.98);
-    border: 1px solid rgba(200, 162, 74, 0.35);
-    border-radius: 14px;
-    padding: 12px 14px;
-    box-shadow: 0 18px 45px rgba(47, 31, 20, 0.16);
-    font-size: 14px;
+    border: 1.5px solid rgba(200, 162, 74, 0.4);
+    border-radius: 16px;
+    padding: 12px 16px;
+    box-shadow: 0 8px 30px rgba(47, 31, 20, 0.13), 0 2px 8px rgba(47, 31, 20, 0.08);
+    font-size: 15px;
     color: var(--cal-ink);
     z-index: 3000;
     pointer-events: none;
     max-width: 380px;
     opacity: 0;
-    transform: translateY(5px);
+    transform: translateY(5px) scale(0.97);
     transition: opacity 0.2s ease, transform 0.2s ease;
     line-height: 1.6;
-    font-weight: 500;
+    font-weight: 600;
+    letter-spacing: 0.01em;
 }
 
 .event-tooltip.show {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
 }
 
 .event-tooltip::before {
@@ -291,50 +266,6 @@ body {
     border-bottom: 10px solid rgba(255, 255, 255, 0.98);
 }
 
-/* 圖例 */
-.calendar-legend {
-    display: flex !important;
-    justify-content: center;
-    gap: 14px;
-    margin-top: 14px;
-    padding-top: 12px;
-    padding-bottom: 4px;
-    border-top: 1px solid var(--cal-line-soft);
-    flex-wrap: wrap;
-    visibility: visible !important;
-    opacity: 1 !important;
-}
-
-.legend-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.legend-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.85);
-}
-
-.legend-dot.available {
-    background-color: #79b06c;
-}
-
-.legend-dot.unavailable {
-    background-color: #d29a55;
-}
-
-.legend-dot.closed {
-    background-color: #d66555;
-}
-
-.legend-text {
-    font-size: 13px;
-    color: var(--cal-ink-muted);
-    letter-spacing: 0.02em;
-}
 
 /* 響應式設計 */
 @media (max-width: 768px) {
@@ -364,15 +295,15 @@ body {
     
     .calendar-day {
         min-height: 60px;
-        padding: 7px;
+        padding: 5px 6px;
     }
-    
+
     .calendar-day-number {
         font-size: 13px;
     }
-    
-    .calendar-legend {
-        gap: 16px;
+
+    .event-item {
+        font-size: 10px;
     }
     
 }
@@ -400,12 +331,16 @@ body {
     
     .calendar-day {
         min-height: 50px;
-        padding: 6px;
+        padding: 4px 5px;
         border-width: 1px;
     }
-    
+
     .calendar-day-number {
         font-size: 12px;
+    }
+
+    .event-item {
+        font-size: 9px;
     }
     
 }
@@ -430,36 +365,16 @@ body {
     }
 
     .calendar-day {
-        min-height: 40px;
-        padding: 8px;
+        min-height: 70px;
+        padding: 6px 7px;
     }
 
     .calendar-day-number {
         font-size: 14px;
     }
 
-    .event-indicator {
-        width: 10px;
-        height: 10px;
-        right: 8px;
-        bottom: 8px;
-    }
-
-    .event-description-indicator {
-        right: 22px;
-        bottom: 6px;
-        width: 16px;
-        height: 16px;
-        font-size: 13px;
-    }
-
-    .legend-dot {
-        width: 10px;
-        height: 10px;
-    }
-
-    .legend-text {
-        font-size: 13px;
+    .event-item {
+        font-size: 11.5px;
     }
 
     .event-tooltip {

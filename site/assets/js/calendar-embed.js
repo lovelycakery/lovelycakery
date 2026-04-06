@@ -59,9 +59,26 @@
       const iframe = getIframe();
       if (!iframe) return;
 
-      // Only accept messages from the embedded calendar iframe
+      if (!event.data) return;
+
+      // Messages FROM parent (admin) → forward to inner iframe
+      if (event.source === window.parent && event.source !== window) {
+        if (event.data.type === 'admin-calendar-update' || event.data.type === 'calendar-request-resize' || event.data.type === 'lovely-language') {
+          try { iframe.contentWindow.postMessage(event.data, '*'); } catch (e) { /* ignore */ }
+        }
+        return;
+      }
+
+      // Messages FROM inner iframe → forward to parent or handle locally
       if (event.source !== iframe.contentWindow) return;
-      if (!event.data || event.data.type !== 'calendar-resize') return;
+
+      // Forward day-click to parent (admin)
+      if (event.data.type === 'calendar-day-clicked') {
+        try { window.parent.postMessage(event.data, '*'); } catch (e) { /* ignore */ }
+        return;
+      }
+
+      if (event.data.type !== 'calendar-resize') return;
 
       const h = Number(event.data.height);
       if (!Number.isFinite(h) || h <= 0) return;

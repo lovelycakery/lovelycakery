@@ -32,8 +32,23 @@
     events.forEach((event) => {
       const dateKey = event && event.date;
       if (!dateKey) return;
-      if (!map[dateKey]) map[dateKey] = [];
-      map[dateKey].push(event);
+      // 新格式：event.items[]；舊格式：event.status + event.description
+      if (event.items && Array.isArray(event.items)) {
+        map[dateKey] = event;
+      } else {
+        // 向下相容舊格式 → 轉成新格式
+        const items = [];
+        if (event.status || (event.description && event.description.trim())) {
+          const color = event.status === 'available' ? '#79b06c'
+            : event.status === 'closed' ? '#d66555'
+            : event.status === 'unavailable' ? '#d29a55' : '#6b5d4f';
+          const text = event.description && event.description.trim()
+            ? event.description.trim()
+            : (event.status || '');
+          items.push({ text: text, color: color });
+        }
+        map[dateKey] = { date: dateKey, items: items };
+      }
     });
     return map;
   }

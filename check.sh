@@ -157,7 +157,7 @@ if not isinstance(events, list):
     print("ERROR: calendar-data.json must contain an 'events' array.")
     sys.exit(1)
 
-allowed = {"available", "unavailable", "closed"}
+max_items = data.get("maxItems", 3)
 date_re = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 seen = set()
 for i, ev in enumerate(events):
@@ -165,8 +165,6 @@ for i, ev in enumerate(events):
         print(f"ERROR: events[{i}] must be an object.")
         sys.exit(1)
     date = ev.get("date")
-    status = ev.get("status")
-    desc = ev.get("description")
     if not isinstance(date, str) or not date_re.match(date):
         print(f"ERROR: events[{i}].date invalid: {date!r}")
         sys.exit(1)
@@ -174,12 +172,20 @@ for i, ev in enumerate(events):
         print(f"ERROR: duplicate date in events: {date}")
         sys.exit(1)
     seen.add(date)
-    if not isinstance(status, str) or status not in allowed:
-        print(f"ERROR: events[{i}].status invalid for {date}: {status!r} (allowed: {sorted(allowed)})")
+    items = ev.get("items")
+    if not isinstance(items, list):
+        print(f"ERROR: events[{i}] ({date}) must have an 'items' array.")
         sys.exit(1)
-    if not isinstance(desc, str):
-        print(f"ERROR: events[{i}].description must be a string for {date} (can be empty).")
+    if len(items) > max_items:
+        print(f"ERROR: events[{i}] ({date}) has {len(items)} items, max is {max_items}.")
         sys.exit(1)
+    for j, item in enumerate(items):
+        if not isinstance(item, dict):
+            print(f"ERROR: events[{i}].items[{j}] must be an object.")
+            sys.exit(1)
+        if not isinstance(item.get("text", ""), str):
+            print(f"ERROR: events[{i}].items[{j}].text must be a string.")
+            sys.exit(1)
 
 print(f"OK: calendar-data.json schema valid ({len(events)} events)")
 PY

@@ -67,17 +67,9 @@
 
                     <div id="calendarEditForm" style="display: none;">
                         <div class="panel__section">
-                            <label class="label" for="statusSelect">狀態</label>
-                            <select id="statusSelect" class="input">
-                                <option value="available">可預訂</option>
-                                <option value="unavailable">不可預訂</option>
-                                <option value="closed">休息</option>
-                            </select>
-                        </div>
-
-                        <div class="panel__section">
-                            <label class="label" for="descInput">說明（點日曆時顯示）</label>
-                            <textarea id="descInput" class="input textarea" rows="5" placeholder="可留空"></textarea>
+                            <label class="label">項目（每日最多 <span id="maxItemsLabel">3</span> 項）</label>
+                            <div id="calendarItemsContainer"></div>
+                            <button id="addItemBtn" class="btn btn-sm" type="button" style="margin-top:6px;">＋ 新增項目</button>
                         </div>
 
                         <div class="panel__section panel__actions">

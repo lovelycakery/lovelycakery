@@ -74,13 +74,18 @@
   function validateCalendarData(data) {
     if (!data || typeof data !== 'object') throw new Error('calendar-data.json must be an object.');
     if (!Array.isArray(data.events)) throw new Error('calendar-data.json must contain an "events" array.');
-    var allowed = ['available', 'unavailable', 'closed'];
+    var maxItems = (typeof data.maxItems === 'number' && data.maxItems > 0) ? data.maxItems : 3;
     for (var i = 0; i < data.events.length; i++) {
       var ev = data.events[i];
       if (!ev || typeof ev !== 'object') throw new Error('Each event must be an object.');
       if (typeof ev.date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(ev.date)) throw new Error('Invalid date: ' + ev.date);
-      if (typeof ev.status !== 'string' || allowed.indexOf(ev.status) === -1) throw new Error('Invalid status: ' + ev.status);
-      if (typeof ev.description !== 'string') throw new Error('Description must be a string.');
+      if (!Array.isArray(ev.items)) throw new Error('Event ' + ev.date + ' must have an items array.');
+      if (ev.items.length > maxItems) throw new Error('Event ' + ev.date + ' has too many items (max ' + maxItems + ').');
+      for (var j = 0; j < ev.items.length; j++) {
+        var item = ev.items[j];
+        if (!item || typeof item !== 'object') throw new Error('Each item must be an object.');
+        if (typeof item.text !== 'string') throw new Error('Item text must be a string.');
+      }
     }
   }
 
@@ -209,17 +214,14 @@
   function sendCalendarDataToPreview() {
     var iframe = $('previewFrame');
     if (!iframe || !iframe.contentWindow) return;
-    // calendar.html embeds calendar-widget-readonly.html in a nested iframe.
-    // We send to the outer iframe; calendar-embed.js or the widget itself will pick it up.
-    // The widget listens for 'admin-calendar-update' on its own window,
-    // so we need to reach the inner iframe.
+    var msg = { type: 'admin-calendar-update', data: state.calendarData };
+    // Send to outer iframe (calendar.html) — calendar-embed.js forwards to inner widget
+    try { iframe.contentWindow.postMessage(msg, '*'); } catch (e) { /* ignore */ }
+    // Also try direct inner iframe access (same-origin only)
     try {
       var innerIframe = iframe.contentDocument && iframe.contentDocument.querySelector('iframe.calendar-iframe');
       if (innerIframe && innerIframe.contentWindow) {
-        innerIframe.contentWindow.postMessage({
-          type: 'admin-calendar-update',
-          data: state.calendarData,
-        }, '*');
+        innerIframe.contentWindow.postMessage(msg, '*');
       }
     } catch (e) { /* cross-origin or not ready */ }
   }
@@ -237,6 +239,7 @@
 
   function tryInstallCalendarClickHook() {
     if (state.clickHookInstalled) return true;
+    try {
     var outer = $('previewFrame');
     if (!outer || !outer.contentWindow || !outer.contentDocument) return false;
     var inner = outer.contentDocument.querySelector('iframe.calendar-iframe');
@@ -268,6 +271,7 @@
     state.clickHookInstalled = true;
     logStatus('✅ 日曆點擊已連結');
     return true;
+    } catch (e) { return false; }
   }
 
   function startHookWatcher() {
@@ -283,17 +287,51 @@
 
   async function refreshCalendarData() {
     var res = await GitHubAPI.getJSON(SITE + '/assets/data/calendar-data.json');
-    state.calendarData = res.data;
-    state.eventsByDate = buildEventsMap(res.data);
+    state.calendarData = migrateCalendarData(res.data);
+    state.eventsByDate = buildEventsMap(state.calendarData);
+  }
+
+  // 將舊格式（status + description）轉成新格式（items[]）
+  function migrateCalendarData(data) {
+    if (!data || !Array.isArray(data.events)) return data;
+    var needsMigration = false;
+    for (var i = 0; i < data.events.length; i++) {
+      var ev = data.events[i];
+      if (ev && !Array.isArray(ev.items)) { needsMigration = true; break; }
+    }
+    if (!needsMigration) return data;
+    var migrated = JSON.parse(JSON.stringify(data));
+    if (typeof migrated.maxItems !== 'number') migrated.maxItems = 3;
+    for (var i = 0; i < migrated.events.length; i++) {
+      var ev = migrated.events[i];
+      if (ev && !Array.isArray(ev.items)) {
+        var items = [];
+        var color = ev.status === 'available' ? '#79b06c'
+          : ev.status === 'closed' ? '#d66555'
+          : ev.status === 'unavailable' ? '#d29a55' : '#6b5d4f';
+        var text = (ev.description && ev.description.trim()) ? ev.description.trim() : (ev.status || '');
+        if (text) items.push({ text: text, color: color });
+        ev.items = items;
+        delete ev.status;
+        delete ev.description;
+      }
+    }
+    return migrated;
   }
 
   function buildEventsMap(data) {
     var map = new Map();
     var events = data && Array.isArray(data.events) ? data.events : [];
     for (var i = 0; i < events.length; i++) {
-      if (events[i] && events[i].date) map.set(events[i].date, events[i]);
+      var ev = events[i];
+      if (ev && ev.date) map.set(ev.date, ev);
     }
     return map;
+  }
+
+  function getMaxItems() {
+    return (state.calendarData && typeof state.calendarData.maxItems === 'number' && state.calendarData.maxItems > 0)
+      ? state.calendarData.maxItems : 3;
   }
 
   function setSelectedDate(dateStr) {
@@ -306,8 +344,9 @@
       form.style.display = 'block';
       var has = state.eventsByDate.has(state.selectedDate);
       var ev = has ? state.eventsByDate.get(state.selectedDate) : null;
-      $('statusSelect').value = ev && ev.status ? ev.status : 'available';
-      $('descInput').value = ev && typeof ev.description === 'string' ? ev.description : '';
+      var items = (ev && Array.isArray(ev.items)) ? ev.items : [];
+      renderCalendarItemsEditor(items);
+      $('maxItemsLabel').textContent = String(getMaxItems());
       $('saveBtn').disabled = false;
       $('clearBtn').disabled = !has;
     } else {
@@ -317,17 +356,166 @@
     }
   }
 
+  // ── Calendar items editor UI ──────────────────────────────────────
+
+  function renderCalendarItemsEditor(items) {
+    var container = $('calendarItemsContainer');
+    if (!container) return;
+    container.innerHTML = '';
+    var max = getMaxItems();
+    for (var i = 0; i < items.length && i < max; i++) {
+      container.appendChild(createItemRow(items[i], i));
+    }
+    updateAddItemBtn();
+  }
+
+  // 常用顏色預設
+  var COLOR_PRESETS = [
+    { color: '#2f1f14', name: '深棕' },
+    { color: '#333333', name: '黑' },
+    { color: '#cc0000', name: '紅' },
+    { color: '#e67700', name: '橘' },
+    { color: '#1a8a1a', name: '綠' },
+    { color: '#0066cc', name: '藍' },
+    { color: '#7b2d8e', name: '紫' },
+    { color: '#888888', name: '灰' },
+  ];
+
+  function createItemRow(item, index) {
+    var row = document.createElement('div');
+    row.className = 'cal-item-row';
+    row.style.cssText = 'display:flex;flex-direction:column;gap:4px;padding:8px;margin-bottom:6px;background:rgba(0,0,0,0.03);border-radius:8px;position:relative;';
+
+    // 第一行：顏色選擇器 + 顯示文字
+    var topRow = document.createElement('div');
+    topRow.style.cssText = 'display:flex;align-items:center;gap:6px;';
+
+    var colorInput = document.createElement('input');
+    colorInput.type = 'color';
+    colorInput.className = 'cal-item-color';
+    colorInput.value = item.color || '#6b5d4f';
+    colorInput.title = '自訂顏色';
+    colorInput.style.cssText = 'width:28px;height:28px;border:1px solid #ccc;border-radius:50%;cursor:pointer;padding:1px;flex-shrink:0;';
+
+    var textInput = document.createElement('input');
+    textInput.type = 'text';
+    textInput.className = 'cal-item-text input';
+    textInput.value = item.text || '';
+    textInput.placeholder = '顯示文字（短）';
+    textInput.style.cssText = 'flex:1;font-size:13px;';
+
+    var removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'btn btn-sm';
+    removeBtn.textContent = '✕';
+    removeBtn.title = '移除此項目';
+    removeBtn.style.cssText = 'flex-shrink:0;padding:2px 7px;font-size:12px;color:#d66555;';
+    removeBtn.addEventListener('click', function () {
+      row.remove();
+      updateAddItemBtn();
+    });
+
+    topRow.appendChild(colorInput);
+    topRow.appendChild(textInput);
+    topRow.appendChild(removeBtn);
+    row.appendChild(topRow);
+
+    // 第二行：快速顏色選擇
+    var swatchRow = document.createElement('div');
+    swatchRow.style.cssText = 'display:flex;align-items:center;gap:4px;flex-wrap:wrap;';
+    COLOR_PRESETS.forEach(function (preset) {
+      var swatch = document.createElement('span');
+      swatch.title = preset.name;
+      swatch.style.cssText = 'width:18px;height:18px;border-radius:50%;cursor:pointer;border:2px solid transparent;box-sizing:border-box;flex-shrink:0;transition:border-color 0.15s;background:' + preset.color + ';';
+      if (colorInput.value.toLowerCase() === preset.color.toLowerCase()) {
+        swatch.style.borderColor = 'rgba(47,31,20,0.5)';
+      }
+      swatch.addEventListener('click', function () {
+        colorInput.value = preset.color;
+        // 更新所有 swatch 的選取狀態
+        swatchRow.querySelectorAll('span').forEach(function (s) { s.style.borderColor = 'transparent'; });
+        swatch.style.borderColor = 'rgba(47,31,20,0.5)';
+      });
+      swatchRow.appendChild(swatch);
+    });
+    row.appendChild(swatchRow);
+
+    // 第三行：hover 詳細說明
+    var detailInput = document.createElement('input');
+    detailInput.type = 'text';
+    detailInput.className = 'cal-item-detail input';
+    detailInput.value = item.detail || '';
+    detailInput.placeholder = '滑鼠移入時顯示的詳細說明（可留空）';
+    detailInput.style.cssText = 'font-size:12px;color:#6b5d4f;';
+    row.appendChild(detailInput);
+
+    // color picker 變更時同步 swatch 選取狀態
+    colorInput.addEventListener('input', function () {
+      swatchRow.querySelectorAll('span').forEach(function (s) { s.style.borderColor = 'transparent'; });
+      // 如果剛好選到預設色，標記它
+      var val = colorInput.value.toLowerCase();
+      COLOR_PRESETS.forEach(function (p, i) {
+        if (p.color.toLowerCase() === val) {
+          swatchRow.children[i].style.borderColor = 'rgba(47,31,20,0.5)';
+        }
+      });
+    });
+
+    return row;
+  }
+
+  function addCalendarItem() {
+    var container = $('calendarItemsContainer');
+    if (!container) return;
+    var max = getMaxItems();
+    if (container.children.length >= max) return;
+    container.appendChild(createItemRow({ text: '', color: '#6b5d4f', detail: '' }, container.children.length));
+    updateAddItemBtn();
+  }
+
+  function updateAddItemBtn() {
+    var btn = $('addItemBtn');
+    if (!btn) return;
+    var container = $('calendarItemsContainer');
+    var max = getMaxItems();
+    btn.disabled = container && container.children.length >= max;
+  }
+
+  function readCalendarItemsFromUI() {
+    var container = $('calendarItemsContainer');
+    if (!container) return [];
+    var items = [];
+    var rows = container.querySelectorAll('.cal-item-row');
+    for (var i = 0; i < rows.length; i++) {
+      var textEl = rows[i].querySelector('.cal-item-text');
+      var colorEl = rows[i].querySelector('.cal-item-color');
+      var detailEl = rows[i].querySelector('.cal-item-detail');
+      var text = textEl ? textEl.value.trim() : '';
+      if (!text) continue; // 跳過空文字
+      var obj = { text: text, color: colorEl ? colorEl.value : '#6b5d4f' };
+      var detail = detailEl ? detailEl.value.trim() : '';
+      if (detail) obj.detail = detail;
+      items.push(obj);
+    }
+    return items;
+  }
+
   // ── Calendar save (LOCAL — instant preview) ───────────────────────
 
   function saveCalendarEvent() {
     if (!state.selectedDate) return;
-    var status = $('statusSelect').value;
-    var description = $('descInput').value || '';
+    var items = readCalendarItemsFromUI();
     var data = JSON.parse(JSON.stringify(state.calendarData));
     var events = Array.isArray(data.events) ? data.events : [];
     var idx = events.findIndex(function (e) { return e && e.date === state.selectedDate; });
-    var next = { date: state.selectedDate, status: status, description: description };
-    if (idx >= 0) events[idx] = next; else events.push(next);
+
+    if (items.length === 0) {
+      // 沒有項目 → 移除該日期
+      if (idx >= 0) events.splice(idx, 1);
+    } else {
+      var next = { date: state.selectedDate, items: items };
+      if (idx >= 0) events[idx] = next; else events.push(next);
+    }
     events.sort(function (a, b) { return String(a.date).localeCompare(String(b.date)); });
     data.events = events;
     try { validateCalendarData(data); } catch (e) { showError('驗證失敗：' + e.message); return; }
@@ -337,8 +525,7 @@
     dirty.calendar = true;
     updatePublishButton();
 
-    var statusText = status === 'available' ? '可預訂' : (status === 'unavailable' ? '不可預訂' : '休息');
-    showSuccess('已儲存（本地）：' + state.selectedDate + ' (' + statusText + ')');
+    showSuccess('已儲存（本地）：' + state.selectedDate + ' (' + items.length + ' 項)');
     setSelectedDate(state.selectedDate);
     sendCalendarDataToPreview();
   }
@@ -865,7 +1052,10 @@
   // ── PostMessage from iframe ───────────────────────────────────────
 
   window.addEventListener('message', function (e) {
-    if (e.origin !== location.origin) return;
+    // file:// 協定下 e.origin 是 "null" 但 location.origin 可能是 "file://"（Chrome）
+    var sameOrigin = e.origin === location.origin
+      || (location.protocol === 'file:' && (e.origin === 'null' || e.origin === 'file://'));
+    if (!sameOrigin) return;
     if (!e.data || typeof e.data !== 'object' || !e.data.type) return;
     if (e.data.type === 'gallery-reorder') {
       var type = state.currentTab === 'seasonal' ? 'seasonal' : 'products';
@@ -881,6 +1071,11 @@
       if (batchSelected.has(idx)) batchSelected.delete(idx);
       else batchSelected.add(idx);
       updateBatchDeleteButton();
+    } else if (e.data.type === 'calendar-day-clicked') {
+      // postMessage fallback for calendar click (works even when contentDocument is blocked)
+      if (state.currentTab === 'calendar' && state.currentMode === 'edit' && e.data.date) {
+        setSelectedDate(e.data.date);
+      }
     }
   });
 
@@ -902,6 +1097,7 @@
 
     $('saveBtn').addEventListener('click', saveCalendarEvent);
     $('clearBtn').addEventListener('click', clearCalendarEvent);
+    if ($('addItemBtn')) $('addItemBtn').addEventListener('click', addCalendarItem);
 
     $('imageEditSaveBtn').addEventListener('click', function () {
       if (state.currentTab === 'seasonal' || state.currentTab === 'products') saveImageEdit(state.currentTab);
