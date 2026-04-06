@@ -368,6 +368,7 @@
       img.decoding = 'async';
       img.width = 1000;
       img.height = 1000;
+      img.onload = () => imageWrapper.classList.add('loaded');
       imageWrapper.appendChild(img);
 
       // 如果有標籤，在圖片上顯示標籤
