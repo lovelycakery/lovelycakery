@@ -101,19 +101,40 @@
       </div>
     `;
     
+    let modalOpen = true;
+
     const closeModal = () => {
+      if (!modalOpen) return;
+      modalOpen = false;
       if (modal.parentNode) document.body.removeChild(modal);
       document.body.style.overflow = '';
       document.removeEventListener('keydown', escHandler);
+      window.removeEventListener('popstate', popstateHandler);
+    };
+
+    // X / overlay / Escape 關閉時，要 history.back() 消掉 pushState 的記錄
+    const closeAndBack = () => {
+      if (!modalOpen) return;
+      closeModal();
+      history.back();
     };
 
     const escHandler = (e) => {
-      if (e.key === 'Escape') closeModal();
+      if (e.key === 'Escape') closeAndBack();
     };
 
-    modal.querySelector('.image-modal__overlay').addEventListener('click', closeModal);
-    modal.querySelector('.image-modal__close').addEventListener('click', closeModal);
+    // 手機滑返回 / 返回鍵 → popstate 觸發 → 關閉 modal
+    const popstateHandler = () => {
+      if (modalOpen) closeModal();
+    };
+
+    modal.querySelector('.image-modal__overlay').addEventListener('click', closeAndBack);
+    modal.querySelector('.image-modal__close').addEventListener('click', closeAndBack);
     document.addEventListener('keydown', escHandler);
+    window.addEventListener('popstate', popstateHandler);
+
+    // 推一筆歷史記錄，讓返回手勢可以攔截
+    history.pushState({ modal: true }, '');
 
     document.body.appendChild(modal);
     document.body.style.overflow = 'hidden';
