@@ -960,16 +960,12 @@ img {
     .gallery-image-tag {
         font-size: 0;
         padding: 0;
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
+        width: 14px;
+        height: 14px;
+        border-radius: 2px;
         letter-spacing: 0;
-        transform: none;
-        box-shadow: none;
-    }
-
-    .gallery-image-tag::after {
-        display: none;
+        transform: rotate(-2deg);
+        box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.15);
     }
 
     .tag-legend-badge {
