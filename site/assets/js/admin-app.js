@@ -1039,17 +1039,34 @@
       var exportData = { schema_version: 1, items: exportItems };
       zip.file('data.json', JSON.stringify(exportData, null, 2));
 
-      // Generate and trigger download
+      // Generate and trigger download with save dialog
       var blob = await zip.generateAsync({ type: 'blob' });
       var today = new Date().toISOString().slice(0, 10);
       var zipName = type + '-backup-' + today + '.zip';
-      var a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = zipName;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(a.href);
+
+      if (window.showSaveFilePicker) {
+        try {
+          var handle = await window.showSaveFilePicker({
+            suggestedName: zipName,
+            types: [{ description: 'ZIP 壓縮檔', accept: { 'application/zip': ['.zip'] } }],
+          });
+          var writable = await handle.createWritable();
+          await writable.write(blob);
+          await writable.close();
+        } catch (e) {
+          if (e.name === 'AbortError') { logStatus('已取消下載'); return; }
+          throw e;
+        }
+      } else {
+        // Fallback for browsers without File System Access API (e.g. Firefox)
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = zipName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(a.href);
+      }
 
       logStatus('✅ 備份完成：' + zipName + '（' + exportItems.length + ' 個品項）');
     } catch (e) {
