@@ -245,49 +245,37 @@ class CalendarWidgetReadonly {
                 itemEl.className = 'event-item';
                 itemEl.textContent = item.text || '';
                 if (item.color) itemEl.style.color = item.color;
-                // 文字被截斷時，hover 顯示完整內容
+                // hover 顯示：標題（大字）＋ detail（深色）
                 if (item.text) {
+                    const tooltipHtml = this.buildItemTooltipHtml(item);
                     itemEl.addEventListener('mouseenter', (e) => {
-                        const html = item.color
-                            ? '<span style="color:' + item.color + '">' + this.escapeHtml(item.text) + '</span>'
-                            : this.escapeHtml(item.text);
-                        this.showTooltip(e, html);
+                        this.showTooltip(e, tooltipHtml);
                     });
                     itemEl.addEventListener('mouseleave', () => {
                         if (this._tooltipAnchorEl === itemEl) this.hideTooltip();
+                    });
+                    // 手機 click
+                    itemEl.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.toggleTooltip(itemEl, tooltipHtml);
                     });
                 }
                 itemsContainer.appendChild(itemEl);
             });
             dayEl.appendChild(itemsContainer);
-
-            // 收集有 detail 的項目
-            const details = items
-                .filter((item) => item.detail && item.detail.trim())
-                .map((item) => {
-                    const span = item.color
-                        ? '<span style="color:' + item.color + '">' + this.escapeHtml(item.text || '') + '</span>'
-                        : '<span>' + this.escapeHtml(item.text || '') + '</span>';
-                    return span + '　' + this.escapeHtml(item.detail);
-                });
-            const hasDetail = details.length > 0;
-
-            if (hasDetail) {
-                dayEl.classList.add('has-detail');
-                const detailHtml = details.join('<br>');
-
-                // 桌機 hover
-                dayEl.addEventListener('mouseenter', (e) => this.showTooltip(e, detailHtml));
-                dayEl.addEventListener('mouseleave', () => this.hideTooltip());
-
-                // 手機 click
-                dayEl.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    this.toggleTooltip(dayEl, detailHtml);
-                });
-            }
         }
         container.appendChild(dayEl);
+    }
+
+    buildItemTooltipHtml(item) {
+        const titleColor = item.color || 'var(--cal-ink)';
+        let html = '<div style="font-size:17px;font-weight:700;color:' + titleColor + ';line-height:1.4;">'
+            + this.escapeHtml(item.text) + '</div>';
+        if (item.detail && item.detail.trim()) {
+            html += '<div style="margin-top:4px;font-size:14px;font-weight:500;color:var(--cal-ink);line-height:1.5;">'
+                + this.escapeHtml(item.detail) + '</div>';
+        }
+        return html;
     }
 
     escapeHtml(str) {
