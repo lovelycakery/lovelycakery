@@ -712,46 +712,49 @@ img {
 /* 標籤位置統一：圖片右下角內側（藥丸形不需超出邊界） */
 
 /* ============================================
-   共用標籤樣式（藥丸圓角 + 左側吊牌小圓孔）
+   共用標籤樣式（便利貼風格）
    .gallery-image-tag / .tag-legend-badge / .image-modal__tag 共用
    ============================================ */
 .tag-badge {
     display: inline-block;
-    padding: 6px 14px 6px 22px;
+    padding: 5px 10px;
     font-size: 12px;
-    font-weight: 500;
+    font-weight: 600;
     font-family: 'Playfair Display', serif;
     line-height: 1.3;
     white-space: nowrap;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: none;
     transition: all 0.3s ease;
     letter-spacing: 0.3px;
     position: relative;
-    border-radius: 20px;
+    border-radius: 2px;
+    box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.15);
 }
 
-/* 左側吊牌小圓孔（用 ::before，避免與圖例 checked ::after 打勾衝突） */
-.tag-badge::before {
+/* 便利貼右下角摺角 */
+.tag-badge::after {
     content: '';
     position: absolute;
-    left: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.6);
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15);
+    right: 0;
+    bottom: 0;
+    width: 8px;
+    height: 8px;
+    background: linear-gradient(135deg, transparent 50%, rgba(0, 0, 0, 0.08) 50%);
+    border-radius: 0 0 2px 0;
 }
 
 /* ── 圖片標籤（覆蓋差異） ── */
 .gallery-image-tag {
-    backdrop-filter: blur(8px);
+    transform: rotate(-2deg);
+}
+
+.gallery-image-tag:nth-child(even) {
+    transform: rotate(1.5deg);
 }
 
 .gallery-image-tag:hover {
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+    transform: rotate(0deg) translateY(-2px);
+    box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.2) !important;
 }
 
 /* ============================================
@@ -803,26 +806,25 @@ img {
 
 /* ── 圖例標籤（覆蓋差異：稍大尺寸） ── */
 .tag-legend-badge {
-    padding: 8px 18px 8px 26px;
+    padding: 7px 14px;
     font-size: 13px;
 }
 
 .tag-legend-checkbox:checked + .tag-legend-badge {
-    border: 2px solid rgba(255, 255, 255, 0.6);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
-    transform: translateY(-2px) scale(1.05);
+    box-shadow: 2px 3px 8px rgba(0, 0, 0, 0.25) !important;
+    transform: translateY(-2px);
 }
 
 .tag-legend-checkbox-label:hover .tag-legend-badge {
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+    transform: translateY(-2px);
+    box-shadow: 2px 3px 8px rgba(0, 0, 0, 0.2) !important;
 }
 
-.tag-legend-checkbox:checked + .tag-legend-badge::after {
+.tag-legend-checkbox:checked + .tag-legend-badge::before {
     content: '✓';
     position: absolute;
     top: -6px;
-    left: -6px;
+    right: -6px;
     width: 18px;
     height: 18px;
     background-color: rgba(255, 255, 255, 0.95);
@@ -839,9 +841,11 @@ img {
 
 .tag-legend-hint {
     font-size: 13px;
-    color: #999;
+    color: #666;
     white-space: nowrap;
     margin-left: 4px;
+    display: flex;
+    align-items: center;
 }
 
 /* ============================================
@@ -954,13 +958,23 @@ img {
     }
 
     .gallery-image-tag {
-        font-size: 11px;
-        padding: 5px 12px 5px 18px;
+        font-size: 0;
+        padding: 0;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        letter-spacing: 0;
+        transform: none;
+        box-shadow: none;
+    }
+
+    .gallery-image-tag::after {
+        display: none;
     }
 
     .tag-legend-badge {
         font-size: 12px;
-        padding: 6px 14px 6px 22px;
+        padding: 6px 12px;
     }
 }
 
@@ -1416,6 +1430,11 @@ img {
 /* ── Modal 標籤（覆蓋差異：稍大字體） ── */
 .image-modal__tag {
     font-size: 13px;
+    transform: rotate(-1deg);
+}
+
+.image-modal__tag:nth-child(even) {
+    transform: rotate(1deg);
 }
 
 @media (max-width: 768px) {
