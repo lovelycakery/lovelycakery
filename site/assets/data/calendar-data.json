@@ -4,85 +4,128 @@
     {
       "date": "2026-04-01",
       "items": [
-        { "text": "本週切片口味", "color": "#6b5d4f", "detail": "花生OREO/ 檸檬草莓/ 抹茶乳酪/ 芝麻花園" }
+        {
+          "text": "本週切片口味",
+          "color": "#1a8a1a",
+          "detail": "花生OREO/ 檸檬草莓/ 抹茶乳酪/ 芝麻花園"
+        }
       ]
     },
     {
       "date": "2026-04-03",
       "items": [
-        { "text": "休息", "color": "#cc0000" }
+        {
+          "text": "休息",
+          "color": "#cc0000"
+        }
       ]
     },
     {
       "date": "2026-04-04",
       "items": [
-        { "text": "休息", "color": "#cc0000" }
+        {
+          "text": "休息",
+          "color": "#cc0000"
+        }
       ]
     },
     {
       "date": "2026-04-05",
       "items": [
-        { "text": "休息", "color": "#cc0000" }
+        {
+          "text": "休息",
+          "color": "#cc0000"
+        }
       ]
     },
     {
       "date": "2026-04-06",
       "items": [
-        { "text": "休息", "color": "#cc0000" }
+        {
+          "text": "休息",
+          "color": "#cc0000"
+        }
       ]
     },
     {
       "date": "2026-04-11",
       "items": [
-        { "text": "10am -2pm", "color": "#1a8a1a" }
+        {
+          "text": "10am -2pm",
+          "color": "#1a8a1a"
+        }
       ]
     },
     {
       "date": "2026-04-12",
       "items": [
-        { "text": "10am -2pm", "color": "#1a8a1a" }
+        {
+          "text": "10am -2pm",
+          "color": "#1a8a1a"
+        }
       ]
     },
     {
       "date": "2026-04-13",
       "items": [
-        { "text": "休息", "color": "#cc0000" }
+        {
+          "text": "休息",
+          "color": "#cc0000"
+        }
       ]
     },
     {
       "date": "2026-04-18",
       "items": [
-        { "text": "10am -2pm", "color": "#1a8a1a" }
+        {
+          "text": "10am -2pm",
+          "color": "#1a8a1a"
+        }
       ]
     },
     {
       "date": "2026-04-19",
       "items": [
-        { "text": "10am -2pm", "color": "#1a8a1a" }
+        {
+          "text": "10am -2pm",
+          "color": "#1a8a1a"
+        }
       ]
     },
     {
       "date": "2026-04-20",
       "items": [
-        { "text": "休息", "color": "#cc0000" }
+        {
+          "text": "休息",
+          "color": "#cc0000"
+        }
       ]
     },
     {
       "date": "2026-04-25",
       "items": [
-        { "text": "10am -2pm", "color": "#1a8a1a" }
+        {
+          "text": "10am -2pm",
+          "color": "#1a8a1a"
+        }
       ]
     },
     {
       "date": "2026-04-26",
       "items": [
-        { "text": "10am -2pm", "color": "#1a8a1a" }
+        {
+          "text": "10am -2pm",
+          "color": "#1a8a1a"
+        }
       ]
     },
     {
       "date": "2026-04-27",
       "items": [
-        { "text": "休息", "color": "#cc0000" }
+        {
+          "text": "休息",
+          "color": "#cc0000"
+        }
       ]
     }
   ]
