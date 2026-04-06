@@ -687,6 +687,7 @@
     batchSelected.clear();
     clearImageEditPanel();
     $('batchDeleteBtn').style.display = 'none';
+    $('downloadBackupBtn').style.display = 'none';
     $('batchDeleteActions').style.display = 'block';
     $('imageEditForm').style.display = 'none';
     updateBatchDeleteButton();
@@ -699,6 +700,7 @@
     batchMode = false;
     batchSelected.clear();
     $('batchDeleteBtn').style.display = '';
+    $('downloadBackupBtn').style.display = '';
     $('batchDeleteActions').style.display = 'none';
     var iframe = $('previewFrame');
     if (iframe && iframe.contentWindow) iframe.contentWindow.postMessage({ type: 'batch-mode', enabled: false }, '*');
@@ -969,6 +971,95 @@
     });
   }
 
+  // ── Download Backup ───────────────────────────────────────────────
+
+  async function downloadBackup(type) {
+    if (typeof JSZip === 'undefined') { showError('JSZip 尚未載入，請檢查網路連線'); return; }
+
+    var items = state.imageData[type].items || [];
+    if (items.length === 0) { showError('沒有可備份的資料'); return; }
+
+    var btn = $('downloadBackupBtn');
+    setButtonLoading(btn, true);
+    logStatus('📦 開始打包 ' + (type === 'seasonal' ? '季節限定' : '全部品項') + '…');
+
+    try {
+      var zip = new JSZip();
+      var imgFolder = zip.folder('images');
+
+      // Build clean data and fetch images in parallel
+      var exportItems = [];
+      var fetchPromises = [];
+      var usedNames = {};
+
+      items.forEach(function (item, i) {
+        // Clean copy for export
+        var clean = Object.assign({}, item);
+        delete clean._previewUrl;
+        delete clean._sha;
+
+        // Use product name as filename for readability
+        var origPath = item.image || '';
+        var baseName = (item.name && item.name.trim()) ? sanitizeFilename(item.name) : ('image-' + (i + 1));
+        // Deduplicate: append number if name already used
+        var candidate = baseName + '.jpg';
+        var n = 1;
+        while (usedNames[candidate]) { candidate = baseName + '-' + (++n) + '.jpg'; }
+        usedNames[candidate] = true;
+        var filename = candidate;
+        clean.image = 'images/' + filename;
+        exportItems.push(clean);
+
+        // Fetch image: use blob URL for unpublished, GitHub raw URL for published
+        var imgUrl = item._previewUrl;
+        if (!imgUrl && origPath) {
+          // Build raw.githubusercontent.com URL (works on file:// and https://)
+          var rawBase = 'https://raw.githubusercontent.com/' + GitHubAPI.OWNER + '/' + GitHubAPI.REPO + '/' + GitHubAPI.BRANCH + '/' + SITE + '/';
+          imgUrl = rawBase + encodeURI(origPath);
+        }
+        if (imgUrl) {
+          fetchPromises.push(
+            (function (url, fname) {
+              return fetch(url).then(function (r) {
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                return r.arrayBuffer();
+              }).then(function (buf) {
+                imgFolder.file(fname, buf);
+              }).catch(function (e) {
+                logStatus('⚠️ 無法下載圖片：' + fname + ' (' + e.message + ')');
+              });
+            })(imgUrl, filename)
+          );
+        }
+      });
+
+      await Promise.all(fetchPromises);
+
+      // Add data.json
+      var exportData = { schema_version: 1, items: exportItems };
+      zip.file('data.json', JSON.stringify(exportData, null, 2));
+
+      // Generate and trigger download
+      var blob = await zip.generateAsync({ type: 'blob' });
+      var today = new Date().toISOString().slice(0, 10);
+      var zipName = type + '-backup-' + today + '.zip';
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = zipName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(a.href);
+
+      logStatus('✅ 備份完成：' + zipName + '（' + exportItems.length + ' 個品項）');
+    } catch (e) {
+      showError('備份失敗：' + (e.message || String(e)));
+    } finally {
+      setButtonLoading(btn, false);
+      btn.textContent = '下載備份';
+    }
+  }
+
   // ── Validation ────────────────────────────────────────────────────
 
   function checkAllFields() {
@@ -1118,6 +1209,11 @@
       if (!state.imageData.seasonal.items.length && !dirty.seasonal) loadImageData('seasonal');
       if (!state.imageData.products.items.length && !dirty.products) loadImageData('products');
       setTimeout(checkAllFields, 300);
+    });
+
+    // Download backup
+    $('downloadBackupBtn').addEventListener('click', function () {
+      if (state.currentTab === 'seasonal' || state.currentTab === 'products') downloadBackup(state.currentTab);
     });
 
     // Batch delete
