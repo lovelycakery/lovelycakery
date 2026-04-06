@@ -703,9 +703,9 @@ img {
     bottom: 10px;
     right: 10px;
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap-reverse;
+    justify-content: flex-end;
     gap: 6px;
-    align-items: flex-end;
     z-index: 5;
 }
 
