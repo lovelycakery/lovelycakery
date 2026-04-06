@@ -1213,14 +1213,6 @@
     $('imageEditDeleteBtn').addEventListener('click', function () {
       if (state.currentTab === 'seasonal' || state.currentTab === 'products') deleteImage(state.currentTab, state.editingImageIndex);
     });
-    $('validateBtn').addEventListener('click', function () {
-      if (state.currentTab === 'seasonal' || state.currentTab === 'products') {
-        var items = state.imageData[state.currentTab].items || [];
-        var issues = [];
-        items.forEach(function (item, i) { if (!item.name || !item.name.trim()) issues.push('#' + (i + 1) + '：缺少名稱'); });
-        logStatus(issues.length === 0 ? '✅ 驗證通過' : '⚠️ ' + issues.join(', '));
-      }
-    });
     $('checkEnglishBtn').addEventListener('click', function () {
       // Ensure data is loaded
       if (!state.imageData.seasonal.items.length && !dirty.seasonal) loadImageData('seasonal');

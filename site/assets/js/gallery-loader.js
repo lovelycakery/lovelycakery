@@ -222,7 +222,7 @@
 
     legend.innerHTML = `
       <div class="tag-legend-items">${legendItems}</div>
-      <span class="tag-legend-hint" data-en="clickable" data-zh="可勾選">可勾選</span>
+      <span class="tag-legend-hint" data-en="← clickable" data-zh="← 可勾選">← 可勾選</span>
     `;
 
     // 插入到 page-header 下方，gallery-grid 上方
