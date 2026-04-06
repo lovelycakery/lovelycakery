@@ -340,8 +340,8 @@
       img.className = 'gallery-image';
       img.loading = 'lazy';
       img.decoding = 'async';
-      img.width = 1600;
-      img.height = 1600;
+      img.width = 1200;
+      img.height = 1200;
       imageWrapper.appendChild(img);
 
       // 如果有標籤，在圖片上顯示標籤
