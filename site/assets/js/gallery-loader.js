@@ -336,6 +336,12 @@
       imageWrapper.className = 'gallery-image-wrapper';
       const img = document.createElement('img');
       img.src = imageSrc;
+      // 手機用小圖（sm/），桌面用原圖
+      if (!item._previewUrl && imageSrc.includes('/products/')) {
+        const smSrc = imageSrc.replace('/products/', '/products/sm/');
+        img.srcset = smSrc + ' 600w, ' + imageSrc + ' 1200w';
+        img.sizes = '(max-width: 768px) 50vw, 600px';
+      }
       img.alt = imageAlt;
       img.className = 'gallery-image';
       img.loading = 'lazy';
