@@ -4,52 +4,47 @@
   'use strict';
   if (window.ImageCompress) return;
 
-  const MAX_DIMENSION = 2000;
-  const QUALITY_HIGH = 0.85;
-  const QUALITY_LOW = 0.75;
-  const SIZE_THRESHOLD = 500 * 1024; // 500 KB
+  // 桌面版：1000px, quality 0.72
+  const DESKTOP_MAX = 1000;
+  const DESKTOP_QUALITY = 0.72;
+  // 手機版：480px, quality 0.68
+  const MOBILE_MAX = 480;
+  const MOBILE_QUALITY = 0.68;
 
   /**
-   * Compress an image File/Blob to JPEG.
-   * @param {File|Blob} file - The input image
-   * @returns {Promise<{blob: Blob, base64: string, width: number, height: number}>}
+   * Resize a bitmap to fit within maxDim and export as JPEG.
    */
-  async function compress(file) {
-    // Load image as bitmap (handles EXIF orientation automatically)
-    const bitmap = await createImageBitmap(file, {
-      imageOrientation: 'from-image',
-    });
-
+  async function resizeAndExport(bitmap, maxDim, quality) {
     let w = bitmap.width;
     let h = bitmap.height;
-
-    // Resize if exceeding max dimension
-    if (w > MAX_DIMENSION || h > MAX_DIMENSION) {
-      const scale = MAX_DIMENSION / Math.max(w, h);
+    if (w > maxDim || h > maxDim) {
+      const scale = maxDim / Math.max(w, h);
       w = Math.round(w * scale);
       h = Math.round(h * scale);
     }
-
-    // Draw to canvas
     const canvas = document.createElement('canvas');
     canvas.width = w;
     canvas.height = h;
     const ctx = canvas.getContext('2d');
     ctx.drawImage(bitmap, 0, 0, w, h);
-    bitmap.close();
-
-    // First pass: high quality
-    let blob = await canvasToBlob(canvas, QUALITY_HIGH);
-
-    // If still too large, try lower quality
-    if (blob.size > SIZE_THRESHOLD) {
-      blob = await canvasToBlob(canvas, QUALITY_LOW);
-    }
-
-    // Convert to base64 (without data URI prefix)
+    const blob = await canvasToBlob(canvas, quality);
     const base64 = await blobToBase64(blob);
-
     return { blob, base64, width: w, height: h };
+  }
+
+  /**
+   * Compress an image File/Blob to two JPEG versions (desktop + mobile).
+   * @param {File|Blob} file - The input image
+   * @returns {Promise<{desktop: {blob, base64, width, height}, mobile: {blob, base64, width, height}}>}
+   */
+  async function compress(file) {
+    const bitmap = await createImageBitmap(file, {
+      imageOrientation: 'from-image',
+    });
+    const desktop = await resizeAndExport(bitmap, DESKTOP_MAX, DESKTOP_QUALITY);
+    const mobile = await resizeAndExport(bitmap, MOBILE_MAX, MOBILE_QUALITY);
+    bitmap.close();
+    return { desktop, mobile };
   }
 
   function canvasToBlob(canvas, quality) {

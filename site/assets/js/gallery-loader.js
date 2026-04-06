@@ -360,14 +360,14 @@
       img.dataset.src = imageSrc;
       if (!item._previewUrl && imageSrc.includes('/products/')) {
         const smSrc = imageSrc.replace('/products/', '/products/sm/');
-        img.dataset.srcset = smSrc + ' 600w, ' + imageSrc + ' 1200w';
-        img.dataset.sizes = '(max-width: 768px) 50vw, 600px';
+        img.dataset.srcset = smSrc + ' 480w, ' + imageSrc + ' 1000w';
+        img.dataset.sizes = '(max-width: 768px) 50vw, 500px';
       }
       img.alt = imageAlt;
       img.className = 'gallery-image';
       img.decoding = 'async';
-      img.width = 1200;
-      img.height = 1200;
+      img.width = 1000;
+      img.height = 1000;
       imageWrapper.appendChild(img);
 
       // 如果有標籤，在圖片上顯示標籤

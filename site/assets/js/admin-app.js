@@ -754,9 +754,11 @@
       try {
         var compressed = await ImageCompress.compress(file);
 
-        // Store pending upload
+        // Store pending uploads: desktop + mobile (sm/)
         var repoPath = SITE + '/' + imageDir + '/' + filename;
-        dirty.pendingImages.push({ repoPath: repoPath, base64: compressed.base64 });
+        var repoPathSm = SITE + '/' + imageDir + '/sm/' + filename;
+        dirty.pendingImages.push({ repoPath: repoPath, base64: compressed.desktop.base64 });
+        dirty.pendingImages.push({ repoPath: repoPathSm, base64: compressed.mobile.base64 });
 
         // Add to local items for instant preview
         var newItem = {
@@ -768,7 +770,7 @@
           description_en: '',
           tags: [],
           // Store blob URL for instant preview
-          _previewUrl: URL.createObjectURL(compressed.blob),
+          _previewUrl: URL.createObjectURL(compressed.desktop.blob),
         };
         state.imageData[type].items.push(newItem);
         lastUploadedName = sanitized;
