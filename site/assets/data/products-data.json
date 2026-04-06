@@ -267,6 +267,21 @@
         "奶蛋素",
         "無咖啡因"
       ]
+    },
+    {
+      "image": "assets/images/products/未命名 (Facebook 影片) (1).jpg",
+      "name": "花生OREO千層",
+      "name_en": "",
+      "prices": {
+        "size6": "1480",
+        "size8": "2580",
+        "slice": "250"
+      },
+      "description": "OREO\n花生醬 \nMINI OREO",
+      "description_en": "",
+      "tags": [
+        "奶蛋素"
+      ]
     }
   ]
 }
