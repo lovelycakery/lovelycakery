@@ -356,16 +356,15 @@
       const imageWrapper = document.createElement('div');
       imageWrapper.className = 'gallery-image-wrapper';
       const img = document.createElement('img');
-      img.src = imageSrc;
-      // 手機用小圖（sm/），桌面用原圖
+      // 先不設 src，由 IntersectionObserver 觸發載入
+      img.dataset.src = imageSrc;
       if (!item._previewUrl && imageSrc.includes('/products/')) {
         const smSrc = imageSrc.replace('/products/', '/products/sm/');
-        img.srcset = smSrc + ' 600w, ' + imageSrc + ' 1200w';
-        img.sizes = '(max-width: 768px) 50vw, 600px';
+        img.dataset.srcset = smSrc + ' 600w, ' + imageSrc + ' 1200w';
+        img.dataset.sizes = '(max-width: 768px) 50vw, 600px';
       }
       img.alt = imageAlt;
       img.className = 'gallery-image';
-      img.loading = 'lazy';
       img.decoding = 'async';
       img.width = 1200;
       img.height = 1200;
@@ -678,6 +677,24 @@
       return;
     }
     renderGallery(items, container);
+
+    // 用 IntersectionObserver 控制圖片載入，避免同時發出太多請求
+    const lazyImages = container.querySelectorAll('img[data-src]');
+    const imageObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const img = entry.target;
+          img.src = img.dataset.src;
+          if (img.dataset.srcset) {
+            img.srcset = img.dataset.srcset;
+            img.sizes = img.dataset.sizes;
+          }
+          imageObserver.unobserve(img);
+        }
+      });
+    }, { rootMargin: '200px' });
+
+    lazyImages.forEach(img => imageObserver.observe(img));
   }
 
   // 注入選取狀態的 CSS 樣式（僅在 admin 模式下）
