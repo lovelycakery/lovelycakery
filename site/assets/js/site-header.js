@@ -34,7 +34,7 @@
   function renderNavItems(currentPage) {
     const items = [
       { href: 'index.html', zh: '首頁', en: 'HOME', isIcon: true, iconType: 'home' },
-      { href: 'calendar.html', zh: '日曆', en: 'CALENDAR', isIcon: true, iconType: 'calendar' },
+      { href: 'calendar.html', zh: '月曆', en: 'CALENDAR' },
       { href: 'seasonal.html', zh: '季節限定', en: 'SEASONAL' },
       { href: 'all-items.html', zh: '全部品項', en: 'ALL ITEMS' },
       { href: 'order.html', zh: '訂購說明', en: 'ORDER' },
