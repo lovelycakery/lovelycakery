@@ -1490,9 +1490,12 @@
         });
       });
       if (calMissing > 0 || imgMissing > 0) {
-        logStatus('⚠️ 偵測到缺漏欄位：月曆 ' + calMissing + ' 項，商品 ' + imgMissing + ' 項（點對應頁面的「檢查所有欄位」查看詳情）');
+        var parts = [];
+        if (calMissing > 0) parts.push('月曆 ' + calMissing + ' 項');
+        if (imgMissing > 0) parts.push('商品 ' + imgMissing + ' 項');
+        showError('偵測到缺漏欄位：' + parts.join('、') + '（點對應頁面的「檢查所有欄位」查看詳情）');
       } else {
-        logStatus('✅ 欄位檢查通過：無缺漏');
+        showSuccess('欄位檢查通過：無缺漏');
       }
     }, 600);
   }
