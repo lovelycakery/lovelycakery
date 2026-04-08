@@ -7,7 +7,9 @@
         {
           "text": "本週切片口味",
           "color": "#0066cc",
-          "detail": "花生OREO/ 檸檬草莓/ 抹茶乳酪/ 芝麻花園"
+          "detail": "花生OREO/ 檸檬草莓/ 抹茶乳酪/ 芝麻花園",
+          "text_en": "Slice flavors",
+          "detail_en": "Peanut OREO / Lemongrass Strawberry / Matcha Cheese / Sesame Garden"
         }
       ]
     },
@@ -16,7 +18,8 @@
       "items": [
         {
           "text": "休息",
-          "color": "#cc0000"
+          "color": "#cc0000",
+          "text_en": "Closed"
         }
       ]
     },
@@ -25,7 +28,8 @@
       "items": [
         {
           "text": "休息",
-          "color": "#cc0000"
+          "color": "#cc0000",
+          "text_en": "Closed"
         }
       ]
     },
@@ -34,7 +38,8 @@
       "items": [
         {
           "text": "休息",
-          "color": "#cc0000"
+          "color": "#cc0000",
+          "text_en": "Closed"
         }
       ]
     },
@@ -43,7 +48,8 @@
       "items": [
         {
           "text": "休息",
-          "color": "#cc0000"
+          "color": "#cc0000",
+          "text_en": "Closed"
         }
       ]
     },
@@ -52,12 +58,15 @@
       "items": [
         {
           "text": "切片優惠組合",
-          "color": "#e67700"
+          "color": "#e67700",
+          "text_en": "Slice Combos"
         },
         {
           "text": "本周切片口味",
           "color": "#0066cc",
-          "detail": "隱藏版新口味/ 玫瑰乳酪/ 早春/ 微醺栗香/ 檸檬藍莓/ 杏仁茶"
+          "detail": "隱藏版新口味/ 玫瑰乳酪/ 早春/ 微醺栗香/ 檸檬藍莓/ 杏仁茶",
+          "text_en": "Slice flavors",
+          "detail_en": "Hidden new flavor / Rose cheese / Early spring / Tipsy chestnut / Lemon blueberry / Almond tea"
         }
       ]
     },
@@ -66,7 +75,8 @@
       "items": [
         {
           "text": "10am -2pm",
-          "color": "#1a8a1a"
+          "color": "#1a8a1a",
+          "text_en": "10am - 2pm"
         }
       ]
     },
@@ -75,7 +85,8 @@
       "items": [
         {
           "text": "10am -2pm",
-          "color": "#1a8a1a"
+          "color": "#1a8a1a",
+          "text_en": "10am - 2pm"
         }
       ]
     },
@@ -84,7 +95,8 @@
       "items": [
         {
           "text": "休息",
-          "color": "#cc0000"
+          "color": "#cc0000",
+          "text_en": "Closed"
         }
       ]
     },
@@ -93,7 +105,8 @@
       "items": [
         {
           "text": "切片優惠組合",
-          "color": "#e67700"
+          "color": "#e67700",
+          "text_en": "Slice combo"
         }
       ]
     },
@@ -102,7 +115,8 @@
       "items": [
         {
           "text": "10am -2pm",
-          "color": "#1a8a1a"
+          "color": "#1a8a1a",
+          "text_en": "10am–2pm"
         }
       ]
     },
@@ -111,7 +125,8 @@
       "items": [
         {
           "text": "10am -2pm",
-          "color": "#1a8a1a"
+          "color": "#1a8a1a",
+          "text_en": "10am - 2pm"
         }
       ]
     },
@@ -120,7 +135,8 @@
       "items": [
         {
           "text": "休息",
-          "color": "#cc0000"
+          "color": "#cc0000",
+          "text_en": "Closed"
         }
       ]
     },
@@ -129,7 +145,8 @@
       "items": [
         {
           "text": "切片優惠組合",
-          "color": "#e67700"
+          "color": "#e67700",
+          "text_en": "Slice combos"
         }
       ]
     },
@@ -138,7 +155,8 @@
       "items": [
         {
           "text": "10am -2pm",
-          "color": "#1a8a1a"
+          "color": "#1a8a1a",
+          "text_en": "10am-2pm"
         }
       ]
     },
@@ -147,7 +165,8 @@
       "items": [
         {
           "text": "10am -2pm",
-          "color": "#1a8a1a"
+          "color": "#1a8a1a",
+          "text_en": "10am–2pm"
         }
       ]
     },
@@ -156,7 +175,8 @@
       "items": [
         {
           "text": "休息",
-          "color": "#cc0000"
+          "color": "#cc0000",
+          "text_en": "Closed"
         }
       ]
     },
@@ -165,7 +185,8 @@
       "items": [
         {
           "text": "切片優惠組合",
-          "color": "#e67700"
+          "color": "#e67700",
+          "text_en": "Slice combo"
         }
       ]
     }
