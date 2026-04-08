@@ -30,6 +30,7 @@ index.html / calendar.html / seasonal.html / all-items.html / order.html / conta
 ## 開發注意事項
 
 - 變更後跑 `./check.sh` 確認無問題
+- 改到 `styles.css` 或其他日曆會引用的共用資源時，`check.sh` 會要求 bump 日曆 cache 版本，請跑 `./bump-calendar-cache.sh` 再部署
 - 新增/替換圖片先跑 `python3 scripts/optimize_images.py --only-changed`
 - 語言同步用 postMessage，不要用 setInterval 輪詢
 - `image-protection.js` 會攔截 IMG dragstart，編輯模式的拖曳在 `gallery-loader.js` 內處理衝突
