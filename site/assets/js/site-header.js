@@ -173,7 +173,7 @@
 
   function ensureGoogleFonts() {
     if (document.querySelector('link[href*="fonts.googleapis.com/css2"]')) return;
-    var fontsUrl = 'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500&display=swap';
+    var fontsUrl = 'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;700&display=swap';
     // preconnect
     ['https://fonts.googleapis.com', 'https://fonts.gstatic.com'].forEach(function (origin) {
       if (document.querySelector('link[href="' + origin + '"]')) return;

@@ -1327,6 +1327,16 @@ img {
 .order-list li {
     margin-bottom: 6px;
 }
+.order-list li.is-bold {
+    font-weight: 600;
+    color: #3d2817;
+}
+.order-list strong,
+.order-qa strong,
+.order-text strong {
+    font-weight: 700;
+    color: #3d2817;
+}
 
 /* 用 ✱ 取代圓點的條列樣式 */
 .order-list--star {
