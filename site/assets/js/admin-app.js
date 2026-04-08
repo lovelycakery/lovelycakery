@@ -1335,6 +1335,67 @@
       }
     });
 
+    // Translate all calendar items across all dates that don't yet have text_en
+    $('translateAllCalendarBtn').addEventListener('click', async function () {
+      if (!window.AdminTranslate || !AdminTranslate.hasApiKey()) {
+        alert('請先點右上角「AI」按鈕設定 Claude API Key');
+        return;
+      }
+      // 先把當前編輯中的列存回 state，避免遺失尚未儲存的修改
+      if (state.selectedDate) {
+        try { saveCalendarEvent(); } catch (_) { /* */ }
+      }
+      var data = state.calendarData;
+      if (!data || !Array.isArray(data.events)) { alert('沒有月曆資料'); return; }
+
+      // 範圍：當前選取日期所在的月份；若未選取則用今天
+      var refDate = state.selectedDate || (new Date()).toISOString().slice(0, 10);
+      var monthPrefix = refDate.slice(0, 7); // YYYY-MM
+
+      // 收集當月缺英文的項目
+      var pending = [];
+      data.events.forEach(function (ev) {
+        if (!ev || !Array.isArray(ev.items)) return;
+        if (typeof ev.date !== 'string' || ev.date.slice(0, 7) !== monthPrefix) return;
+        ev.items.forEach(function (item, idx) {
+          if (item && item.text && !item.text_en) {
+            pending.push({ ev: ev, item: item, idx: idx });
+          }
+        });
+      });
+      if (pending.length === 0) { alert(monthPrefix + ' 沒有需要翻譯的項目'); return; }
+      if (!confirm('將翻譯 ' + monthPrefix + ' 的 ' + pending.length + ' 個項目，確定？')) return;
+
+      var btn = $('translateAllCalendarBtn');
+      var orig = btn.textContent;
+      btn.disabled = true;
+      var done = 0, failed = 0;
+      for (var i = 0; i < pending.length; i++) {
+        var p = pending[i];
+        btn.textContent = '翻譯中… ' + (i + 1) + '/' + pending.length;
+        try {
+          var result = await AdminTranslate.translateCalendar(p.item.text || '', p.item.detail || '');
+          if (result.text_en) p.item.text_en = result.text_en;
+          if (result.detail_en) p.item.detail_en = result.detail_en;
+          done++;
+        } catch (e) {
+          failed++;
+          logStatus('❌ 翻譯失敗：' + (p.item.text || '') + ' — ' + (e.message || String(e)));
+        }
+      }
+      btn.disabled = false;
+      btn.textContent = orig;
+
+      // 標記為 dirty 並重新整理當前列
+      dirty.calendar = true;
+      updatePublishButton();
+      sendCalendarDataToPreview();
+      if (state.selectedDate) setSelectedDate(state.selectedDate);
+
+      logStatus('✅ AI 翻譯完成：成功 ' + done + ' / 失敗 ' + failed);
+      alert('完成：成功 ' + done + '，失敗 ' + failed + '\n記得按「發布」才會上線');
+    });
+
     // Publish button
     $('publishBtn').addEventListener('click', publish);
 
