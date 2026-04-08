@@ -340,3 +340,14 @@ tags 允許值：`奶蛋素`、`無咖啡因`、`含酒精`、`可宅配`
 ### 修改圖片壓縮參數
 
 改 `admin-image-compress.js` 頂部常數：`MAX_DIMENSION`、`QUALITY_HIGH`、`QUALITY_LOW`、`SIZE_THRESHOLD`
+
+---
+
+## 暫時隱藏的內容
+
+### 訂購說明 — 匯款資料 section
+
+`site/order.html` 內的 `#payment` section（台新銀行 812-28881013902388）目前用 HTML 註解 `<!-- ... -->` 包起來，並在標籤列也移除對應的 tag。內容完整保留，要恢復只要：
+
+1. 拿掉 `site/order.html` 裡 `<!-- 匯款資料... -->` 與對應 `-->` 註解標記
+2. 把 `<a class="order-tag" href="#payment" ...>匯款資料</a>` 加回 `.order-tags` 導覽列

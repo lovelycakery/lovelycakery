@@ -1387,12 +1387,27 @@ img {
     font-weight: 300;
 }
 
-.order-map {
+.contact-info {
+    margin: 28px auto 0;
+    max-width: 560px;
+    text-align: center;
+}
+
+.contact-info-line {
+    margin: 0 0 8px;
+    font-family: 'Inter', 'Noto Sans TC', sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    font-weight: 300;
+    color: #5a4030;
+}
+
+.contact-walking-map {
     display: block;
     width: 100%;
     max-width: 420px;
     height: auto;
-    margin: 18px auto 0;
+    margin: 24px auto 0;
     border-radius: 14px;
     box-shadow: 0 6px 20px rgba(61, 40, 23, 0.1);
 }
