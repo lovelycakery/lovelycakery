@@ -1328,11 +1328,89 @@ img {
     margin-bottom: 6px;
 }
 
+/* 用 ✱ 取代圓點的條列樣式 */
+.order-list--star {
+    list-style: none;
+    padding-left: 4px;
+}
+.order-list--star li {
+    position: relative;
+    padding-left: 22px;
+    margin-bottom: 12px;
+}
+.order-list--star li::before {
+    content: "✱";
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: #87c094;
+    font-size: 14px;
+    line-height: 1.85;
+}
+.order-list--star a {
+    color: #5fa372;
+    text-decoration: underline;
+}
+
+/* Q&A 區塊 */
+.order-qa {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px dashed rgba(95, 163, 114, 0.35);
+}
+.order-qa:first-of-type {
+    border-top: none;
+    padding-top: 0;
+    margin-top: 6px;
+}
+.order-qa__q {
+    margin: 0 0 6px;
+    font-family: 'Inter', 'Noto Sans TC', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: #3d2817;
+    line-height: 1.5;
+}
+.order-qa__a {
+    margin: 0 0 6px;
+    font-family: 'Inter', 'Noto Sans TC', sans-serif;
+    font-size: 15px;
+    line-height: 1.85;
+    font-weight: 300;
+    color: #5a4030;
+}
+.order-qa__a a,
+.order-link {
+    color: #5fa372;
+    text-decoration: underline;
+}
+.order-link:hover { color: #3d7a4f; }
+
 .order-hours-title {
     margin: 18px 0 6px;
     font-weight: 500;
     color: #3d2817;
     font-size: 16px;
+}
+
+/* 大型子標題（宅配分頁的三段）：置中、底下有金黃漸層細線 */
+.order-subhead {
+    margin: 36px 0 16px;
+    padding: 0 0 10px;
+    font-family: 'Inter', 'Noto Sans TC', sans-serif;
+    font-size: 19px;
+    font-weight: 600;
+    color: #3d2817;
+    text-align: center;
+    line-height: 1.4;
+    position: relative;
+    letter-spacing: 0.5px;
+}
+.order-subhead::before { content: "✿  "; color: #87c094; }
+.order-subhead::after  { content: "  ✿"; color: #87c094; }
+.order-subhead + ul,
+.order-subhead + .order-qa {
+    margin-top: 0;
 }
 
 .order-price-list {
@@ -1421,6 +1499,35 @@ img {
     letter-spacing: 0.2px;
 }
 
+/* 各分頁淺色條紋變化 */
+#example.order-section {
+    background-image: repeating-linear-gradient(
+        90deg,
+        #fff7f2 0,
+        #fff7f2 28px,
+        #fcebe1 28px,
+        #fcebe1 56px
+    );
+    border-color: #f6dccb;
+}
+#example.order-section::before {
+    background: linear-gradient(to right, #e8a585, #d6845e);
+}
+
+#addons.order-section {
+    background-image: repeating-linear-gradient(
+        90deg,
+        #fff4f7 0,
+        #fff4f7 28px,
+        #fce6ed 28px,
+        #fce6ed 56px
+    );
+    border-color: #f4cdd8;
+}
+#addons.order-section::before {
+    background: linear-gradient(to right, #e89bb0, #d57691);
+}
+
 #shipping.order-section {
     background-image: repeating-linear-gradient(
         90deg,
@@ -1431,9 +1538,22 @@ img {
     );
     border-color: #c9dcf0;
 }
-
 #shipping.order-section::before {
     background: linear-gradient(to right, #8fb8e0, #6a9bd1);
+}
+
+#delivery.order-section {
+    background-image: repeating-linear-gradient(
+        90deg,
+        #e8f3eb 0,
+        #e8f3eb 28px,
+        #d4ebda 28px,
+        #d4ebda 56px
+    );
+    border-color: #b8dac1;
+}
+#delivery.order-section::before {
+    background: linear-gradient(to right, #87c094, #5fa372);
 }
 
 .order-qrcode {
