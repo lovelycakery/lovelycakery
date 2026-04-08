@@ -1140,6 +1140,27 @@
 
   // ── Validation ────────────────────────────────────────────────────
 
+  function collectCalendarMissing() {
+    var missing = [];
+    var data = state.calendarData;
+    if (!data || !Array.isArray(data.events)) return missing;
+    data.events.forEach(function (ev) {
+      if (!ev || !Array.isArray(ev.items)) return;
+      ev.items.forEach(function (item) {
+        if (!item || !item.text) return;
+        var mf = [];
+        if (!item.text_en || !item.text_en.trim()) mf.push('英文標籤');
+        if (item.detail && item.detail.trim() && (!item.detail_en || !item.detail_en.trim())) mf.push('英文詳細');
+        if (mf.length > 0) missing.push({ type: '月曆 ' + ev.date, name: item.text, required: [], fields: mf });
+      });
+    });
+    return missing;
+  }
+
+  function checkAllCalendarFields() {
+    showCheckResultModal(collectCalendarMissing());
+  }
+
   function checkAllFields() {
     var missing = [];
     ['seasonal', 'products'].forEach(function (type) {
@@ -1226,6 +1247,10 @@
       || (location.protocol === 'file:' && (e.origin === 'null' || e.origin === 'file://'));
     if (!sameOrigin) return;
     if (!e.data || typeof e.data !== 'object' || !e.data.type) return;
+    if (e.data.type === 'calendar-month-changed' && typeof e.data.month === 'string') {
+      state.previewMonth = e.data.month;
+      return;
+    }
     if (e.data.type === 'gallery-reorder') {
       var type = state.currentTab === 'seasonal' ? 'seasonal' : 'products';
       if (typeof e.data.fromIndex === 'number' && typeof e.data.toIndex === 'number') reorderImages(type, e.data.fromIndex, e.data.toIndex);
@@ -1274,6 +1299,7 @@
     $('imageEditDeleteBtn').addEventListener('click', function () {
       if (state.currentTab === 'seasonal' || state.currentTab === 'products') deleteImage(state.currentTab, state.editingImageIndex);
     });
+    $('checkCalendarFieldsBtn').addEventListener('click', checkAllCalendarFields);
     $('checkEnglishBtn').addEventListener('click', function () {
       // Ensure data is loaded
       if (!state.imageData.seasonal.items.length && !dirty.seasonal) loadImageData('seasonal');
@@ -1348,9 +1374,10 @@
       var data = state.calendarData;
       if (!data || !Array.isArray(data.events)) { alert('沒有月曆資料'); return; }
 
-      // 範圍：當前選取日期所在的月份；若未選取則用今天
-      var refDate = state.selectedDate || (new Date()).toISOString().slice(0, 10);
-      var monthPrefix = refDate.slice(0, 7); // YYYY-MM
+      // 範圍：iframe 預覽當前顯示的月份（fallback：選取日期 → 今天）
+      var monthPrefix = state.previewMonth
+        || (state.selectedDate && state.selectedDate.slice(0, 7))
+        || (new Date()).toISOString().slice(0, 7);
 
       // 收集當月缺英文的項目
       var pending = [];
@@ -1453,6 +1480,25 @@
     switchTab('calendar');
     switchMode('edit');
     updatePublishButton();
+
+    // 開啟編輯頁時自動檢查所有欄位，有缺則跳出提醒
+    setTimeout(function () {
+      var missing = [];
+      try { missing = collectCalendarMissing(); } catch (_) { /* */ }
+      ['seasonal', 'products'].forEach(function (type) {
+        (state.imageData[type].items || []).forEach(function (item) {
+          var mf = [], mr = [];
+          if (!item.name || !item.name.trim()) mr.push('名稱');
+          if (!item.name_en || !item.name_en.trim()) mf.push('名稱 (英文)');
+          var hasPrices = item.prices && (item.prices.size6 || item.prices.size8 || item.prices.slice);
+          if (!hasPrices) mf.push('價格');
+          if (!item.description || !item.description.trim()) mf.push('描述');
+          if (!item.description_en || !item.description_en.trim()) mf.push('描述 (英文)');
+          if (mr.length > 0 || mf.length > 0) missing.push({ type: type === 'seasonal' ? '季節限定' : '全部品項', name: item.name || '未命名', required: mr, fields: mf });
+        });
+      });
+      if (missing.length > 0) showCheckResultModal(missing);
+    }, 600);
   }
 
   // ── Boot ──────────────────────────────────────────────────────────

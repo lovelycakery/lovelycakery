@@ -146,6 +146,12 @@ class CalendarWidgetReadonly {
         const year = this.currentDate.getFullYear();
         const month = this.currentDate.getMonth();
 
+        // 通知父頁目前顯示的月份（admin 用來決定批次翻譯範圍）
+        try {
+            const monthStr = year + '-' + String(month + 1).padStart(2, '0');
+            window.parent.postMessage({ type: 'calendar-month-changed', month: monthStr }, '*');
+        } catch (_) { /* ignore */ }
+
         const currentLang = localStorage.getItem('language') || 'zh';
         const monthYearEl = document.getElementById('monthYear');
         if (monthYearEl) {
