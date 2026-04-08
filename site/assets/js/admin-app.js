@@ -1324,25 +1324,26 @@
       }
     });
 
-    // Translate button
-    $('translateBtn').addEventListener('click', async function () {
+    // 通用：翻譯單一欄位（名稱或描述）
+    async function runFieldTranslate(btnId, srcInputId, dstInputId, srcKind) {
       if (!AdminTranslate.hasApiKey()) {
         alert('請先點右上角「AI」按鈕設定 Claude API Key');
         return;
       }
-      var zhName = $('imageNameInput').value.trim();
-      var zhDesc = $('imageDescInput').value.trim();
-      if (!zhName && !zhDesc) { alert('請先填寫中文名稱或描述'); return; }
-
-      var btn = $('translateBtn');
+      var src = $(srcInputId).value.trim();
+      if (!src) { alert('請先填寫中文' + (srcKind === 'name' ? '名稱' : '描述')); return; }
+      var btn = $(btnId);
       var origText = btn.textContent;
       btn.disabled = true;
       btn.textContent = '翻譯中…';
       try {
-        var result = await AdminTranslate.translate(zhName, zhDesc);
-        if (result.name_en) $('imageNameEnInput').value = result.name_en;
-        if (result.description_en) $('imageDescEnInput').value = result.description_en;
-        logStatus('✅ AI 翻譯完成：' + (result.name_en || ''));
+        var result = await AdminTranslate.translate(
+          srcKind === 'name' ? src : '',
+          srcKind === 'desc' ? src : ''
+        );
+        var out = srcKind === 'name' ? result.name_en : result.description_en;
+        if (out) $(dstInputId).value = out;
+        logStatus('✅ AI 翻譯完成：' + (out || ''));
       } catch (e) {
         alert('翻譯失敗：' + (e.message || String(e)));
         logStatus('❌ 翻譯失敗：' + (e.message || String(e)));
@@ -1350,6 +1351,13 @@
         btn.disabled = false;
         btn.textContent = origText;
       }
+    }
+
+    $('translateBtn').addEventListener('click', function () {
+      runFieldTranslate('translateBtn', 'imageNameInput', 'imageNameEnInput', 'name');
+    });
+    $('translateDescBtn').addEventListener('click', function () {
+      runFieldTranslate('translateDescBtn', 'imageDescInput', 'imageDescEnInput', 'desc');
     });
 
     // Translate all calendar items across all dates that don't yet have text_en

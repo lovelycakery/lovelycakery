@@ -253,7 +253,7 @@ class CalendarWidgetReadonly {
                 const displayText = (lang === 'en' && item.text_en) ? item.text_en : (item.text || '');
                 itemEl.textContent = displayText;
                 if (item.color) itemEl.style.color = item.color;
-                // hover 顯示：標題（大字）＋ detail（深色）
+                // 桌面 hover：顯示單項詳情
                 if (displayText) {
                     const tooltipHtml = this.buildItemTooltipHtml(item);
                     itemEl.addEventListener('mouseenter', (e) => {
@@ -262,17 +262,42 @@ class CalendarWidgetReadonly {
                     itemEl.addEventListener('mouseleave', () => {
                         if (this._tooltipAnchorEl === itemEl) this.hideTooltip();
                     });
-                    // 手機 click
-                    itemEl.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        this.toggleTooltip(itemEl, tooltipHtml);
-                    });
                 }
                 itemsContainer.appendChild(itemEl);
             });
             dayEl.appendChild(itemsContainer);
+
+            // 點擊整個日期格 → 顯示當天所有項目（手機與桌面通用），會持續直到外部點擊
+            const dayTooltipHtml = this.buildDayTooltipHtml(eventData);
+            dayEl.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.toggleTooltip(dayEl, dayTooltipHtml);
+            });
         }
         container.appendChild(dayEl);
+    }
+
+    buildDayTooltipHtml(eventData) {
+        const lang = localStorage.getItem('language') || 'zh';
+        const items = (eventData && Array.isArray(eventData.items)) ? eventData.items : [];
+        if (items.length === 0) return '';
+        let html = '';
+        items.forEach((item, i) => {
+            const titleColor = item.color || 'var(--cal-ink)';
+            const title = (lang === 'en' && item.text_en) ? item.text_en : (item.text || '');
+            const detail = (lang === 'en' && item.detail_en) ? item.detail_en : (item.detail || '');
+            if (!title) return;
+            const sep = i > 0 ? 'margin-top:10px;padding-top:10px;border-top:1px solid rgba(0,0,0,0.08);' : '';
+            html += '<div style="' + sep + '">'
+                + '<div style="font-size:16px;font-weight:700;color:' + titleColor + ';line-height:1.4;">'
+                + this.escapeHtml(title) + '</div>';
+            if (detail && detail.trim()) {
+                html += '<div style="margin-top:3px;font-size:13px;font-weight:500;color:var(--cal-ink);line-height:1.5;">'
+                    + this.escapeHtml(detail) + '</div>';
+            }
+            html += '</div>';
+        });
+        return html;
     }
 
     buildItemTooltipHtml(item) {
