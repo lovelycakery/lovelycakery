@@ -33,12 +33,12 @@
 
   function renderNavItems(currentPage) {
     const items = [
-      { href: 'index.html', zh: '首頁', en: 'HOME', isIcon: true, iconType: 'home' },
-      { href: 'calendar.html', zh: '月曆', en: 'CALENDAR' },
-      { href: 'seasonal.html', zh: '季節限定', en: 'SEASONAL' },
-      { href: 'all-items.html', zh: '全部品項', en: 'ALL ITEMS' },
-      { href: 'order.html', zh: '訂購說明', en: 'ORDER' },
-      { href: 'contact.html', zh: '地圖', en: 'MAP' },
+      { href: 'index.html', zh: '首頁', en: 'Home', isIcon: true, iconType: 'home' },
+      { href: 'calendar.html', zh: '月曆', en: 'Calendar' },
+      { href: 'seasonal.html', zh: '季節限定', en: 'Season' },
+      { href: 'all-items.html', zh: '全部品項', en: 'Menu' },
+      { href: 'order.html', zh: '訂購說明', en: 'Order' },
+      { href: 'contact.html', zh: '地圖', en: 'Map' },
     ];
 
     const parts = [];
