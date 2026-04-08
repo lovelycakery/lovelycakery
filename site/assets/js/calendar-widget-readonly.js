@@ -240,13 +240,15 @@ class CalendarWidgetReadonly {
             // 渲染格內文字
             const itemsContainer = document.createElement('div');
             itemsContainer.className = 'event-items';
+            const lang = localStorage.getItem('language') || 'zh';
             items.forEach((item) => {
                 const itemEl = document.createElement('div');
                 itemEl.className = 'event-item';
-                itemEl.textContent = item.text || '';
+                const displayText = (lang === 'en' && item.text_en) ? item.text_en : (item.text || '');
+                itemEl.textContent = displayText;
                 if (item.color) itemEl.style.color = item.color;
                 // hover 顯示：標題（大字）＋ detail（深色）
-                if (item.text) {
+                if (displayText) {
                     const tooltipHtml = this.buildItemTooltipHtml(item);
                     itemEl.addEventListener('mouseenter', (e) => {
                         this.showTooltip(e, tooltipHtml);
@@ -268,12 +270,15 @@ class CalendarWidgetReadonly {
     }
 
     buildItemTooltipHtml(item) {
+        const lang = localStorage.getItem('language') || 'zh';
         const titleColor = item.color || 'var(--cal-ink)';
+        const title = (lang === 'en' && item.text_en) ? item.text_en : (item.text || '');
+        const detail = (lang === 'en' && item.detail_en) ? item.detail_en : (item.detail || '');
         let html = '<div style="font-size:17px;font-weight:700;color:' + titleColor + ';line-height:1.4;">'
-            + this.escapeHtml(item.text) + '</div>';
-        if (item.detail && item.detail.trim()) {
+            + this.escapeHtml(title) + '</div>';
+        if (detail && detail.trim()) {
             html += '<div style="margin-top:4px;font-size:14px;font-weight:500;color:var(--cal-ink);line-height:1.5;">'
-                + this.escapeHtml(item.detail) + '</div>';
+                + this.escapeHtml(detail) + '</div>';
         }
         return html;
     }

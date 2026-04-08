@@ -449,6 +449,59 @@
     detailInput.style.cssText = 'font-size:12px;color:#6b5d4f;';
     row.appendChild(detailInput);
 
+    // 第四行：英文標籤 + AI 翻譯按鈕
+    var enRow = document.createElement('div');
+    enRow.style.cssText = 'display:flex;align-items:center;gap:6px;margin-top:2px;';
+
+    var textEnInput = document.createElement('input');
+    textEnInput.type = 'text';
+    textEnInput.className = 'cal-item-text-en input';
+    textEnInput.value = item.text_en || '';
+    textEnInput.placeholder = 'Display text (EN)';
+    textEnInput.style.cssText = 'flex:1;font-size:12px;';
+
+    var translateBtn = document.createElement('button');
+    translateBtn.type = 'button';
+    translateBtn.className = 'btn btn-sm btn-translate';
+    translateBtn.textContent = 'AI 翻譯';
+    translateBtn.title = '用 Claude AI 自動翻譯';
+    translateBtn.style.cssText = 'flex-shrink:0;font-size:11px;padding:3px 8px;';
+    translateBtn.addEventListener('click', async function () {
+      if (!window.AdminTranslate || !AdminTranslate.hasApiKey()) {
+        alert('請先點右上角「AI」按鈕設定 Claude API Key');
+        return;
+      }
+      var zhText = textInput.value.trim();
+      var zhDetail = detailInput.value.trim();
+      if (!zhText && !zhDetail) { alert('請先填寫中文標籤或詳細說明'); return; }
+      var orig = translateBtn.textContent;
+      translateBtn.disabled = true;
+      translateBtn.textContent = '翻譯中…';
+      try {
+        var result = await AdminTranslate.translateCalendar(zhText, zhDetail);
+        if (result.text_en) textEnInput.value = result.text_en;
+        if (result.detail_en) detailEnInput.value = result.detail_en;
+      } catch (e) {
+        alert('翻譯失敗：' + (e.message || String(e)));
+      } finally {
+        translateBtn.disabled = false;
+        translateBtn.textContent = orig;
+      }
+    });
+
+    enRow.appendChild(textEnInput);
+    enRow.appendChild(translateBtn);
+    row.appendChild(enRow);
+
+    // 第五行：英文詳細說明
+    var detailEnInput = document.createElement('input');
+    detailEnInput.type = 'text';
+    detailEnInput.className = 'cal-item-detail-en input';
+    detailEnInput.value = item.detail_en || '';
+    detailEnInput.placeholder = 'Hover detail (EN, optional)';
+    detailEnInput.style.cssText = 'font-size:11px;color:#6b5d4f;';
+    row.appendChild(detailEnInput);
+
     // color picker 變更時同步 swatch 選取狀態
     colorInput.addEventListener('input', function () {
       swatchRow.querySelectorAll('span').forEach(function (s) { s.style.borderColor = 'transparent'; });
@@ -495,6 +548,12 @@
       var obj = { text: text, color: colorEl ? colorEl.value : '#6b5d4f' };
       var detail = detailEl ? detailEl.value.trim() : '';
       if (detail) obj.detail = detail;
+      var textEnEl = rows[i].querySelector('.cal-item-text-en');
+      var detailEnEl = rows[i].querySelector('.cal-item-detail-en');
+      var textEn = textEnEl ? textEnEl.value.trim() : '';
+      var detailEn = detailEnEl ? detailEnEl.value.trim() : '';
+      if (textEn) obj.text_en = textEn;
+      if (detailEn) obj.detail_en = detailEn;
       items.push(obj);
     }
     return items;

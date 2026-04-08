@@ -89,11 +89,68 @@
     };
   }
 
+  /**
+   * Translate calendar item text (short label + optional detail).
+   * @param {string} zhText - short label, e.g. 「休息」
+   * @param {string} zhDetail - longer detail, e.g. 「花生OREO/檸檬草莓」
+   * @returns {Promise<{text_en: string, detail_en: string}>}
+   */
+  async function translateCalendar(zhText, zhDetail) {
+    var key = getApiKey();
+    if (!key) throw new Error('請先設定 Claude API Key');
+    var parts = [];
+    if (zhText) parts.push('標籤：' + zhText);
+    if (zhDetail) parts.push('詳細：' + zhDetail);
+    if (parts.length === 0) throw new Error('沒有需要翻譯的內容');
+
+    var systemPrompt = '你是蛋糕甜點店月曆翻譯助手。將繁體中文的月曆短標籤與詳細說明翻譯成自然簡潔的英文。' +
+      '標籤要極簡（1–4 個字，例如「休息」→「Closed」、「本週切片口味」→「Slice flavors」），' +
+      '詳細說明要忠於原意但通順。' +
+      '只回傳 JSON，格式：{"text_en":"...","detail_en":"..."}' +
+      '如果只有標籤沒有詳細，detail_en 留空字串。';
+
+    var res = await fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        max_tokens: 256,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: parts.join('\n') }],
+      }),
+    });
+
+    if (!res.ok) {
+      var errBody = '';
+      try { errBody = (await res.json()).error.message; } catch (_) { /* */ }
+      if (res.status === 401) throw new Error('Claude API Key 無效，請重新設定');
+      if (res.status === 429) throw new Error('API 額度已用盡或請求過於頻繁，請稍後再試');
+      if (res.status === 403) throw new Error('API Key 權限不足，請確認 Key 是否正確');
+      throw new Error('翻譯失敗 (' + res.status + ')' + (errBody ? '：' + errBody : ''));
+    }
+
+    var data = await res.json();
+    var text = data.content && data.content[0] && data.content[0].text || '';
+    var jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('翻譯回傳格式異常');
+    var result = JSON.parse(jsonMatch[0]);
+    return {
+      text_en: result.text_en || '',
+      detail_en: result.detail_en || '',
+    };
+  }
+
   window.AdminTranslate = {
     getApiKey: getApiKey,
     setApiKey: setApiKey,
     clearApiKey: clearApiKey,
     hasApiKey: hasApiKey,
     translate: translate,
+    translateCalendar: translateCalendar,
   };
 })();
