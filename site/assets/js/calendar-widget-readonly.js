@@ -253,16 +253,6 @@ class CalendarWidgetReadonly {
                 const displayText = (lang === 'en' && item.text_en) ? item.text_en : (item.text || '');
                 itemEl.textContent = displayText;
                 if (item.color) itemEl.style.color = item.color;
-                // 桌面 hover：顯示單項詳情
-                if (displayText) {
-                    const tooltipHtml = this.buildItemTooltipHtml(item);
-                    itemEl.addEventListener('mouseenter', (e) => {
-                        this.showTooltip(e, tooltipHtml);
-                    });
-                    itemEl.addEventListener('mouseleave', () => {
-                        if (this._tooltipAnchorEl === itemEl) this.hideTooltip();
-                    });
-                }
                 itemsContainer.appendChild(itemEl);
             });
             dayEl.appendChild(itemsContainer);
