@@ -16,6 +16,60 @@
 .cal-item-color::-webkit-color-swatch { border: none; border-radius: 50%; }
 .cal-item-color::-moz-color-swatch { border: none; border-radius: 50%; }
 
+/* Calendar item editor row */
+.cal-item-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  margin-bottom: 6px;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 8px;
+  position: relative;
+}
+.cal-item-row__top { display: flex; align-items: center; gap: 6px; }
+.cal-item-row__en  { display: flex; align-items: center; gap: 6px; margin-top: 2px; }
+.cal-item-row__swatches { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+
+.cal-item-color {
+  width: 28px;
+  height: 28px;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  cursor: pointer;
+  padding: 1px;
+  flex-shrink: 0;
+}
+.cal-item-text { flex: 1; font-size: 13px; }
+.cal-item-text-en { flex: 1; font-size: 12px; }
+.cal-item-detail { font-size: 12px; color: #6b5d4f; }
+.cal-item-detail-en { font-size: 11px; color: #6b5d4f; }
+
+.cal-item-remove {
+  flex-shrink: 0;
+  padding: 2px 7px;
+  font-size: 12px;
+  color: var(--danger);
+}
+
+.cal-item-translate {
+  flex-shrink: 0;
+  font-size: 11px;
+  padding: 3px 8px;
+}
+
+.cal-item-swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  transition: border-color 0.15s;
+}
+.cal-item-swatch.is-selected { border-color: rgba(47, 31, 20, 0.5); }
+
 *, *::before, *::after {
   box-sizing: border-box;
 }

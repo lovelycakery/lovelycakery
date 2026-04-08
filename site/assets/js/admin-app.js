@@ -26,7 +26,6 @@
     },
     editingImageIndex: -1,
     scrollToImageIndex: -1,
-    saving: false,
   };
 
   // Tracks what has been modified locally (not yet published)
@@ -249,6 +248,8 @@
     if (!doc.getElementById('lovely-admin-style')) {
       var style = doc.createElement('style');
       style.id = 'lovely-admin-style';
+      // Inject minimal selection style. Outline color matches admin --accent (#d4a574 → rgba(212,165,116,...)).
+      // Can't reference parent CSS variables here because this style lives inside an iframe doc.
       style.textContent = '.calendar-day.lovely-admin-selected{outline:3px solid rgba(212,165,116,0.95);outline-offset:2px;box-shadow:0 0 0 6px rgba(212,165,116,0.22);}';
       if (doc.head) doc.head.appendChild(style);
     }
@@ -306,9 +307,9 @@
       var ev = migrated.events[i];
       if (ev && !Array.isArray(ev.items)) {
         var items = [];
-        var color = ev.status === 'available' ? '#79b06c'
-          : ev.status === 'closed' ? '#d66555'
-          : ev.status === 'unavailable' ? '#d29a55' : '#6b5d4f';
+        var color = (window.LovelyCalendarShared && window.LovelyCalendarShared.legacyStatusColor)
+          ? window.LovelyCalendarShared.legacyStatusColor(ev.status)
+          : '#6b5d4f';
         var text = (ev.description && ev.description.trim()) ? ev.description.trim() : (ev.status || '');
         if (text) items.push({ text: text, color: color });
         ev.items = items;
@@ -382,34 +383,31 @@
   ];
 
   function createItemRow(item, index) {
+    var DEFAULT_COLOR = (window.LovelyCalendarShared && window.LovelyCalendarShared.DEFAULT_ITEM_COLOR) || '#6b5d4f';
     var row = document.createElement('div');
     row.className = 'cal-item-row';
-    row.style.cssText = 'display:flex;flex-direction:column;gap:4px;padding:8px;margin-bottom:6px;background:rgba(0,0,0,0.03);border-radius:8px;position:relative;';
 
     // 第一行：顏色選擇器 + 顯示文字
     var topRow = document.createElement('div');
-    topRow.style.cssText = 'display:flex;align-items:center;gap:6px;';
+    topRow.className = 'cal-item-row__top';
 
     var colorInput = document.createElement('input');
     colorInput.type = 'color';
     colorInput.className = 'cal-item-color';
-    colorInput.value = item.color || '#6b5d4f';
+    colorInput.value = item.color || DEFAULT_COLOR;
     colorInput.title = '自訂顏色';
-    colorInput.style.cssText = 'width:28px;height:28px;border:1px solid #ccc;border-radius:50%;cursor:pointer;padding:1px;flex-shrink:0;';
 
     var textInput = document.createElement('input');
     textInput.type = 'text';
     textInput.className = 'cal-item-text input';
     textInput.value = item.text || '';
     textInput.placeholder = '顯示文字（短）';
-    textInput.style.cssText = 'flex:1;font-size:13px;';
 
     var removeBtn = document.createElement('button');
     removeBtn.type = 'button';
-    removeBtn.className = 'btn btn-sm';
+    removeBtn.className = 'btn btn-sm cal-item-remove';
     removeBtn.textContent = '✕';
     removeBtn.title = '移除此項目';
-    removeBtn.style.cssText = 'flex-shrink:0;padding:2px 7px;font-size:12px;color:#d66555;';
     removeBtn.addEventListener('click', function () {
       row.remove();
       updateAddItemBtn();
@@ -422,19 +420,19 @@
 
     // 第二行：快速顏色選擇
     var swatchRow = document.createElement('div');
-    swatchRow.style.cssText = 'display:flex;align-items:center;gap:4px;flex-wrap:wrap;';
+    swatchRow.className = 'cal-item-row__swatches';
     COLOR_PRESETS.forEach(function (preset) {
       var swatch = document.createElement('span');
+      swatch.className = 'cal-item-swatch';
       swatch.title = preset.name;
-      swatch.style.cssText = 'width:18px;height:18px;border-radius:50%;cursor:pointer;border:2px solid transparent;box-sizing:border-box;flex-shrink:0;transition:border-color 0.15s;background:' + preset.color + ';';
+      swatch.style.background = preset.color;
       if (colorInput.value.toLowerCase() === preset.color.toLowerCase()) {
-        swatch.style.borderColor = 'rgba(47,31,20,0.5)';
+        swatch.classList.add('is-selected');
       }
       swatch.addEventListener('click', function () {
         colorInput.value = preset.color;
-        // 更新所有 swatch 的選取狀態
-        swatchRow.querySelectorAll('span').forEach(function (s) { s.style.borderColor = 'transparent'; });
-        swatch.style.borderColor = 'rgba(47,31,20,0.5)';
+        swatchRow.querySelectorAll('.cal-item-swatch').forEach(function (s) { s.classList.remove('is-selected'); });
+        swatch.classList.add('is-selected');
       });
       swatchRow.appendChild(swatch);
     });
@@ -446,26 +444,23 @@
     detailInput.className = 'cal-item-detail input';
     detailInput.value = item.detail || '';
     detailInput.placeholder = '滑鼠移入時顯示的詳細說明（可留空）';
-    detailInput.style.cssText = 'font-size:12px;color:#6b5d4f;';
     row.appendChild(detailInput);
 
     // 第四行：英文標籤 + AI 翻譯按鈕
     var enRow = document.createElement('div');
-    enRow.style.cssText = 'display:flex;align-items:center;gap:6px;margin-top:2px;';
+    enRow.className = 'cal-item-row__en';
 
     var textEnInput = document.createElement('input');
     textEnInput.type = 'text';
     textEnInput.className = 'cal-item-text-en input';
     textEnInput.value = item.text_en || '';
     textEnInput.placeholder = 'Display text (EN)';
-    textEnInput.style.cssText = 'flex:1;font-size:12px;';
 
     var translateBtn = document.createElement('button');
     translateBtn.type = 'button';
-    translateBtn.className = 'btn btn-sm btn-translate';
+    translateBtn.className = 'btn btn-sm btn-translate cal-item-translate';
     translateBtn.textContent = 'AI 翻譯';
     translateBtn.title = '用 Claude AI 自動翻譯';
-    translateBtn.style.cssText = 'flex-shrink:0;font-size:11px;padding:3px 8px;';
     translateBtn.addEventListener('click', async function () {
       if (!window.AdminTranslate || !AdminTranslate.hasApiKey()) {
         alert('請先點右上角「AI」按鈕設定 Claude API Key');
@@ -499,18 +494,13 @@
     detailEnInput.className = 'cal-item-detail-en input';
     detailEnInput.value = item.detail_en || '';
     detailEnInput.placeholder = 'Hover detail (EN, optional)';
-    detailEnInput.style.cssText = 'font-size:11px;color:#6b5d4f;';
     row.appendChild(detailEnInput);
 
     // color picker 變更時同步 swatch 選取狀態
     colorInput.addEventListener('input', function () {
-      swatchRow.querySelectorAll('span').forEach(function (s) { s.style.borderColor = 'transparent'; });
-      // 如果剛好選到預設色，標記它
       var val = colorInput.value.toLowerCase();
-      COLOR_PRESETS.forEach(function (p, i) {
-        if (p.color.toLowerCase() === val) {
-          swatchRow.children[i].style.borderColor = 'rgba(47,31,20,0.5)';
-        }
+      swatchRow.querySelectorAll('.cal-item-swatch').forEach(function (s, i) {
+        s.classList.toggle('is-selected', COLOR_PRESETS[i] && COLOR_PRESETS[i].color.toLowerCase() === val);
       });
     });
 
@@ -522,7 +512,8 @@
     if (!container) return;
     var max = getMaxItems();
     if (container.children.length >= max) return;
-    container.appendChild(createItemRow({ text: '', color: '#6b5d4f', detail: '' }, container.children.length));
+    var defColor = (window.LovelyCalendarShared && window.LovelyCalendarShared.DEFAULT_ITEM_COLOR) || '#6b5d4f';
+    container.appendChild(createItemRow({ text: '', color: defColor, detail: '' }, container.children.length));
     updateAddItemBtn();
   }
 
@@ -1481,23 +1472,28 @@
     switchMode('edit');
     updatePublishButton();
 
-    // 開啟編輯頁時自動檢查所有欄位，有缺則跳出提醒
+    // 開啟編輯頁時自動檢查所有欄位，有缺則用狀態列訊息提醒（不跳視窗）
     setTimeout(function () {
-      var missing = [];
-      try { missing = collectCalendarMissing(); } catch (_) { /* */ }
+      var calMissing = 0;
+      try { calMissing = collectCalendarMissing().length; } catch (_) { /* */ }
+      var imgMissing = 0;
       ['seasonal', 'products'].forEach(function (type) {
         (state.imageData[type].items || []).forEach(function (item) {
-          var mf = [], mr = [];
-          if (!item.name || !item.name.trim()) mr.push('名稱');
-          if (!item.name_en || !item.name_en.trim()) mf.push('名稱 (英文)');
+          var bad = false;
+          if (!item.name || !item.name.trim()) bad = true;
+          if (!item.name_en || !item.name_en.trim()) bad = true;
           var hasPrices = item.prices && (item.prices.size6 || item.prices.size8 || item.prices.slice);
-          if (!hasPrices) mf.push('價格');
-          if (!item.description || !item.description.trim()) mf.push('描述');
-          if (!item.description_en || !item.description_en.trim()) mf.push('描述 (英文)');
-          if (mr.length > 0 || mf.length > 0) missing.push({ type: type === 'seasonal' ? '季節限定' : '全部品項', name: item.name || '未命名', required: mr, fields: mf });
+          if (!hasPrices) bad = true;
+          if (!item.description || !item.description.trim()) bad = true;
+          if (!item.description_en || !item.description_en.trim()) bad = true;
+          if (bad) imgMissing++;
         });
       });
-      if (missing.length > 0) showCheckResultModal(missing);
+      if (calMissing > 0 || imgMissing > 0) {
+        logStatus('⚠️ 偵測到缺漏欄位：月曆 ' + calMissing + ' 項，商品 ' + imgMissing + ' 項（點對應頁面的「檢查所有欄位」查看詳情）');
+      } else {
+        logStatus('✅ 欄位檢查通過：無缺漏');
+      }
     }, 600);
   }
 

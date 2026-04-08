@@ -62,6 +62,10 @@
                 <!-- Calendar panel -->
                 <div id="calendarPanel" class="panel-content">
                     <div class="panel__section">
+                        <button id="translateAllCalendarBtn" class="btn btn-sm btn-translate" type="button" title="用 Claude AI 翻譯整月所有未翻譯的項目">AI 翻譯整月</button>
+                        <button id="checkCalendarFieldsBtn" class="btn btn-sm btn-secondary" type="button" style="margin-left:6px;" title="列出有缺英文的日期">檢查所有欄位</button>
+                    </div>
+                    <div class="panel__section">
                         <div class="panel__title" id="selectedDate">選取日期：尚未選取</div>
                     </div>
 
@@ -70,8 +74,6 @@
                             <label class="label">項目（每日最多 <span id="maxItemsLabel">3</span> 項）</label>
                             <div id="calendarItemsContainer"></div>
                             <button id="addItemBtn" class="btn btn-sm" type="button" style="margin-top:6px;">＋ 新增項目</button>
-                            <button id="translateAllCalendarBtn" class="btn btn-sm btn-translate" type="button" style="margin-top:6px;margin-left:6px;" title="用 Claude AI 翻譯所有未翻譯的項目">AI 翻譯整月</button>
-                            <button id="checkCalendarFieldsBtn" class="btn btn-sm btn-secondary" type="button" style="margin-top:6px;margin-left:6px;" title="列出有缺英文的日期">檢查所有欄位</button>
                         </div>
 
                         <div class="panel__section panel__actions">
@@ -193,6 +195,7 @@
     <script src="assets/js/jszip.min.js"></script>
     <script src="assets/js/admin-github-api.js"></script>
     <script src="assets/js/admin-image-compress.js"></script>
+    <script src="assets/js/calendar-shared.js"></script>
     <script src="assets/js/admin-translate.js"></script>
     <script src="assets/js/admin-app.js"></script>
 </body>

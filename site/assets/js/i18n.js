@@ -100,10 +100,12 @@
           });
 
           // Notify embedded iframes (event-driven, avoids polling).
+          // file:// 協定下 origin 是 "null"，必須用 '*'；其他情境鎖定同源。
+          const targetOrigin = (window.location.protocol === 'file:') ? '*' : window.location.origin;
           try {
             document.querySelectorAll('iframe').forEach((ifr) => {
               try {
-                ifr.contentWindow && ifr.contentWindow.postMessage({ type: 'lovely-language', lang }, '*');
+                ifr.contentWindow && ifr.contentWindow.postMessage({ type: 'lovely-language', lang }, targetOrigin);
               } catch (e) {
                 // ignore
               }

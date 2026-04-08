@@ -390,19 +390,30 @@ document.addEventListener('DOMContentLoaded', () => {
     window.calendarWidgetReadonly = new CalendarWidgetReadonly();
 
     window.addEventListener('message', (e) => {
-        if (e && e.data && e.data.type === 'lovely-language') {
+        // 安全：只接受同源或本機 dev 的訊息
+        if (!e) return;
+        const isSameOrigin = e.origin === window.location.origin;
+        const isLocalDev = e.origin === 'null' || e.origin === 'file://'
+            || (typeof e.origin === 'string' && (e.origin.startsWith('http://127.0.0.1:') || e.origin.startsWith('http://localhost:')));
+        if (!isSameOrigin && !isLocalDev) return;
+        if (!e.data || typeof e.data !== 'object') return;
+
+        if (e.data.type === 'lovely-language') {
             if (typeof e.data.lang === 'string') {
                 localStorage.setItem('language', e.data.lang);
             }
             window.calendarWidgetReadonly.updateLanguage();
+            return;
         }
-        if (e && e.data && e.data.type === 'calendar-request-resize') {
+        if (e.data.type === 'calendar-request-resize') {
             requestAnimationFrame(() => window.calendarWidgetReadonly.notifyParentHeight());
+            return;
         }
         // Admin instant preview: receive updated calendar data and re-render
-        if (e && e.data && e.data.type === 'admin-calendar-update' && e.data.data) {
-            const shared = window.LovelyCalendarShared;
+        if (e.data.type === 'admin-calendar-update') {
             const data = e.data.data;
+            if (!data || typeof data !== 'object' || !Array.isArray(data.events)) return;
+            const shared = window.LovelyCalendarShared;
             if (typeof data.maxItems === 'number' && data.maxItems > 0) {
                 window.calendarWidgetReadonly.maxItems = data.maxItems;
             }

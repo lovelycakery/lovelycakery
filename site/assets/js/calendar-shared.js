@@ -26,6 +26,18 @@
     return url + joiner + 'v=' + encodeURIComponent(cacheVersion);
   }
 
+  // 舊格式 status → 顏色對照（向下相容用）
+  const LEGACY_STATUS_COLORS = {
+    available: '#79b06c',
+    closed: '#d66555',
+    unavailable: '#d29a55',
+  };
+  const DEFAULT_ITEM_COLOR = '#6b5d4f';
+
+  function legacyStatusColor(status) {
+    return LEGACY_STATUS_COLORS[status] || DEFAULT_ITEM_COLOR;
+  }
+
   function eventsArrayToMap(data) {
     const map = {};
     const events = data && Array.isArray(data.events) ? data.events : [];
@@ -39,9 +51,7 @@
         // 向下相容舊格式 → 轉成新格式
         const items = [];
         if (event.status || (event.description && event.description.trim())) {
-          const color = event.status === 'available' ? '#79b06c'
-            : event.status === 'closed' ? '#d66555'
-            : event.status === 'unavailable' ? '#d29a55' : '#6b5d4f';
+          const color = legacyStatusColor(event.status);
           const text = event.description && event.description.trim()
             ? event.description.trim()
             : (event.status || '');
@@ -91,6 +101,9 @@
     formatDateKey,
     getMonthYearLabel,
     applyLanguageToDocument,
+    legacyStatusColor,
+    LEGACY_STATUS_COLORS,
+    DEFAULT_ITEM_COLOR,
   };
 })();
 
