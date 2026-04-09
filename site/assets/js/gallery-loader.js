@@ -152,7 +152,7 @@
       text: '#3d7a9e',
       shadow: 'rgba(122, 173, 197, 0.25)'
     },    // 粉藍便利貼
-    '含酒精': {
+    '無酒精': {
       bg: '#f8d4c4',
       text: '#a05a45',
       shadow: 'rgba(212, 135, 106, 0.25)'
@@ -168,7 +168,7 @@
   const TAG_I18N = {
     '奶蛋素': { zh: '奶蛋素', en: 'Vegetarian' },
     '無咖啡因': { zh: '無咖啡因', en: 'Caffeine-Free' },
-    '含酒精': { zh: '含酒精', en: 'Alcohol' },
+    '無酒精': { zh: '無酒精', en: 'Alcohol-Free' },
     '可宅配': { zh: '可宅配', en: 'Delivery' },
   };
 
