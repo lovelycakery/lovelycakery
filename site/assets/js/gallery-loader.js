@@ -209,11 +209,11 @@
       return;
     }
 
-    // 有選中標籤，只顯示包含任一選中標籤的圖片（OR 邏輯）
+    // 有選中標籤，只顯示包含所有選中標籤的圖片（AND 邏輯）
     items.forEach(item => {
       const itemTags = item.dataset.tags ? item.dataset.tags.split(',') : [];
-      const hasSelectedTag = selectedTags.some(tag => itemTags.includes(tag));
-      item.style.display = hasSelectedTag ? '' : 'none';
+      const hasAllSelectedTags = selectedTags.every(tag => itemTags.includes(tag));
+      item.style.display = hasAllSelectedTags ? '' : 'none';
     });
   }
 
