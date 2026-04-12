@@ -1116,26 +1116,27 @@ img {
     box-shadow: 0 12px 40px rgba(61, 40, 23, 0.15);
 }
 
-/* 訂購卡片四角花朵裝飾 */
+/* 訂購卡片上下花朵裝飾 */
 .order-deco {
     position: absolute;
     pointer-events: none;
     user-select: none;
     line-height: 1;
-    font-style: normal;
 }
-/* 左上 */
-.order-deco--a { top: 26px;  left: 32px;  font-size: 22px; color: #f5a0b8; opacity: 0.65; }
-.order-deco--b { top: 48px;  left: 54px;  font-size: 13px; color: #87c094; opacity: 0.55; }
-/* 右上 */
-.order-deco--c { top: 26px;  right: 32px; font-size: 14px; color: #87c094; opacity: 0.55; }
-.order-deco--d { top: 44px;  right: 54px; font-size: 20px; color: #f5a0b8; opacity: 0.60; }
-/* 左下 */
-.order-deco--e { bottom: 44px; left: 30px;  font-size: 20px; color: #f5a0b8; opacity: 0.60; }
-.order-deco--f { bottom: 24px; left: 54px;  font-size: 13px; color: #87c094; opacity: 0.50; }
-/* 右下 */
-.order-deco--g { bottom: 26px; right: 32px; font-size: 22px; color: #f5a0b8; opacity: 0.65; }
-.order-deco--h { bottom: 48px; right: 54px; font-size: 13px; color: #87c094; opacity: 0.55; }
+/* 上方散落 */
+.order-deco--t1 { top: 22px;  left:  8%;  font-size: 22px; opacity: 0.75; }
+.order-deco--t2 { top: 50px;  left: 20%;  font-size: 15px; opacity: 0.55; }
+.order-deco--t3 { top: 18px;  left: 38%;  font-size: 18px; opacity: 0.65; }
+.order-deco--t4 { top: 52px;  left: 55%;  font-size: 13px; opacity: 0.50; }
+.order-deco--t5 { top: 20px;  left: 72%;  font-size: 20px; opacity: 0.70; }
+.order-deco--t6 { top: 48px;  left: 86%;  font-size: 16px; opacity: 0.60; }
+/* 下方散落 */
+.order-deco--b1 { bottom: 22px; left:  6%;  font-size: 18px; opacity: 0.65; }
+.order-deco--b2 { bottom: 50px; left: 18%;  font-size: 13px; opacity: 0.50; }
+.order-deco--b3 { bottom: 20px; left: 34%;  font-size: 22px; opacity: 0.75; }
+.order-deco--b4 { bottom: 48px; left: 52%;  font-size: 16px; opacity: 0.55; }
+.order-deco--b5 { bottom: 22px; left: 70%;  font-size: 13px; opacity: 0.50; }
+.order-deco--b6 { bottom: 46px; left: 84%;  font-size: 20px; opacity: 0.70; }
 
 @media (max-width: 640px) {
     .order-deco { display: none; }
