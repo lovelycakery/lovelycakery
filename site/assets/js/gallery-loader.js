@@ -48,8 +48,8 @@
         const tagText = getTagText(tag, currentLang);
         const tagTextZh = TAG_I18N[tag] ? TAG_I18N[tag].zh : tag;
         const tagTextEn = TAG_I18N[tag] ? TAG_I18N[tag].en : tag;
-        const color = TAG_COLORS[tag];
-        const colorStyle = color ? `background-color: ${color.bg}; color: ${color.text}; box-shadow: 0 2px 8px ${color.shadow}; --tag-bg-color: ${color.bg};` : '';
+        const color = TAG_COLORS[tag] || TAG_COLOR_DEFAULT;
+        const colorStyle = `background-color: ${color.bg}; color: ${color.text}; box-shadow: 0 2px 8px ${color.shadow}; --tag-bg-color: ${color.bg};`;
         return `<span class="tag-badge image-modal__tag" data-en="${tagTextEn}" data-zh="${tagTextZh}" data-tag-key="${tag}" style="${colorStyle}">${tagText}</span>`;
       }).join('');
       tagsHTML = `<div class="image-modal__tags">${tags}</div>`;
@@ -162,6 +162,12 @@
       text: '#947e30',
       shadow: 'rgba(212, 179, 94, 0.25)'
     },      // 粉黃便利貼
+  };
+
+  const TAG_COLOR_DEFAULT = {
+    bg: '#e8e0f0',
+    text: '#6b5a8a',
+    shadow: 'rgba(150, 130, 180, 0.25)'
   };
 
   // 標籤中英文對應
@@ -282,18 +288,14 @@
   function renderImageTags(imageWrapper, tags) {
     if (!tags || !Array.isArray(tags) || tags.length === 0) return;
 
-    // 過濾出有顏色定義的標籤
-    const validTags = tags.filter(tag => TAG_COLORS[tag]);
-    if (validTags.length === 0) return;
-
     // 獲取當前語言
     const currentLang = localStorage.getItem('language') || 'zh';
 
     const tagsContainer = document.createElement('div');
     tagsContainer.className = 'gallery-image-tags';
 
-    validTags.forEach(tag => {
-      const color = TAG_COLORS[tag];
+    tags.forEach(tag => {
+      const color = TAG_COLORS[tag] || TAG_COLOR_DEFAULT;
       const tagText = getTagText(tag, currentLang);
       const tagTextZh = TAG_I18N[tag] ? TAG_I18N[tag].zh : tag;
       const tagTextEn = TAG_I18N[tag] ? TAG_I18N[tag].en : tag;
@@ -346,11 +348,7 @@
       
       // 將標籤儲存到 data 屬性中，用於篩選
       if (item.tags && Array.isArray(item.tags) && item.tags.length > 0) {
-        // 只儲存有顏色定義的標籤
-        const validTags = item.tags.filter(tag => TAG_COLORS[tag]);
-        if (validTags.length > 0) {
-          itemEl.dataset.tags = validTags.join(',');
-        }
+        itemEl.dataset.tags = item.tags.join(',');
       }
       
       const imageWrapper = document.createElement('div');

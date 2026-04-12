@@ -503,27 +503,92 @@ body {
   flex: 1;
 }
 
-/* ── Tag checkboxes ──────────────────────────────────────────────── */
+/* ── Tag editor ──────────────────────────────────────────────────── */
 
-.tag-checkboxes {
+.tag-editor {
   display: flex;
   flex-direction: column;
   gap: 8px;
   margin-top: 8px;
 }
 
-.tag-checkboxes label {
+.tag-chips {
   display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 0;
+}
+
+.tag-chip {
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
+  padding: 3px 8px 3px 10px;
+  background: rgba(212, 165, 116, 0.18);
+  color: var(--accent);
+  border: 1px solid rgba(212, 165, 116, 0.35);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.tag-chip__remove {
+  background: none;
+  border: none;
+  color: var(--accent);
   cursor: pointer;
+  font-size: 15px;
+  line-height: 1;
+  padding: 0 2px;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+}
+
+.tag-chip__remove:hover { opacity: 1; }
+
+.tag-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag-preset {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 3px 10px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.tag-preset:hover:not(:disabled) {
+  background: rgba(212, 165, 116, 0.15);
+  color: var(--accent);
+  border-color: rgba(212, 165, 116, 0.35);
+}
+
+.tag-preset:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.tag-input-row {
+  display: flex;
+  gap: 6px;
+}
+
+.tag-input-row .input--sm {
+  flex: 1;
+  padding: 5px 10px;
   font-size: 13px;
 }
 
-.tag-checkboxes input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
+.tag-input-row .btn-sm {
+  padding: 5px 12px;
+  font-size: 13px;
+  white-space: nowrap;
 }
 
 /* ── Image upload ────────────────────────────────────────────────── */

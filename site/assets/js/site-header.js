@@ -35,7 +35,7 @@
     const items = [
       { href: 'index.html', zh: '首頁', en: 'Home', isIcon: true, iconType: 'home' },
       { href: 'calendar.html', zh: '月曆', en: 'Calendar' },
-      { href: 'seasonal.html', zh: '季節限定', en: 'Season' },
+      { href: 'seasonal.html', zh: '新品上市', en: 'Season' },
       { href: 'all-items.html', zh: '全部品項', en: 'Menu' },
       { href: 'order.html', zh: '訂購說明', en: 'Order' },
       { href: 'contact.html', zh: '地圖', en: 'Map' },

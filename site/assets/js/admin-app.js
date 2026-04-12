@@ -26,6 +26,7 @@
     },
     editingImageIndex: -1,
     scrollToImageIndex: -1,
+    editingTags: [],
   };
 
   // Tracks what has been modified locally (not yet published)
@@ -93,7 +94,6 @@
   function validateImageData(data) {
     if (!data || typeof data !== 'object') throw new Error('Data must be an object');
     if (!Array.isArray(data.items)) throw new Error('Data must contain items array');
-    var allowedTags = ['奶蛋素', '無咖啡因', '無酒精', '可宅配'];
     for (var i = 0; i < data.items.length; i++) {
       var item = data.items[i];
       if (!item || typeof item !== 'object') throw new Error('Each item must be an object');
@@ -101,7 +101,7 @@
       if (typeof item.image !== 'string') throw new Error('Item image must be a string');
       if (!Array.isArray(item.tags)) throw new Error('Item tags must be an array');
       for (var j = 0; j < item.tags.length; j++) {
-        if (allowedTags.indexOf(item.tags[j]) === -1) throw new Error('Invalid tag: ' + item.tags[j]);
+        if (typeof item.tags[j] !== 'string' || !item.tags[j].trim()) throw new Error('Tag must be a non-empty string');
       }
     }
   }
@@ -608,14 +608,54 @@
 
   // ── Image edit panel ──────────────────────────────────────────────
 
+  // ── Tag editor ────────────────────────────────────────────────────
+
+  function renderTagChips() {
+    var chips = $('tagChips');
+    if (!chips) return;
+    chips.innerHTML = '';
+    state.editingTags.forEach(function (tag) {
+      var chip = document.createElement('span');
+      chip.className = 'tag-chip';
+      var text = document.createTextNode(tag);
+      chip.appendChild(text);
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'tag-chip__remove';
+      btn.setAttribute('aria-label', '移除 ' + tag);
+      btn.textContent = '×';
+      (function (t) {
+        btn.addEventListener('click', function () { removeEditingTag(t); });
+      }(tag));
+      chip.appendChild(btn);
+      chips.appendChild(chip);
+    });
+    document.querySelectorAll('.tag-preset').forEach(function (btn) {
+      btn.disabled = state.editingTags.indexOf(btn.dataset.tag) !== -1;
+    });
+  }
+
+  function addEditingTag(tag) {
+    tag = tag.trim();
+    if (!tag || state.editingTags.indexOf(tag) !== -1) return;
+    state.editingTags.push(tag);
+    renderTagChips();
+  }
+
+  function removeEditingTag(tag) {
+    var idx = state.editingTags.indexOf(tag);
+    if (idx === -1) return;
+    state.editingTags.splice(idx, 1);
+    renderTagChips();
+  }
+
   function hasUnsavedChanges() {
     if (state.editingImageIndex < 0) return false;
     var type = state.currentTab === 'seasonal' ? 'seasonal' : 'products';
     var item = state.imageData[type].items[state.editingImageIndex];
     if (!item) return false;
     var prices = (item.prices && typeof item.prices === 'object') ? item.prices : {};
-    var tags = [];
-    document.querySelectorAll('.tag-checkboxes input[type="checkbox"]:checked').forEach(function (cb) { tags.push(cb.value); });
+    var tags = state.editingTags;
     var origTags = item.tags || [];
     if ($('imageNameInput').value.trim() !== (item.name || '').trim()) return true;
     if ($('imageNameEnInput').value.trim() !== (item.name_en || '').trim()) return true;
@@ -648,13 +688,8 @@
     $('imagePriceSliceInput').value = prices.slice || '';
     $('imageDescInput').value = item.description || '';
     $('imageDescEnInput').value = item.description_en || '';
-    document.querySelectorAll('.tag-checkboxes input[type="checkbox"]').forEach(function (cb) { cb.checked = false; });
-    if (item.tags && Array.isArray(item.tags)) {
-      item.tags.forEach(function (tag) {
-        var id = tag === '奶蛋素' ? 'tag-vegetarian' : (tag === '無咖啡因' ? 'tag-caffeine-free' : (tag === '無酒精' ? 'tag-alcohol' : (tag === '可宅配' ? 'tag-delivery' : '')));
-        if (id && $(id)) $(id).checked = true;
-      });
-    }
+    state.editingTags = (item.tags && Array.isArray(item.tags)) ? item.tags.slice() : [];
+    renderTagChips();
     $('imageEditForm').style.display = 'block';
     $('imageEditSaveBtn').disabled = false;
     $('imageEditDeleteBtn').disabled = false;
@@ -667,7 +702,8 @@
     state.editingImageIndex = -1;
     $('selectedImage').textContent = '選取圖片：尚未選取';
     ['imageNameInput', 'imageNameEnInput', 'imagePriceSize6Input', 'imagePriceSize8Input', 'imagePriceSliceInput', 'imageDescInput', 'imageDescEnInput'].forEach(function (id) { $(id).value = ''; });
-    document.querySelectorAll('.tag-checkboxes input[type="checkbox"]').forEach(function (cb) { cb.checked = false; });
+    state.editingTags = [];
+    renderTagChips();
     $('imageEditForm').style.display = 'none';
     $('imageEditSaveBtn').disabled = true;
     $('imageEditDeleteBtn').disabled = true;
@@ -697,9 +733,7 @@
     else { delete item.prices; }
     item.description = $('imageDescInput').value.trim();
     item.description_en = $('imageDescEnInput').value.trim();
-    var tags = [];
-    document.querySelectorAll('.tag-checkboxes input[type="checkbox"]:checked').forEach(function (cb) { tags.push(cb.value); });
-    item.tags = tags;
+    item.tags = state.editingTags.slice();
 
     // 名稱和檔名分離：改名稱只改 JSON，不動圖片檔案
     dirty[type] = true;
@@ -902,7 +936,7 @@
         var sData = { schema_version: 1, items: cleanItemsForCommit(state.imageData.seasonal.items) };
         validateImageData(sData);
         changes.push({ path: SITE + '/assets/data/seasonal-data.json', content: JSON.stringify(sData, null, 2) + '\n' });
-        parts.push('季節限定');
+        parts.push('新品上市');
       }
 
       // 3. Products data
@@ -1033,7 +1067,7 @@
 
     var btn = $('downloadBackupBtn');
     setButtonLoading(btn, true);
-    logStatus('📦 開始打包 ' + (type === 'seasonal' ? '季節限定' : '全部品項') + '…');
+    logStatus('📦 開始打包 ' + (type === 'seasonal' ? '新品上市' : '全部品項') + '…');
 
     try {
       var zip = new JSZip();
@@ -1163,7 +1197,7 @@
         if (!hasPrices) mf.push('價格');
         if (!item.description || !item.description.trim()) mf.push('描述');
         if (!item.description_en || !item.description_en.trim()) mf.push('描述 (英文)');
-        if (mr.length > 0 || mf.length > 0) missing.push({ type: type === 'seasonal' ? '季節限定' : '全部品項', name: item.name || '未命名', required: mr, fields: mf });
+        if (mr.length > 0 || mf.length > 0) missing.push({ type: type === 'seasonal' ? '新品上市' : '全部品項', name: item.name || '未命名', required: mr, fields: mf });
       });
     });
     showCheckResultModal(missing);
@@ -1286,6 +1320,25 @@
 
     $('imageEditSaveBtn').addEventListener('click', function () {
       if (state.currentTab === 'seasonal' || state.currentTab === 'products') saveImageEdit(state.currentTab);
+    });
+
+    // Tag editor: preset buttons
+    document.querySelectorAll('.tag-preset').forEach(function (btn) {
+      btn.addEventListener('click', function () { addEditingTag(btn.dataset.tag); });
+    });
+
+    // Tag editor: custom tag input
+    $('tagAddBtn').addEventListener('click', function () {
+      var input = $('tagInput');
+      addEditingTag(input.value);
+      input.value = '';
+    });
+    $('tagInput').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        addEditingTag($('tagInput').value);
+        $('tagInput').value = '';
+      }
     });
     $('imageEditDeleteBtn').addEventListener('click', function () {
       if (state.currentTab === 'seasonal' || state.currentTab === 'products') deleteImage(state.currentTab, state.editingImageIndex);
