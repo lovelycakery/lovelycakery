@@ -1198,6 +1198,14 @@ img {
     filter: brightness(0.95);
 }
 
+.order-social-link--line {
+    background-color: #06C755; /* LINE green */
+}
+
+.order-social-link--line:hover {
+    background-color: #05b34d;
+}
+
 /* 訂購說明 — tag 導覽與章節 */
 .order-tags {
     position: fixed;
