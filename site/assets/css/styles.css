@@ -1086,7 +1086,7 @@ img {
     background-color: #ffffff;
     border: 1px solid #f0e6d2;
     border-radius: 22px;
-    padding: 56px 52px;
+    padding: 36px 52px;
     max-width: 720px;
     width: 100%;
     text-align: center;
@@ -1589,7 +1589,7 @@ img {
 /* 響應式：平板 */
 @media (max-width: 968px) {
     .order-card {
-        padding: 50px 40px;
+        padding: 32px 40px;
         max-width: 500px;
     }
 
@@ -1623,12 +1623,17 @@ img {
         font-size: 12.5px;
     }
 
-    .order-section,
-    .order-card {
+    .order-section {
         padding: 50px 36px;
         border-radius: 18px;
         margin-top: 24px;
         min-height: 70vh;
+    }
+
+    .order-card {
+        padding: 30px 36px;
+        border-radius: 18px;
+        margin-top: 24px;
     }
 
     .order-section::after {
@@ -1653,7 +1658,7 @@ img {
     }
 
     .order-card {
-        padding: 40px 30px;
+        padding: 28px 30px;
         border-radius: 16px;
     }
 
