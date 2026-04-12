@@ -487,7 +487,7 @@
           hasDragged = true; // 確保標記為拖曳操作
           
           const fromIndex = parseInt(e.dataTransfer.getData('text/plain'), 10);
-          const toIndex = parseInt(itemEl.dataset.index, 10) || index;
+          const toIndex = itemEl.dataset.index !== undefined ? parseInt(itemEl.dataset.index, 10) : index;
           
           // 驗證：確保索引有效且不同
           if (isNaN(fromIndex) || isNaN(toIndex)) {
