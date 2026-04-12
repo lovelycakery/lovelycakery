@@ -1092,10 +1092,6 @@ img {
     text-align: center;
     box-shadow: 0 10px 32px rgba(61, 40, 23, 0.08);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    min-height: 62vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
     position: relative;
 }
 
