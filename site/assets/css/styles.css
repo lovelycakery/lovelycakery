@@ -1116,27 +1116,33 @@ img {
     box-shadow: 0 12px 40px rgba(61, 40, 23, 0.15);
 }
 
-/* 訂購卡片上下花朵裝飾 */
+/* 訂購卡片花圈裝飾（橢圓均等 16 點，水平半軸 40%、垂直半軸 36%） */
 .order-deco {
     position: absolute;
     pointer-events: none;
     user-select: none;
+    font-size: 22px;
     line-height: 1;
+    opacity: 0.72;
+    transform: translate(-50%, -50%);
 }
-/* 上方散落 */
-.order-deco--t1 { top: 22px;  left:  8%;  font-size: 22px; opacity: 0.75; }
-.order-deco--t2 { top: 50px;  left: 20%;  font-size: 15px; opacity: 0.55; }
-.order-deco--t3 { top: 18px;  left: 38%;  font-size: 18px; opacity: 0.65; }
-.order-deco--t4 { top: 52px;  left: 55%;  font-size: 13px; opacity: 0.50; }
-.order-deco--t5 { top: 20px;  left: 72%;  font-size: 20px; opacity: 0.70; }
-.order-deco--t6 { top: 48px;  left: 86%;  font-size: 16px; opacity: 0.60; }
-/* 下方散落 */
-.order-deco--b1 { bottom: 22px; left:  6%;  font-size: 18px; opacity: 0.65; }
-.order-deco--b2 { bottom: 50px; left: 18%;  font-size: 13px; opacity: 0.50; }
-.order-deco--b3 { bottom: 20px; left: 34%;  font-size: 22px; opacity: 0.75; }
-.order-deco--b4 { bottom: 48px; left: 52%;  font-size: 16px; opacity: 0.55; }
-.order-deco--b5 { bottom: 22px; left: 70%;  font-size: 13px; opacity: 0.50; }
-.order-deco--b6 { bottom: 46px; left: 84%;  font-size: 20px; opacity: 0.70; }
+/* 從正上方順時針，每 22.5° 一朵 */
+.order-deco--1  { left: 50.0%; top: 14.0%; } /* 270° 正上 */
+.order-deco--2  { left: 65.3%; top: 16.7%; } /* 292.5° */
+.order-deco--3  { left: 78.3%; top: 24.5%; } /* 315° */
+.order-deco--4  { left: 86.9%; top: 36.2%; } /* 337.5° */
+.order-deco--5  { left: 90.0%; top: 50.0%; } /* 0° 正右 */
+.order-deco--6  { left: 86.9%; top: 63.8%; } /* 22.5° */
+.order-deco--7  { left: 78.3%; top: 75.5%; } /* 45° */
+.order-deco--8  { left: 65.3%; top: 83.3%; } /* 67.5° */
+.order-deco--9  { left: 50.0%; top: 86.0%; } /* 90° 正下 */
+.order-deco--10 { left: 34.7%; top: 83.3%; } /* 112.5° */
+.order-deco--11 { left: 21.7%; top: 75.5%; } /* 135° */
+.order-deco--12 { left: 13.1%; top: 63.8%; } /* 157.5° */
+.order-deco--13 { left: 10.0%; top: 50.0%; } /* 180° 正左 */
+.order-deco--14 { left: 13.1%; top: 36.2%; } /* 202.5° */
+.order-deco--15 { left: 21.7%; top: 24.5%; } /* 225° */
+.order-deco--16 { left: 34.7%; top: 16.7%; } /* 247.5° */
 
 @media (max-width: 640px) {
     .order-deco { display: none; }
