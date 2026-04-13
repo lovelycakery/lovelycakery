@@ -1096,9 +1096,8 @@ img {
     border: 1px solid #f0e6d2;
     background-color: #ffffff;
     border-radius: 22px;
-    padding: 56px 52px;
+    padding: 160px 52px;
     max-width: 720px;
-    min-height: 62vh;
     width: 100%;
     text-align: center;
     box-shadow: 0 10px 32px rgba(61, 40, 23, 0.08);
@@ -1649,7 +1648,7 @@ img {
     }
 
     .order-card {
-        padding: 80px 30px;
+        padding: 106px 30px;
         border-radius: 16px;
         margin-top: 6px;
     }
