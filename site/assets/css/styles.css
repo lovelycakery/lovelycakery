@@ -533,9 +533,16 @@ img {
 
     .nav-right .nav {
         grid-area: nav;
-        justify-content: center;  /* 居中對齊 */
-        width: 100%;  /* 確保導覽有足夠寬度 */
-        min-width: 0;  /* 允許flex項目縮小 */
+        justify-content: space-evenly;
+        width: 100%;
+        min-width: 0;
+        gap: 0;
+    }
+
+    .nav-right .nav .nav-link,
+    .nav-right .nav .nav-link-icon {
+        flex: 1;
+        justify-content: center;
     }
 
     .nav-right .social-links {
@@ -1000,8 +1007,8 @@ img {
     }
 
     .tag-legend-badge {
-        font-size: 10.5px;
-        padding: 5px 10px;
+        font-size: 12px;
+        padding: 6px 12px;
     }
 }
 
