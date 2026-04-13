@@ -292,6 +292,11 @@ body.calendar-page-body {
     background-color: #f0ede8;  /* 下層米色背景 */
 }
 
+/* 訂購說明頁：移除頂部 padding，由 order-content 自行控制與 tags nav 的間距 */
+.main-content.order-page {
+    padding-top: 0;
+}
+
 /* 首頁：垂直置中內容 */
 .home-page .main-content {
     display: flex;
@@ -1084,15 +1089,16 @@ img {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: calc(var(--tags-h, 65px) + 20px) 0 60px;
+    padding: calc(var(--tags-h, 65px) + 28px) 0 60px;
 }
 
 .order-card {
     border: 1px solid #f0e6d2;
     background-color: #ffffff;
     border-radius: 22px;
-    padding: 80px 52px;
+    padding: 56px 52px;
     max-width: 720px;
+    min-height: 62vh;
     width: 100%;
     text-align: center;
     box-shadow: 0 10px 32px rgba(61, 40, 23, 0.08);
@@ -1262,12 +1268,12 @@ img {
 }
 
 .order-section {
-    margin: 28px auto 0;
+    margin: 28px auto 28px;
     max-width: 720px;
     width: 100%;
     background-color: #fffdf7;
     border-radius: 22px;
-    padding: 72px 68px;
+    padding: 100px 68px;
     box-shadow: 0 10px 32px rgba(61, 40, 23, 0.08);
     scroll-margin-top: calc(var(--header-h, 100px) + var(--tags-h, 80px) + 8px);
     display: flex;
@@ -1623,7 +1629,7 @@ img {
 /* 響應式：手機 */
 @media (max-width: 640px) {
     .order-content {
-        padding: var(--tags-h, 80px) 0 40px;
+        padding: calc(var(--tags-h, 80px) + 24px) 0 40px;
     }
 
     .order-tags {
@@ -1637,13 +1643,13 @@ img {
     }
 
     .order-section {
-        padding: 50px 36px;
+        padding: 70px 36px;
         border-radius: 18px;
-        margin-top: 24px;
+        margin: 24px auto 24px;
     }
 
     .order-card {
-        padding: 56px 30px;
+        padding: 80px 30px;
         border-radius: 16px;
         margin-top: 6px;
     }
