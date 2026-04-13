@@ -1116,37 +1116,31 @@ img {
     box-shadow: 0 12px 40px rgba(61, 40, 23, 0.15);
 }
 
-/* 訂購卡片花圈裝飾（橢圓均等 16 點，水平半軸 40%、垂直半軸 36%） */
-.order-deco {
+/* 訂購卡片上方花叢 */
+.order-bouquet {
+    position: relative;
+    width: 120px;
+    height: 90px;
+    margin: 0 auto 8px;
+    flex-shrink: 0;
+}
+.order-bouquet__f {
     position: absolute;
+    font-size: 24px;
+    line-height: 1;
     pointer-events: none;
     user-select: none;
-    font-size: 22px;
-    line-height: 1;
-    opacity: 0.72;
     transform: translate(-50%, -50%);
 }
-/* 從正上方順時針，每 22.5° 一朵 */
-.order-deco--1  { left: 50.0%; top: 14.0%; } /* 270° 正上 */
-.order-deco--2  { left: 65.3%; top: 16.7%; } /* 292.5° */
-.order-deco--3  { left: 78.3%; top: 24.5%; } /* 315° */
-.order-deco--4  { left: 86.9%; top: 36.2%; } /* 337.5° */
-.order-deco--5  { left: 90.0%; top: 50.0%; } /* 0° 正右 */
-.order-deco--6  { left: 86.9%; top: 63.8%; } /* 22.5° */
-.order-deco--7  { left: 78.3%; top: 75.5%; } /* 45° */
-.order-deco--8  { left: 65.3%; top: 83.3%; } /* 67.5° */
-.order-deco--9  { left: 50.0%; top: 86.0%; } /* 90° 正下 */
-.order-deco--10 { left: 34.7%; top: 83.3%; } /* 112.5° */
-.order-deco--11 { left: 21.7%; top: 75.5%; } /* 135° */
-.order-deco--12 { left: 13.1%; top: 63.8%; } /* 157.5° */
-.order-deco--13 { left: 10.0%; top: 50.0%; } /* 180° 正左 */
-.order-deco--14 { left: 13.1%; top: 36.2%; } /* 202.5° */
-.order-deco--15 { left: 21.7%; top: 24.5%; } /* 225° */
-.order-deco--16 { left: 34.7%; top: 16.7%; } /* 247.5° */
-
-@media (max-width: 640px) {
-    .order-deco { display: none; }
-}
+/*  8 朵圍成自然花叢，以容器中心 (50%,50%) 為重心 */
+.order-bouquet__f--1 { left: 50%; top: 18%; }           /* 正上中 */
+.order-bouquet__f--2 { left: 30%; top: 30%; }           /* 左上 */
+.order-bouquet__f--3 { left: 70%; top: 30%; }           /* 右上 */
+.order-bouquet__f--4 { left: 18%; top: 56%; }           /* 左中 */
+.order-bouquet__f--5 { left: 50%; top: 50%; }           /* 正中（主花） */
+.order-bouquet__f--6 { left: 82%; top: 56%; }           /* 右中 */
+.order-bouquet__f--7 { left: 34%; top: 80%; }           /* 左下 */
+.order-bouquet__f--8 { left: 66%; top: 80%; }           /* 右下 */
 
 .order-icon {
     font-size: 64px;
