@@ -139,13 +139,6 @@
     // 推一筆歷史記錄，讓返回手勢可以攔截
     history.pushState({ modal: true }, '');
 
-    // 確保 modal 文字可選取（Safari 需要 webkit 前綴，也避免 CSS 快取影響）
-    const infoEl = modal.querySelector('.image-modal__info');
-    if (infoEl) {
-      infoEl.style.userSelect = 'text';
-      infoEl.style.webkitUserSelect = 'text';
-    }
-
     document.body.appendChild(modal);
     document.body.style.overflow = 'hidden';
   }
