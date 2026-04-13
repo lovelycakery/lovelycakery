@@ -34,3 +34,4 @@ index.html / calendar.html / seasonal.html / all-items.html / order.html / conta
 - 新增/替換圖片先跑 `python3 scripts/optimize_images.py --only-changed`
 - 語言同步用 postMessage，不要用 setInterval 輪詢
 - `image-protection.js` 會攔截 IMG dragstart，編輯模式的拖曳在 `gallery-loader.js` 內處理衝突
+- 若 `git push` 出現 SSH port 22 被封鎖，改用：`git remote set-url origin "ssh://git@ssh.github.com:443/lovelycakery/lovelycakery.git" && git push && git remote set-url origin git@github.com:lovelycakery/lovelycakery.git`
