@@ -1084,15 +1084,14 @@ img {
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* 上方留 72px 給 fixed 標籤列 */
-    padding: 112px 0 60px;
+    padding: calc(var(--tags-h, 65px) + 20px) 0 60px;
 }
 
 .order-card {
     border: 1px solid #f0e6d2;
     background-color: #ffffff;
     border-radius: 22px;
-    padding: 56px 52px;
+    padding: 80px 52px;
     max-width: 720px;
     width: 100%;
     text-align: center;
@@ -1644,7 +1643,7 @@ img {
     }
 
     .order-card {
-        padding: 44px 30px;
+        padding: 56px 30px;
         border-radius: 16px;
         margin-top: 6px;
     }
