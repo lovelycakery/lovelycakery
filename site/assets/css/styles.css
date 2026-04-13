@@ -1116,7 +1116,7 @@ img {
     box-shadow: 0 12px 40px rgba(61, 40, 23, 0.15);
 }
 
-/* 訂購卡片上方一排花（絕對定位在上半空白區中央，不影響文字置中） */
+/* 訂購卡片上方裝飾（絕對定位在上半空白區中央，不影響文字置中） */
 .order-bouquet {
     position: absolute;
     top: 0;
@@ -1124,13 +1124,43 @@ img {
     right: 0;
     bottom: 50%;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 14px;
+    gap: 10px;
     pointer-events: none;
     user-select: none;
+}
+.order-bouquet__row {
+    display: flex;
+    gap: 10px;
     font-size: 26px;
     line-height: 1;
+}
+/* 裝飾線：✦ 居中，兩側金色漸層線 */
+.order-bouquet__line {
+    position: relative;
+    width: 240px;
+    text-align: center;
+    color: #c9a84c;
+    font-size: 12px;
+    line-height: 1;
+}
+.order-bouquet__line::before,
+.order-bouquet__line::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 88px;
+    height: 1px;
+}
+.order-bouquet__line::before {
+    right: calc(50% + 12px);
+    background: linear-gradient(to left, #c9a84c, transparent);
+}
+.order-bouquet__line::after {
+    left: calc(50% + 12px);
+    background: linear-gradient(to right, #c9a84c, transparent);
 }
 
 @media (max-width: 640px) {
