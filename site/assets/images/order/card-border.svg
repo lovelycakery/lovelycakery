@@ -26,24 +26,24 @@
   ===== -->
   <path d="
     M 72,18
-    C  96,18  140,5   168,18
-    C 196,31  236,31  264,18
-    C 292,5   332,5   360,18
-    C 388,31  428,31  456,18
-    C 484,5   524,5   552,18
-    C 580,31  624,18  648,18
+    C  96,18  140,10  168,18
+    C 196,26  236,26  264,18
+    C 292,10  332,10  360,18
+    C 388,26  428,26  456,18
+    C 484,10  524,10  552,18
+    C 580,26  624,18  648,18
     C 672,18  706,44  707,72
     C 708,100 718,140 707,176
     C 696,212 696,244 707,280
     C 718,316 718,348 707,384
     C 696,420 708,462 707,488
     C 706,514 672,542 648,542
-    C 624,542 580,555 552,542
-    C 524,529 484,529 456,542
-    C 428,555 388,555 360,542
-    C 332,529 292,529 264,542
-    C 236,555 196,555 168,542
-    C 140,529  96,542  72,542
+    C 624,542 580,550 552,542
+    C 524,534 484,534 456,542
+    C 428,550 388,550 360,542
+    C 332,534 292,534 264,542
+    C 236,550 196,550 168,542
+    C 140,534  96,542  72,542
     C  48,542  14,514  13,488
     C  12,462   2,420  13,384
     C  24,348  24,316  13,280
@@ -69,12 +69,12 @@
   <ellipse cx="676" cy="539" rx="2.5" ry="6"   fill="#87c094" opacity="0.65" transform="rotate(-62,676,539)"/>
 
   <!-- 上邊葉（內峰旁，位置不等距） -->
-  <ellipse cx="214" cy="33"  rx="2.5" ry="5.5" fill="#87c094" opacity="0.70" transform="rotate(-5,214,33)"/>
-  <ellipse cx="414" cy="35"  rx="2.5" ry="5.5" fill="#87c094" opacity="0.65" transform="rotate(9,414,35)"/>
+  <ellipse cx="214" cy="27"  rx="2.5" ry="5.5" fill="#87c094" opacity="0.70" transform="rotate(-5,214,27)"/>
+  <ellipse cx="414" cy="29"  rx="2.5" ry="5.5" fill="#87c094" opacity="0.65" transform="rotate(9,414,29)"/>
 
   <!-- 下邊葉（位置與上邊錯開） -->
-  <ellipse cx="308" cy="527" rx="2.5" ry="5.5" fill="#87c094" opacity="0.70" transform="rotate(6,308,527)"/>
-  <ellipse cx="506" cy="524" rx="2.5" ry="5.5" fill="#87c094" opacity="0.65" transform="rotate(-8,506,524)"/>
+  <ellipse cx="308" cy="533" rx="2.5" ry="5.5" fill="#87c094" opacity="0.70" transform="rotate(6,308,533)"/>
+  <ellipse cx="506" cy="530" rx="2.5" ry="5.5" fill="#87c094" opacity="0.65" transform="rotate(-8,506,530)"/>
 
   <!-- 左邊葉（外峰側） -->
   <ellipse cx="28"  cy="232" rx="2.5" ry="5.5" fill="#87c094" opacity="0.70" transform="rotate(-85,28,232)"/>
@@ -101,12 +101,12 @@
   <use href="#sf" transform="translate(703,504)"/>
 
   <!-- 上邊小花（內峰，2 朵） -->
-  <use href="#sf" transform="translate(216,31)"/>
-  <use href="#sf" transform="translate(408,31)"/>
+  <use href="#sf" transform="translate(216,24)"/>
+  <use href="#sf" transform="translate(408,24)"/>
 
   <!-- 下邊小花（內峰，與上邊位置錯開） -->
-  <use href="#sf" transform="translate(312,529)"/>
-  <use href="#sf" transform="translate(504,529)"/>
+  <use href="#sf" transform="translate(312,536)"/>
+  <use href="#sf" transform="translate(504,536)"/>
 
   <!-- 左邊小花（內峰） -->
   <use href="#sf" transform="translate(21,124)"/>
@@ -117,10 +117,10 @@
   <use href="#sf" transform="translate(699,436)"/>
 
   <!-- 花苞小圓點（外峰，僅深弧位置） -->
-  <circle cx="312" cy="8"   r="2.5" fill="#f5b0c8" opacity="0.72"/>
-  <circle cx="504" cy="8"   r="2.5" fill="#f5b0c8" opacity="0.72"/>
-  <circle cx="216" cy="552" r="2.5" fill="#f5b0c8" opacity="0.72"/>
-  <circle cx="408" cy="552" r="2.5" fill="#f5b0c8" opacity="0.72"/>
+  <circle cx="312" cy="12"  r="2.5" fill="#f5b0c8" opacity="0.72"/>
+  <circle cx="504" cy="12"  r="2.5" fill="#f5b0c8" opacity="0.72"/>
+  <circle cx="216" cy="548" r="2.5" fill="#f5b0c8" opacity="0.72"/>
+  <circle cx="408" cy="548" r="2.5" fill="#f5b0c8" opacity="0.72"/>
   <circle cx="5"   cy="228" r="2.5" fill="#f5b0c8" opacity="0.68"/>
   <circle cx="6"   cy="440" r="2.5" fill="#f5b0c8" opacity="0.68"/>
   <circle cx="715" cy="124" r="2.5" fill="#f5b0c8" opacity="0.68"/>
