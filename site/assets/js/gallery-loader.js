@@ -128,7 +128,10 @@
       if (modalOpen) closeModal();
     };
 
-    modal.querySelector('.image-modal__overlay').addEventListener('click', closeAndBack);
+    // overlay 改為 pointer-events: none，由外層 modal 偵測點擊背景關閉
+    modal.addEventListener('click', (e) => {
+      if (!e.target.closest('.image-modal__content')) closeAndBack();
+    });
     modal.querySelector('.image-modal__close').addEventListener('click', closeAndBack);
     document.addEventListener('keydown', escHandler);
     window.addEventListener('popstate', popstateHandler);

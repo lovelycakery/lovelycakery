@@ -1798,6 +1798,7 @@ img {
     align-items: center;
     justify-content: center;
     padding: 20px;
+    cursor: pointer;
 }
 
 .image-modal__overlay {
@@ -1807,7 +1808,7 @@ img {
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.8);
-    cursor: pointer;
+    pointer-events: none;
 }
 
 .image-modal__content {
@@ -1820,6 +1821,7 @@ img {
     overflow-y: auto;
     z-index: 10001;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    cursor: default;
 }
 
 .image-modal__close {

@@ -3,11 +3,12 @@
 (function () {
   'use strict';
 
-  // 禁用右鍵選單（modal 內文字區除外，允許複製）
+  // 禁用右鍵選單（僅限圖片，文字可正常右鍵複製）
   document.addEventListener('contextmenu', function (e) {
-    if (e.target.closest('.image-modal__info')) return;
-    e.preventDefault();
-    return false;
+    if (e.target.tagName === 'IMG') {
+      e.preventDefault();
+      return false;
+    }
   });
 
   // 禁用常見的快捷鍵
