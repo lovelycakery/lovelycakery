@@ -1270,7 +1270,7 @@ img {
     border-radius: 22px;
     padding: 72px 68px;
     box-shadow: 0 10px 32px rgba(61, 40, 23, 0.08);
-    scroll-margin-top: calc(var(--header-h, 100px) + 80px);
+    scroll-margin-top: calc(var(--header-h, 100px) + var(--tags-h, 80px) + 8px);
     min-height: 62vh;
     display: flex;
     flex-direction: column;
@@ -1625,7 +1625,7 @@ img {
 /* 響應式：手機 */
 @media (max-width: 640px) {
     .order-content {
-        padding: 130px 0 40px;
+        padding: calc(var(--tags-h, 80px) + 20px) 0 40px;
     }
 
     .order-tags {

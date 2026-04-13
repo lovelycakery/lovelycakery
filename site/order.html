@@ -156,6 +156,18 @@
     <script defer src="assets/js/site-header.js"></script>
     <script defer src="assets/js/i18n.js"></script>
     <script defer src="assets/js/image-protection.js"></script>
+    <script>
+    (function () {
+        function updateTagsHeight() {
+            var tags = document.querySelector('.order-tags');
+            if (!tags) return;
+            document.documentElement.style.setProperty('--tags-h', tags.getBoundingClientRect().height + 'px');
+        }
+        document.addEventListener('DOMContentLoaded', updateTagsHeight);
+        if (document.fonts) document.fonts.ready.then(updateTagsHeight);
+        window.addEventListener('resize', updateTagsHeight);
+    })();
+    </script>
 </body>
 </html>
 
