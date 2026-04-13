@@ -8,6 +8,7 @@
 
   const $ = (id) => document.getElementById(id);
   const SITE = 'site';
+  const DEFAULT_TAGS = ['奶蛋素', '無咖啡因', '無酒精', '可宅配'];
 
   // ── State ─────────────────────────────────────────────────────────
 
@@ -27,6 +28,7 @@
     editingImageIndex: -1,
     scrollToImageIndex: -1,
     editingTags: [],
+    globalTags: DEFAULT_TAGS.slice(),
   };
 
   // Tracks what has been modified locally (not yet published)
@@ -630,9 +632,7 @@
       chip.appendChild(btn);
       chips.appendChild(chip);
     });
-    document.querySelectorAll('.tag-preset').forEach(function (btn) {
-      btn.disabled = state.editingTags.indexOf(btn.dataset.tag) !== -1;
-    });
+    renderPresetButtons();
   }
 
   function addEditingTag(tag) {
@@ -647,6 +647,154 @@
     if (idx === -1) return;
     state.editingTags.splice(idx, 1);
     renderTagChips();
+  }
+
+  // ── Global tag management ──────────────────────────────────────────
+
+  function refreshGlobalTags() {
+    var all = DEFAULT_TAGS.slice();
+    ['products', 'seasonal'].forEach(function (type) {
+      (state.imageData[type].items || []).forEach(function (item) {
+        (item.tags || []).forEach(function (tag) {
+          if (all.indexOf(tag) === -1) all.push(tag);
+        });
+      });
+    });
+    state.globalTags = all;
+    renderPresetButtons();
+    renderTagManager();
+  }
+
+  function renderPresetButtons() {
+    var container = $('tagPresets');
+    if (!container) return;
+    container.innerHTML = '';
+    state.globalTags.forEach(function (tag) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'tag-preset';
+      btn.dataset.tag = tag;
+      btn.textContent = tag;
+      btn.disabled = state.editingTags.indexOf(tag) !== -1;
+      container.appendChild(btn);
+    });
+  }
+
+  function renderTagManager() {
+    var list = $('tagManagerList');
+    if (!list) return;
+    list.innerHTML = '';
+    if (state.globalTags.length === 0) {
+      var empty = document.createElement('div');
+      empty.className = 'tag-manager-empty';
+      empty.textContent = '尚無標籤';
+      list.appendChild(empty);
+      return;
+    }
+    state.globalTags.forEach(function (tag) {
+      var count = 0;
+      ['products', 'seasonal'].forEach(function (type) {
+        (state.imageData[type].items || []).forEach(function (item) {
+          if ((item.tags || []).indexOf(tag) !== -1) count++;
+        });
+      });
+      var row = document.createElement('div');
+      row.className = 'tag-manager-item';
+      row.dataset.tag = tag;
+
+      var nameSpan = document.createElement('span');
+      nameSpan.className = 'tag-manager-item__name';
+      nameSpan.textContent = tag;
+
+      var countSpan = document.createElement('span');
+      countSpan.className = 'tag-manager-item__count';
+      countSpan.textContent = count > 0 ? count + ' 項' : '';
+
+      var actions = document.createElement('div');
+      actions.className = 'tag-manager-item__actions';
+
+      var renameBtn = document.createElement('button');
+      renameBtn.type = 'button';
+      renameBtn.className = 'btn btn-sm btn-secondary tm-rename-btn';
+      renameBtn.dataset.tag = tag;
+      renameBtn.textContent = '改名';
+
+      var deleteBtn = document.createElement('button');
+      deleteBtn.type = 'button';
+      deleteBtn.className = 'btn btn-sm tm-delete-btn';
+      deleteBtn.dataset.tag = tag;
+      deleteBtn.textContent = '刪除';
+
+      actions.appendChild(renameBtn);
+      actions.appendChild(deleteBtn);
+      row.appendChild(nameSpan);
+      row.appendChild(countSpan);
+      row.appendChild(actions);
+      list.appendChild(row);
+    });
+  }
+
+  function addGlobalTag(tag) {
+    tag = tag.trim();
+    if (!tag || state.globalTags.indexOf(tag) !== -1) return;
+    state.globalTags.push(tag);
+    renderPresetButtons();
+    renderTagManager();
+  }
+
+  function renameTagGlobally(oldTag, newTag) {
+    newTag = newTag.trim();
+    if (!newTag || newTag === oldTag) { renderTagManager(); return; }
+    if (state.globalTags.indexOf(newTag) !== -1) {
+      alert('標籤「' + newTag + '」已存在');
+      renderTagManager();
+      return;
+    }
+    ['products', 'seasonal'].forEach(function (type) {
+      var changed = false;
+      (state.imageData[type].items || []).forEach(function (item) {
+        var idx = (item.tags || []).indexOf(oldTag);
+        if (idx !== -1) { item.tags[idx] = newTag; changed = true; }
+      });
+      if (changed) dirty[type] = true;
+    });
+    var gIdx = state.globalTags.indexOf(oldTag);
+    if (gIdx !== -1) state.globalTags[gIdx] = newTag;
+    var eIdx = state.editingTags.indexOf(oldTag);
+    if (eIdx !== -1) state.editingTags[eIdx] = newTag;
+    updatePublishButton();
+    renderPresetButtons();
+    renderTagChips();
+    renderTagManager();
+  }
+
+  function deleteTagGlobally(tag) {
+    var count = 0;
+    ['products', 'seasonal'].forEach(function (type) {
+      (state.imageData[type].items || []).forEach(function (item) {
+        if ((item.tags || []).indexOf(tag) !== -1) count++;
+      });
+    });
+    var msg = count > 0
+      ? '有 ' + count + ' 個品項使用標籤「' + tag + '」，確定要從所有品項中移除此標籤嗎？'
+      : '確定要移除標籤「' + tag + '」？';
+    if (!confirm(msg)) return;
+    ['products', 'seasonal'].forEach(function (type) {
+      var changed = false;
+      (state.imageData[type].items || []).forEach(function (item) {
+        var idx = (item.tags || []).indexOf(tag);
+        if (idx !== -1) { item.tags.splice(idx, 1); changed = true; }
+      });
+      if (changed) dirty[type] = true;
+    });
+    var gIdx = state.globalTags.indexOf(tag);
+    if (gIdx !== -1) state.globalTags.splice(gIdx, 1);
+    var eIdx = state.editingTags.indexOf(tag);
+    if (eIdx !== -1) state.editingTags.splice(eIdx, 1);
+    updatePublishButton();
+    renderPresetButtons();
+    renderTagChips();
+    renderTagManager();
   }
 
   function hasUnsavedChanges() {
@@ -1322,22 +1470,94 @@
       if (state.currentTab === 'seasonal' || state.currentTab === 'products') saveImageEdit(state.currentTab);
     });
 
-    // Tag editor: preset buttons
-    document.querySelectorAll('.tag-preset').forEach(function (btn) {
-      btn.addEventListener('click', function () { addEditingTag(btn.dataset.tag); });
+    // Tag editor: preset buttons (event delegation)
+    $('tagPresets').addEventListener('click', function (e) {
+      var btn = e.target.closest('.tag-preset');
+      if (btn && !btn.disabled) addEditingTag(btn.dataset.tag);
     });
 
-    // Tag editor: custom tag input
-    $('tagAddBtn').addEventListener('click', function () {
-      var input = $('tagInput');
-      addEditingTag(input.value);
+
+
+    // Tag manager: toggle
+    $('tagManagerToggle').addEventListener('click', function () {
+      var content = $('tagManagerContent');
+      var icon = $('tagManagerIcon');
+      var visible = content.style.display !== 'none';
+      content.style.display = visible ? 'none' : 'block';
+      if (icon) icon.style.transform = visible ? '' : 'rotate(180deg)';
+    });
+
+    // Tag manager: add global tag
+    $('globalTagAddBtn').addEventListener('click', function () {
+      var input = $('globalTagInput');
+      addGlobalTag(input.value);
       input.value = '';
     });
-    $('tagInput').addEventListener('keydown', function (e) {
+    $('globalTagInput').addEventListener('keydown', function (e) {
       if (e.key === 'Enter') {
         e.preventDefault();
-        addEditingTag($('tagInput').value);
-        $('tagInput').value = '';
+        addGlobalTag($('globalTagInput').value);
+        $('globalTagInput').value = '';
+      }
+    });
+
+    // Tag manager: list actions (event delegation)
+    $('tagManagerList').addEventListener('click', function (e) {
+      var renameBtn = e.target.closest('.tm-rename-btn');
+      var deleteBtn = e.target.closest('.tm-delete-btn');
+      var confirmBtn = e.target.closest('.tm-confirm-btn');
+      var cancelBtn = e.target.closest('.tm-cancel-btn');
+
+      if (renameBtn) {
+        var tag = renameBtn.dataset.tag;
+        var row = renameBtn.closest('.tag-manager-item');
+        if (!row) return;
+        row.innerHTML = '';
+        var input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'input input--sm tm-rename-input';
+        input.value = tag;
+        input.maxLength = 20;
+        var rowActions = document.createElement('div');
+        rowActions.className = 'tag-manager-item__actions';
+        var confirmBtn2 = document.createElement('button');
+        confirmBtn2.type = 'button';
+        confirmBtn2.className = 'btn btn-sm btn-primary tm-confirm-btn';
+        confirmBtn2.dataset.tag = tag;
+        confirmBtn2.textContent = '確認';
+        var cancelBtn2 = document.createElement('button');
+        cancelBtn2.type = 'button';
+        cancelBtn2.className = 'btn btn-sm btn-secondary tm-cancel-btn';
+        cancelBtn2.dataset.tag = tag;
+        cancelBtn2.textContent = '取消';
+        rowActions.appendChild(confirmBtn2);
+        rowActions.appendChild(cancelBtn2);
+        row.appendChild(input);
+        row.appendChild(rowActions);
+        input.focus();
+        input.select();
+        input.addEventListener('keydown', function (ev) {
+          if (ev.key === 'Enter') { ev.preventDefault(); renameTagGlobally(tag, input.value); }
+          if (ev.key === 'Escape') renderTagManager();
+        });
+        return;
+      }
+
+      if (deleteBtn) {
+        deleteTagGlobally(deleteBtn.dataset.tag);
+        return;
+      }
+
+      if (confirmBtn) {
+        var row2 = confirmBtn.closest('.tag-manager-item');
+        var input2 = row2 ? row2.querySelector('.tm-rename-input') : null;
+        if (input2) renameTagGlobally(confirmBtn.dataset.tag, input2.value);
+        return;
+      }
+
+      if (cancelBtn) {
+        renderTagManager();
+        return;
       }
     });
     $('imageEditDeleteBtn').addEventListener('click', function () {
@@ -1528,6 +1748,7 @@
     // Pre-load image data
     await loadImageData('seasonal');
     await loadImageData('products');
+    refreshGlobalTags();
 
     switchTab('calendar');
     switchMode('edit');

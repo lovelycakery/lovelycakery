@@ -138,16 +138,7 @@
                             <label class="label">標籤</label>
                             <div class="tag-editor">
                                 <div class="tag-chips" id="tagChips"></div>
-                                <div class="tag-presets" id="tagPresets">
-                                    <button type="button" class="tag-preset" data-tag="奶蛋素">奶蛋素</button>
-                                    <button type="button" class="tag-preset" data-tag="無咖啡因">無咖啡因</button>
-                                    <button type="button" class="tag-preset" data-tag="無酒精">無酒精</button>
-                                    <button type="button" class="tag-preset" data-tag="可宅配">可宅配</button>
-                                </div>
-                                <div class="tag-input-row">
-                                    <input type="text" id="tagInput" class="input input--sm" placeholder="自訂標籤…" maxlength="20">
-                                    <button type="button" id="tagAddBtn" class="btn btn-secondary btn-sm">新增</button>
-                                </div>
+                                <div class="tag-presets" id="tagPresets"></div>
                             </div>
                         </div>
 
@@ -162,6 +153,19 @@
                         <div class="image-upload-area" id="imageUploadArea">
                             <p>拖曳圖片到此處或點擊選擇</p>
                             <input type="file" id="imageFileInput" accept="image/jpeg,image/png,image/webp" multiple style="display: none;">
+                        </div>
+                    </div>
+
+                    <div class="panel__section">
+                        <div class="panel__title tag-manager-toggle" id="tagManagerToggle">
+                            管理標籤 <span class="status-toggle-icon" id="tagManagerIcon">&#9660;</span>
+                        </div>
+                        <div id="tagManagerContent" style="display: none; margin-top: 8px;">
+                            <div class="tag-manager-list" id="tagManagerList"></div>
+                            <div class="tag-input-row" style="margin-top: 8px;">
+                                <input type="text" id="globalTagInput" class="input input--sm" placeholder="新增標籤到清單…" maxlength="20">
+                                <button type="button" id="globalTagAddBtn" class="btn btn-secondary btn-sm">新增</button>
+                            </div>
                         </div>
                     </div>
 
