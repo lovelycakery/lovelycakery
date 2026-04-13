@@ -1,4 +1,21 @@
 {
   "schema_version": 1,
-  "items": []
+  "items": [
+    {
+      "image": "assets/images/seasonal/未命名 (Facebook 影片) (2).jpg",
+      "name": "琥珀焙香千層",
+      "name_en": "Amber Hoijcha Mille Crepes",
+      "prices": {
+        "size6": "1680",
+        "size8": "2980",
+        "slice": "280"
+      },
+      "description": "日本靜岡小柳津焙茶\n黑糖蕨餅 迷你西洋梨 \n奶酥餅乾碎 烘烤橙乾",
+      "description_en": "Shizuoka roasted green tea hojicha paired with mini pear, black sugar warabi mochi, buttery crumble, and dried orange peel",
+      "tags": [
+        "奶蛋素",
+        "無酒精"
+      ]
+    }
+  ]
 }
