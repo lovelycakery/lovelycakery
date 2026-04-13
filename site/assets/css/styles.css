@@ -709,6 +709,10 @@ img {
     to { transform: rotate(360deg); }
 }
 
+.gallery-image-wrapper {
+    cursor: pointer;
+}
+
 .gallery-image-wrapper:hover {
     transform: translateY(-4px) scale(1.03);
     box-shadow: 0 8px 24px rgba(61, 40, 23, 0.15);
@@ -1857,6 +1861,7 @@ img {
 
 .image-modal__info {
     padding: 24px;
+    user-select: text;
 }
 
 .image-modal__name {

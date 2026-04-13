@@ -3,8 +3,9 @@
 (function () {
   'use strict';
 
-  // 禁用右鍵選單
+  // 禁用右鍵選單（modal 內文字區除外，允許複製）
   document.addEventListener('contextmenu', function (e) {
+    if (e.target.closest('.image-modal__info')) return;
     e.preventDefault();
     return false;
   });

@@ -551,8 +551,8 @@
           }
         });
       } else {
-        // 非編輯模式（包括預覽模式和訪客模式）：點擊顯示 modal
-        itemEl.addEventListener('click', () => {
+        // 非編輯模式（包括預覽模式和訪客模式）：只有點圖片才開 modal
+        imageWrapper.addEventListener('click', () => {
           createImageModal(item);
         });
       }
