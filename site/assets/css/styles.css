@@ -1624,7 +1624,7 @@ img {
 /* 響應式：手機 */
 @media (max-width: 640px) {
     .order-content {
-        padding: calc(var(--tags-h, 80px) + 8px) 0 40px;
+        padding: var(--tags-h, 80px) 0 40px;
     }
 
     .order-tags {
@@ -1646,7 +1646,7 @@ img {
     .order-card {
         padding: 44px 30px;
         border-radius: 16px;
-        margin-top: 24px;
+        margin-top: 6px;
     }
 
     .order-section::after {
