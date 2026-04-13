@@ -543,6 +543,7 @@ img {
     .nav-right .nav .nav-link-icon {
         flex: 1;
         justify-content: center;
+        font-size: clamp(12px, calc(100vw / 26), 17px);
     }
 
     .nav-right .social-links {
