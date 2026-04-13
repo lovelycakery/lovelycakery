@@ -1863,6 +1863,7 @@ img {
 
 .image-modal__info {
     padding: 24px;
+    -webkit-user-select: text;
     user-select: text;
 }
 
