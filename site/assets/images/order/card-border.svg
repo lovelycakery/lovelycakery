@@ -100,20 +100,25 @@
   <use href="#lf" transform="translate(664,543)"/>
   <use href="#sf" transform="translate(703,504)"/>
 
-  <!-- 上邊小花（內峰，2 朵） -->
+  <!-- 上邊小花（內峰 + 中外峰，3 朵） -->
+  <use href="#sf" transform="translate(136,13)"/>
   <use href="#sf" transform="translate(216,24)"/>
   <use href="#sf" transform="translate(408,24)"/>
+  <use href="#sf" transform="translate(504,12)"/>
 
-  <!-- 下邊小花（內峰，與上邊位置錯開） -->
+  <!-- 下邊小花（內峰 + 中外峰，與上邊位置錯開，3 朵） -->
+  <use href="#sf" transform="translate(216,547)"/>
   <use href="#sf" transform="translate(312,536)"/>
   <use href="#sf" transform="translate(504,536)"/>
 
-  <!-- 左邊小花（內峰） -->
+  <!-- 左邊小花（內峰 + 中外峰） -->
   <use href="#sf" transform="translate(21,124)"/>
+  <use href="#sf" transform="translate(12,228)"/>
   <use href="#sf" transform="translate(21,332)"/>
 
-  <!-- 右邊小花（內峰） -->
+  <!-- 右邊小花（內峰 + 中外峰） -->
   <use href="#sf" transform="translate(699,228)"/>
+  <use href="#sf" transform="translate(709,332)"/>
   <use href="#sf" transform="translate(699,436)"/>
 
   <!-- 花苞小圓點（外峰，僅深弧位置） -->
