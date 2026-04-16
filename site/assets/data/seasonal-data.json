@@ -16,6 +16,22 @@
         "奶蛋素",
         "無酒精"
       ]
+    },
+    {
+      "image": "assets/images/seasonal/未命名設計 - 2026-04-16T080659.889.jpg",
+      "name": "微醺栗香提拉米蘇",
+      "name_en": "微醺栗香提拉米蘇",
+      "prices": {
+        "size6": "1780",
+        "size8": "3180",
+        "slice": "300"
+      },
+      "description": "法國沙巴東栗子泥 貝禮詩香甜酒\n義大利白朗尼手指餅 手工熬煮咖啡焦糖\n法芙娜可可粉 香烤杏仁",
+      "description_en": "French Sabaton chestnut puree with Baileys, Italian Savoiardi ladyfingers, artisanal coffee caramel, Valrhona cocoa powder, and roasted almonds",
+      "tags": [
+        "可宅配",
+        "奶蛋素"
+      ]
     }
   ]
 }
