@@ -35,16 +35,19 @@
     },
     {
       "image": "assets/images/seasonal/未命名設計 - 2026-04-22T141657.138.jpg",
-      "name": "未命名設計 - 2026-04-22T141657.138",
-      "name_en": "",
+      "name": "檸檬香梨千層",
+      "name_en": "Lemon Pear Mille-Crepes",
       "prices": {
-        "size6": "",
-        "size8": "",
-        "slice": ""
+        "size6": "1680",
+        "size8": "2980",
+        "slice": "280"
       },
       "description": "",
       "description_en": "",
-      "tags": []
+      "tags": [
+        "奶蛋素",
+        "無酒精"
+      ]
     }
   ]
 }
