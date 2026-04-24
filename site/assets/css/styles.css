@@ -916,6 +916,31 @@ img {
     font-size: 16px;
 }
 
+/* ============================================
+   新品上市（seasonal）：標籤微幅溢出照片邊緣
+   與 all-items 相同結構：外框不裁切、圓角與陰影移到 <img> 本身
+   ============================================ */
+.seasonal-page .gallery-image-wrapper {
+    overflow: visible;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.seasonal-page .gallery-image {
+    border-radius: 20px;
+    box-shadow: 0 4px 16px rgba(61, 40, 23, 0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+.seasonal-page .gallery-image-wrapper:hover .gallery-image {
+    box-shadow: 0 8px 24px rgba(61, 40, 23, 0.15);
+}
+
+.seasonal-page .gallery-image-tags {
+    bottom: -6px;
+    right: -6px;
+}
+
 /* 響應式���平板 - 分頁樣式 */
 @media (max-width: 968px) {
     .page-header {
@@ -1580,20 +1605,6 @@ img {
 }
 #shipping.order-section::before {
     background: linear-gradient(to right, #8fb8e0, #6a9bd1);
-}
-
-#delivery.order-section {
-    background-image: repeating-linear-gradient(
-        90deg,
-        #e8f3eb 0,
-        #e8f3eb 28px,
-        #d4ebda 28px,
-        #d4ebda 56px
-    );
-    border-color: #b8dac1;
-}
-#delivery.order-section::before {
-    background: linear-gradient(to right, #87c094, #5fa372);
 }
 
 .order-qrcode {

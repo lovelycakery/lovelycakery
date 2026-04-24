@@ -8,7 +8,7 @@
 
   const $ = (id) => document.getElementById(id);
   const SITE = 'site';
-  const DEFAULT_TAGS = ['奶蛋素', '無咖啡因', '無酒精', '可宅配'];
+  const DEFAULT_TAGS = ['奶蛋素', '無咖啡因', '無酒精'];
 
   // ── State ─────────────────────────────────────────────────────────
 

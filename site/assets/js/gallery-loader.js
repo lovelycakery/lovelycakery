@@ -160,11 +160,6 @@
       text: '#a05a45',
       shadow: 'rgba(212, 135, 106, 0.25)'
     },      // 粉橘便利貼
-    '可宅配': {
-      bg: '#f8ecb8',
-      text: '#947e30',
-      shadow: 'rgba(212, 179, 94, 0.25)'
-    },      // 粉黃便利貼
   };
 
   const TAG_COLOR_DEFAULT = {
@@ -178,7 +173,6 @@
     '奶蛋素': { zh: '奶蛋素', en: 'Vegetarian' },
     '無咖啡因': { zh: '無咖啡因', en: 'Caffeine-Free' },
     '無酒精': { zh: '無酒精', en: 'Alcohol-Free' },
-    '可宅配': { zh: '可宅配', en: 'Delivery' },
   };
 
   // 尺寸選項中英文對應
