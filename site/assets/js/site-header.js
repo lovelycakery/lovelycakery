@@ -32,10 +32,11 @@
   }
 
   function renderNavItems(currentPage) {
+    // 優惠組合（sets.html）暫時不在公開導覽列顯示；準備好內容後再把下面那行加回月曆與新品上市之間
+    // { href: 'sets.html', zh: '優惠組合', en: 'Sets' },
     const items = [
       { href: 'index.html', zh: '首頁', en: 'Home', isIcon: true, iconType: 'home' },
       { href: 'calendar.html', zh: '月曆', en: 'Calendar' },
-      { href: 'sets.html', zh: '優惠組合', en: 'Sets' },
       { href: 'seasonal.html', zh: '新品上市', en: 'Season' },
       { href: 'all-items.html', zh: '全部品項', en: 'Menu' },
       { href: 'order.html', zh: '訂購說明', en: 'Order' },
