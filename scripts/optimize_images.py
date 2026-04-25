@@ -48,6 +48,7 @@ def iter_targets(root: Path, include_hero: bool) -> list[Path]:
     targets: list[Path] = []
     targets += sorted((root / "site/assets/images/products").glob("*.jpg"))
     targets += sorted((root / "site/assets/images/seasonal").glob("*.jpg"))
+    targets += sorted((root / "site/assets/images/sets").glob("*.jpg"))
     targets += sorted((root / "site/assets/images/calendar/frames").glob("*.png"))
     targets += sorted((root / "site/assets/images/logo").glob("*.png"))
     if include_hero:

@@ -3,17 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Lovely Cakery 預訂日曆 — 查看可預訂日期與休息日。Check availability and order dates.">
-    <meta property="og:title" content="日曆 - Lovely Cakery">
-    <meta property="og:description" content="查看 Lovely Cakery 的可預訂日期與休息日。">
+    <meta name="description" content="Lovely Cakery 優惠組合 — 精選蛋糕組合搭配，超值划算。Curated cake sets at special prices.">
+    <meta property="og:title" content="優惠組合 - Lovely Cakery">
+    <meta property="og:description" content="精選蛋糕組合搭配，超值划算。">
     <meta property="og:image" content="https://lovelycakery.github.io/lovelycakery/assets/images/cakes.jpg">
-    <meta property="og:url" content="https://lovelycakery.github.io/lovelycakery/calendar.html">
+    <meta property="og:url" content="https://lovelycakery.github.io/lovelycakery/sets.html">
     <meta property="og:type" content="website">
     <meta name="theme-color" content="#ffffff">
-    <title data-en="Calendar - Lovely Cakery" data-zh="日曆 - Lovely Cakery">日曆 - Lovely Cakery</title>
+    <title data-en="Sets - Lovely Cakery" data-zh="優惠組合 - Lovely Cakery">優惠組合 - Lovely Cakery</title>
     <link rel="icon" href="favicon.ico" sizes="any">
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
-    <link rel="stylesheet" href="assets/css/styles.css?v=20260425-2">
+    <link rel="preload" href="assets/data/sets-data.json" as="fetch" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="assets/css/styles.css">
     <!-- Google Fonts loaded by site-header.js -->
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=AW-10994472042"></script>
@@ -24,29 +27,25 @@
       gtag('config', 'AW-10994472042');
     </script>
 </head>
-<body class="calendar-page-body">
+<body class="sets-page">
     <header class="header" id="site-header"></header>
 
-    <main class="main-content calendar-page">
+    <main class="main-content">
         <div class="container">
-            <!-- 嵌入只讀日曆組件 -->
-            <div class="calendar-wrapper">
-                <iframe 
-                    src="calendar-widget-readonly.html?v=20260425-2"
-                    class="calendar-iframe"
-                    title="Calendar Widget"
-                    frameborder="0"
-                    scrolling="no">
-                </iframe>
+            <div class="page-header">
+                <h1 class="page-title" data-en="Sets" data-zh="優惠組合">優惠組合</h1>
+                <p class="page-subtitle" data-en="Curated bundles." data-zh="精選優惠組合。">精選優惠組合。</p>
+            </div>
+
+            <div class="gallery-grid" data-gallery-type="sets">
+                <!-- Images loaded dynamically by gallery-loader.js -->
             </div>
         </div>
     </main>
-    
     <noscript><p style="text-align:center;padding:40px;font-size:16px;color:#3d2817;">本網站需要 JavaScript 才能正常顯示。請啟用 JavaScript 後重新整理頁面。<br>This website requires JavaScript. Please enable it and reload.</p></noscript>
     <script defer src="assets/js/site-header.js"></script>
     <script defer src="assets/js/i18n.js"></script>
-    <script defer src="assets/js/calendar-embed.js?v=20260425-2"></script>
+    <script defer src="assets/js/gallery-loader.js"></script>
     <script defer src="assets/js/image-protection.js"></script>
 </body>
 </html>
-

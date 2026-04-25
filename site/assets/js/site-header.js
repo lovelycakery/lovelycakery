@@ -35,10 +35,11 @@
     const items = [
       { href: 'index.html', zh: '首頁', en: 'Home', isIcon: true, iconType: 'home' },
       { href: 'calendar.html', zh: '月曆', en: 'Calendar' },
+      { href: 'sets.html', zh: '優惠組合', en: 'Sets' },
       { href: 'seasonal.html', zh: '新品上市', en: 'Season' },
       { href: 'all-items.html', zh: '全部品項', en: 'Menu' },
       { href: 'order.html', zh: '訂購說明', en: 'Order' },
-      { href: 'contact.html', zh: '地圖', en: 'Map' },
+      { href: 'contact.html', zh: '地圖', en: 'Map', mobileHidden: true },
     ];
 
     const parts = [];
@@ -77,6 +78,7 @@
             escapeHtml(it.href) +
             '" class="nav-link' +
             (isActive ? ' is-active' : '') +
+            (it.mobileHidden ? ' nav-link--mobile-hidden' : '') +
             '" data-en="' +
             escapeHtml(it.en) +
             '" data-zh="' +
@@ -91,6 +93,17 @@
       // 移除分隔符，改用 CSS gap 來分隔
     });
     return parts.join('');
+  }
+
+  function renderMapLink(currentPage) {
+    const isActive = currentPage === 'contact.html';
+    return (
+      '<a href="contact.html" class="nav-link nav-link--map nav-link--mobile-only' +
+      (isActive ? ' is-active' : '') +
+      '" data-en="Map" data-zh="地圖"' +
+      (isActive ? ' aria-current="page"' : '') +
+      '>地圖</a>'
+    );
   }
 
   function buildHeaderHtml() {
@@ -109,6 +122,7 @@
       '      <nav class="nav" aria-label="Primary">' +
       renderNavItems(currentPage) +
       '      </nav>' +
+      '      ' + renderMapLink(currentPage) +
       '      <div class="social-links">' +
       '        <a href="https://www.facebook.com/lovelycakery2025/" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Facebook">' +
       '          <svg class="social-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' +

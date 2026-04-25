@@ -256,7 +256,7 @@ for f in html_files:
     # admin.html is a standalone admin page with its own scripts — skip shared header/i18n check
     if f.name == 'admin.html':
         continue
-    if f.name in ('index.html', 'calendar.html', 'seasonal.html', 'all-items.html', 'order.html', 'contact.html'):
+    if f.name in ('index.html', 'calendar.html', 'seasonal.html', 'sets.html', 'all-items.html', 'order.html', 'contact.html'):
         if 'assets/js/site-header.js' not in srcs:
             errors.append(f"{f}: missing assets/js/site-header.js (required for shared header/nav)")
         if 'assets/js/i18n.js' not in srcs:

@@ -10,6 +10,16 @@
   const SITE = 'site';
   const DEFAULT_TAGS = ['奶蛋素', '無咖啡因', '無酒精'];
 
+  // 圖片型 tab：seasonal / products / sets。價格欄位僅 seasonal/products 使用
+  const IMAGE_TYPES = ['seasonal', 'products', 'sets'];
+  const TYPE_LABEL = { seasonal: '新品上市', products: '全部品項', sets: '優惠組合' };
+  const TYPE_DATAFILE = { seasonal: 'seasonal-data.json', products: 'products-data.json', sets: 'sets-data.json' };
+  const TYPE_IMAGEDIR = { seasonal: 'assets/images/seasonal', products: 'assets/images/products', sets: 'assets/images/sets' };
+  const TYPES_WITH_PRICE = ['seasonal', 'products'];
+
+  function isImageTab(tab) { return IMAGE_TYPES.indexOf(tab) !== -1; }
+  function tabTypeHasPrice(tab) { return TYPES_WITH_PRICE.indexOf(tab) !== -1; }
+
   // ── State ─────────────────────────────────────────────────────────
 
   const state = {
@@ -24,6 +34,7 @@
     imageData: {
       seasonal: { items: [] },
       products: { items: [] },
+      sets: { items: [] },
     },
     editingImageIndex: -1,
     scrollToImageIndex: -1,
@@ -36,6 +47,7 @@
     calendar: false,
     seasonal: false,
     products: false,
+    sets: false,
     // Pending image uploads: [{path, base64, repoPath}]
     pendingImages: [],
     // Pending image deletions: [repoPath]
@@ -43,7 +55,7 @@
   };
 
   function hasPendingChanges() {
-    return dirty.calendar || dirty.seasonal || dirty.products ||
+    return dirty.calendar || dirty.seasonal || dirty.products || dirty.sets ||
       dirty.pendingImages.length > 0 || dirty.pendingDeletes.length > 0;
   }
 
@@ -55,6 +67,7 @@
     if (dirty.calendar) count++;
     if (dirty.seasonal) count++;
     if (dirty.products) count++;
+    if (dirty.sets) count++;
     count += dirty.pendingImages.length;
     count += dirty.pendingDeletes.length;
     btn.textContent = count > 0 ? '一鍵發布 (' + count + ')' : '一鍵發布';
@@ -201,8 +214,8 @@
   }
 
   function reloadPreview() {
-    var page = state.currentTab === 'calendar' ? 'calendar.html'
-      : (state.currentTab === 'seasonal' ? 'seasonal.html' : 'all-items.html');
+    var pageMap = { calendar: 'calendar.html', seasonal: 'seasonal.html', sets: 'sets.html', products: 'all-items.html' };
+    var page = pageMap[state.currentTab] || 'calendar.html';
     var mode = state.currentMode === 'edit' ? 'edit' : 'preview';
     var iframe = $('previewFrame');
     iframe.src = getPreviewBaseUrl() + '/' + page + '?adminPreview=1&mode=' + mode + '&ts=' + Date.now();
@@ -600,7 +613,7 @@
 
   async function loadImageData(type) {
     try {
-      var filename = type === 'seasonal' ? 'seasonal-data.json' : 'products-data.json';
+      var filename = TYPE_DATAFILE[type] || (type + '-data.json');
       var res = await GitHubAPI.getJSON(SITE + '/assets/data/' + filename);
       state.imageData[type] = res.data;
     } catch (e) {
@@ -653,7 +666,7 @@
 
   function refreshGlobalTags() {
     var all = DEFAULT_TAGS.slice();
-    ['products', 'seasonal'].forEach(function (type) {
+    IMAGE_TYPES.forEach(function (type) {
       (state.imageData[type].items || []).forEach(function (item) {
         (item.tags || []).forEach(function (tag) {
           if (all.indexOf(tag) === -1) all.push(tag);
@@ -693,7 +706,7 @@
     }
     state.globalTags.forEach(function (tag) {
       var count = 0;
-      ['products', 'seasonal'].forEach(function (type) {
+      IMAGE_TYPES.forEach(function (type) {
         (state.imageData[type].items || []).forEach(function (item) {
           if ((item.tags || []).indexOf(tag) !== -1) count++;
         });
@@ -750,7 +763,7 @@
       renderTagManager();
       return;
     }
-    ['products', 'seasonal'].forEach(function (type) {
+    IMAGE_TYPES.forEach(function (type) {
       var changed = false;
       (state.imageData[type].items || []).forEach(function (item) {
         var idx = (item.tags || []).indexOf(oldTag);
@@ -770,7 +783,7 @@
 
   function deleteTagGlobally(tag) {
     var count = 0;
-    ['products', 'seasonal'].forEach(function (type) {
+    IMAGE_TYPES.forEach(function (type) {
       (state.imageData[type].items || []).forEach(function (item) {
         if ((item.tags || []).indexOf(tag) !== -1) count++;
       });
@@ -779,7 +792,7 @@
       ? '有 ' + count + ' 個品項使用標籤「' + tag + '」，確定要從所有品項中移除此標籤嗎？'
       : '確定要移除標籤「' + tag + '」？';
     if (!confirm(msg)) return;
-    ['products', 'seasonal'].forEach(function (type) {
+    IMAGE_TYPES.forEach(function (type) {
       var changed = false;
       (state.imageData[type].items || []).forEach(function (item) {
         var idx = (item.tags || []).indexOf(tag);
@@ -799,7 +812,7 @@
 
   function hasUnsavedChanges() {
     if (state.editingImageIndex < 0) return false;
-    var type = state.currentTab === 'seasonal' ? 'seasonal' : 'products';
+    var type = isImageTab(state.currentTab) ? state.currentTab : 'products';
     var item = state.imageData[type].items[state.editingImageIndex];
     if (!item) return false;
     var prices = (item.prices && typeof item.prices === 'object') ? item.prices : {};
@@ -807,9 +820,11 @@
     var origTags = item.tags || [];
     if ($('imageNameInput').value.trim() !== (item.name || '').trim()) return true;
     if ($('imageNameEnInput').value.trim() !== (item.name_en || '').trim()) return true;
-    if ($('imagePriceSize6Input').value.trim() !== (prices.size6 || '').toString().trim()) return true;
-    if ($('imagePriceSize8Input').value.trim() !== (prices.size8 || '').toString().trim()) return true;
-    if ($('imagePriceSliceInput').value.trim() !== (prices.slice || '').toString().trim()) return true;
+    if (tabTypeHasPrice(type)) {
+      if ($('imagePriceSize6Input').value.trim() !== (prices.size6 || '').toString().trim()) return true;
+      if ($('imagePriceSize8Input').value.trim() !== (prices.size8 || '').toString().trim()) return true;
+      if ($('imagePriceSliceInput').value.trim() !== (prices.slice || '').toString().trim()) return true;
+    }
     if ($('imageDescInput').value.trim() !== (item.description || '').trim()) return true;
     if ($('imageDescEnInput').value.trim() !== (item.description_en || '').trim()) return true;
     if (tags.length !== origTags.length || tags.some(function (t) { return origTags.indexOf(t) === -1; })) return true;
@@ -870,15 +885,19 @@
     var item = state.imageData[type].items[index];
     item.name = name;
     item.name_en = $('imageNameEnInput').value.trim();
-    var prices = {};
-    var s6 = $('imagePriceSize6Input').value.trim();
-    var s8 = $('imagePriceSize8Input').value.trim();
-    var sl = $('imagePriceSliceInput').value.trim();
-    if (s6) prices.size6 = s6;
-    if (s8) prices.size8 = s8;
-    if (sl) prices.slice = sl;
-    if (Object.keys(prices).length > 0) { item.prices = prices; }
-    else { delete item.prices; }
+    if (tabTypeHasPrice(type)) {
+      var prices = {};
+      var s6 = $('imagePriceSize6Input').value.trim();
+      var s8 = $('imagePriceSize8Input').value.trim();
+      var sl = $('imagePriceSliceInput').value.trim();
+      if (s6) prices.size6 = s6;
+      if (s8) prices.size8 = s8;
+      if (sl) prices.slice = sl;
+      if (Object.keys(prices).length > 0) { item.prices = prices; }
+      else { delete item.prices; }
+    } else {
+      delete item.prices;
+    }
     item.description = $('imageDescInput').value.trim();
     item.description_en = $('imageDescEnInput').value.trim();
     item.tags = state.editingTags.slice();
@@ -946,7 +965,7 @@
   }
 
   function executeBatchDelete() {
-    var type = state.currentTab === 'seasonal' ? 'seasonal' : 'products';
+    var type = isImageTab(state.currentTab) ? state.currentTab : 'products';
     var count = batchSelected.size;
     if (count === 0) return;
     if (!confirm('確定要刪除 ' + count + ' 個品項嗎？')) return;
@@ -973,7 +992,7 @@
   async function handleImageUpload(type, files) {
     if (!files || files.length === 0) return;
 
-    var imageDir = type === 'seasonal' ? 'assets/images/seasonal' : 'assets/images/products';
+    var imageDir = TYPE_IMAGEDIR[type] || 'assets/images/products';
     var lastUploadedName = null;
 
     for (var i = 0; i < files.length; i++) {
@@ -997,13 +1016,15 @@
           image: imageDir + '/' + filename,
           name: sanitized,
           name_en: '',
-          prices: { size6: '', size8: '', slice: '' },
           description: '',
           description_en: '',
           tags: [],
           // Store blob URL for instant preview
           _previewUrl: URL.createObjectURL(compressed.desktop.blob),
         };
+        if (tabTypeHasPrice(type)) {
+          newItem.prices = { size6: '', size8: '', slice: '' };
+        }
         state.imageData[type].items.push(newItem);
         lastUploadedName = sanitized;
         logStatus('✅ 已壓縮：' + file.name + ' → ' + filename);
@@ -1079,21 +1100,14 @@
         parts.push('日曆');
       }
 
-      // 2. Seasonal data
-      if (dirty.seasonal) {
-        var sData = { schema_version: 1, items: cleanItemsForCommit(state.imageData.seasonal.items) };
-        validateImageData(sData);
-        changes.push({ path: SITE + '/assets/data/seasonal-data.json', content: JSON.stringify(sData, null, 2) + '\n' });
-        parts.push('新品上市');
-      }
-
-      // 3. Products data
-      if (dirty.products) {
-        var pData = { schema_version: 1, items: cleanItemsForCommit(state.imageData.products.items) };
-        validateImageData(pData);
-        changes.push({ path: SITE + '/assets/data/products-data.json', content: JSON.stringify(pData, null, 2) + '\n' });
-        parts.push('全部品項');
-      }
+      // 2. Image-type data (seasonal / products / sets)
+      IMAGE_TYPES.forEach(function (t) {
+        if (!dirty[t]) return;
+        var data = { schema_version: 1, items: cleanItemsForCommit(state.imageData[t].items) };
+        validateImageData(data);
+        changes.push({ path: SITE + '/assets/data/' + TYPE_DATAFILE[t], content: JSON.stringify(data, null, 2) + '\n' });
+        parts.push(TYPE_LABEL[t]);
+      });
 
       // 4. Pending image uploads
       for (var j = 0; j < dirty.pendingImages.length; j++) {
@@ -1120,16 +1134,16 @@
 
       // Reset dirty state
       dirty.calendar = false;
-      dirty.seasonal = false;
-      dirty.products = false;
+      IMAGE_TYPES.forEach(function (t) { dirty[t] = false; });
       dirty.pendingImages = [];
       dirty.pendingDeletes = [];
       updatePublishButton();
 
       // Reload data from GitHub to sync
       await refreshCalendarData();
-      await loadImageData('seasonal');
-      await loadImageData('products');
+      for (var ti = 0; ti < IMAGE_TYPES.length; ti++) {
+        await loadImageData(IMAGE_TYPES[ti]);
+      }
 
       showSuccess('已發布！等待部署中…');
       watchDeployment();
@@ -1215,7 +1229,7 @@
 
     var btn = $('downloadBackupBtn');
     setButtonLoading(btn, true);
-    logStatus('📦 開始打包 ' + (type === 'seasonal' ? '新品上市' : '全部品項') + '…');
+    logStatus('📦 開始打包 ' + (TYPE_LABEL[type] || type) + '…');
 
     try {
       var zip = new JSZip();
@@ -1336,16 +1350,18 @@
 
   function checkAllFields() {
     var missing = [];
-    ['seasonal', 'products'].forEach(function (type) {
+    IMAGE_TYPES.forEach(function (type) {
       (state.imageData[type].items || []).forEach(function (item) {
         var mf = [], mr = [];
         if (!item.name || !item.name.trim()) mr.push('名稱');
         if (!item.name_en || !item.name_en.trim()) mf.push('名稱 (英文)');
-        var hasPrices = item.prices && (item.prices.size6 || item.prices.size8 || item.prices.slice);
-        if (!hasPrices) mf.push('價格');
+        if (tabTypeHasPrice(type)) {
+          var hasPrices = item.prices && (item.prices.size6 || item.prices.size8 || item.prices.slice);
+          if (!hasPrices) mf.push('價格');
+        }
         if (!item.description || !item.description.trim()) mf.push('描述');
         if (!item.description_en || !item.description_en.trim()) mf.push('描述 (英文)');
-        if (mr.length > 0 || mf.length > 0) missing.push({ type: type === 'seasonal' ? '新品上市' : '全部品項', name: item.name || '未命名', required: mr, fields: mf });
+        if (mr.length > 0 || mf.length > 0) missing.push({ type: TYPE_LABEL[type] || type, name: item.name || '未命名', required: mr, fields: mf });
       });
     });
     showCheckResultModal(missing);
@@ -1388,6 +1404,9 @@
     } else {
       $('calendarPanel').style.display = 'none';
       $('imagePanel').style.display = 'block';
+      // 在沒有價格的 tab（如 sets）隱藏價格區塊
+      var priceSection = $('priceSection');
+      if (priceSection) priceSection.style.display = tabTypeHasPrice(tabName) ? '' : 'none';
       // Only load from GitHub if we haven't loaded yet (or if not dirty)
       if (!dirty[tabName] && (!state.imageData[tabName].items || state.imageData[tabName].items.length === 0)) {
         loadImageData(tabName);
@@ -1425,10 +1444,10 @@
       return;
     }
     if (e.data.type === 'gallery-reorder') {
-      var type = state.currentTab === 'seasonal' ? 'seasonal' : 'products';
+      var type = isImageTab(state.currentTab) ? state.currentTab : 'products';
       if (typeof e.data.fromIndex === 'number' && typeof e.data.toIndex === 'number') reorderImages(type, e.data.fromIndex, e.data.toIndex);
     } else if (e.data.type === 'gallery-edit') {
-      var type2 = state.currentTab === 'seasonal' ? 'seasonal' : 'products';
+      var type2 = isImageTab(state.currentTab) ? state.currentTab : 'products';
       var items = state.imageData[type2] && state.imageData[type2].items;
       if (typeof e.data.index === 'number' && items && e.data.index < items.length) openImageEditPanel(type2, e.data.index);
     } else if (e.data.type === 'gallery-deselect') {
@@ -1467,7 +1486,7 @@
     if ($('addItemBtn')) $('addItemBtn').addEventListener('click', addCalendarItem);
 
     $('imageEditSaveBtn').addEventListener('click', function () {
-      if (state.currentTab === 'seasonal' || state.currentTab === 'products') saveImageEdit(state.currentTab);
+      if (isImageTab(state.currentTab)) saveImageEdit(state.currentTab);
     });
 
     // Tag editor: preset buttons (event delegation)
@@ -1561,19 +1580,20 @@
       }
     });
     $('imageEditDeleteBtn').addEventListener('click', function () {
-      if (state.currentTab === 'seasonal' || state.currentTab === 'products') deleteImage(state.currentTab, state.editingImageIndex);
+      if (isImageTab(state.currentTab)) deleteImage(state.currentTab, state.editingImageIndex);
     });
     $('checkCalendarFieldsBtn').addEventListener('click', checkAllCalendarFields);
     $('checkEnglishBtn').addEventListener('click', function () {
       // Ensure data is loaded
-      if (!state.imageData.seasonal.items.length && !dirty.seasonal) loadImageData('seasonal');
-      if (!state.imageData.products.items.length && !dirty.products) loadImageData('products');
+      IMAGE_TYPES.forEach(function (t) {
+        if (!state.imageData[t].items.length && !dirty[t]) loadImageData(t);
+      });
       setTimeout(checkAllFields, 300);
     });
 
     // Download backup
     $('downloadBackupBtn').addEventListener('click', function () {
-      if (state.currentTab === 'seasonal' || state.currentTab === 'products') downloadBackup(state.currentTab);
+      if (isImageTab(state.currentTab)) downloadBackup(state.currentTab);
     });
 
     // Batch delete
@@ -1705,12 +1725,12 @@
     uploadArea.addEventListener('drop', function (e) {
       e.preventDefault(); uploadArea.classList.remove('dragover');
       var files = Array.from(e.dataTransfer.files || []);
-      if (files.length > 0 && (state.currentTab === 'seasonal' || state.currentTab === 'products')) handleImageUpload(state.currentTab, files);
+      if (files.length > 0 && isImageTab(state.currentTab)) handleImageUpload(state.currentTab, files);
     });
     uploadArea.addEventListener('click', function () { fileInput.click(); });
     fileInput.addEventListener('change', function () {
       var files = Array.from(fileInput.files || []);
-      if (files.length > 0 && (state.currentTab === 'seasonal' || state.currentTab === 'products')) handleImageUpload(state.currentTab, files);
+      if (files.length > 0 && isImageTab(state.currentTab)) handleImageUpload(state.currentTab, files);
       fileInput.value = '';
     });
 
@@ -1724,7 +1744,7 @@
       if (state.currentTab === 'calendar' && dirty.calendar) {
         setTimeout(function () { sendCalendarDataToPreview(); }, 500);
       }
-      if ((state.currentTab === 'seasonal' || state.currentTab === 'products') && dirty[state.currentTab]) {
+      if (isImageTab(state.currentTab) && dirty[state.currentTab]) {
         setTimeout(function () { sendImageDataToPreview(state.currentTab); }, 500);
       }
       if (state.editingImageIndex >= 0 && state.currentMode === 'edit' && previewFrame.contentWindow) {
@@ -1746,8 +1766,9 @@
     }
 
     // Pre-load image data
-    await loadImageData('seasonal');
-    await loadImageData('products');
+    for (var ti = 0; ti < IMAGE_TYPES.length; ti++) {
+      await loadImageData(IMAGE_TYPES[ti]);
+    }
     refreshGlobalTags();
 
     switchTab('calendar');
@@ -1759,13 +1780,15 @@
       var calMissing = 0;
       try { calMissing = collectCalendarMissing().length; } catch (_) { /* */ }
       var imgMissing = 0;
-      ['seasonal', 'products'].forEach(function (type) {
+      IMAGE_TYPES.forEach(function (type) {
         (state.imageData[type].items || []).forEach(function (item) {
           var bad = false;
           if (!item.name || !item.name.trim()) bad = true;
           if (!item.name_en || !item.name_en.trim()) bad = true;
-          var hasPrices = item.prices && (item.prices.size6 || item.prices.size8 || item.prices.slice);
-          if (!hasPrices) bad = true;
+          if (tabTypeHasPrice(type)) {
+            var hasPrices = item.prices && (item.prices.size6 || item.prices.size8 || item.prices.slice);
+            if (!hasPrices) bad = true;
+          }
           if (!item.description || !item.description.trim()) bad = true;
           if (!item.description_en || !item.description_en.trim()) bad = true;
           if (bad) imgMissing++;
