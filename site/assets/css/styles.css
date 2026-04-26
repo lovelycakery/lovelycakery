@@ -213,11 +213,6 @@ body.calendar-page-body {
     opacity: 1;
 }
 
-/* 預設隱藏手機專屬的獨立地圖連結；手機 media query 內再切換顯示 */
-.nav-link--mobile-only {
-    display: none;
-}
-
 /* 語言切換器 */
 .language-switcher {
     display: flex;
@@ -530,13 +525,13 @@ img {
 
     .nav-right {
         display: grid;
-        grid-template-columns: auto 1fr auto;
+        grid-template-columns: auto auto;
         grid-template-areas:
-            "nav nav nav"
-            "map social language";
+            "nav nav"
+            "social language";
         justify-content: stretch;  /* 讓導覽區域拉伸 */
         align-items: center;
-        column-gap: 12px;
+        column-gap: 16px;
         row-gap: 8px;
         width: 100%;  /* 確保導覽區域佔滿寬度 */
     }
@@ -554,20 +549,9 @@ img {
         font-size: clamp(11px, calc(100vw / 28), 16px);
     }
 
-    /* 手機：隱藏首頁 icon 與在 nav 內的地圖（改用第二行的獨立地圖連結） */
-    .nav-right .nav .nav-link-icon,
-    .nav-right .nav .nav-link--mobile-hidden {
+    /* 手機：隱藏首頁 icon */
+    .nav-right .nav .nav-link-icon {
         display: none;
-    }
-
-    .nav-right .nav-link--mobile-only {
-        display: inline-flex;
-    }
-
-    .nav-right .nav-link--map {
-        grid-area: map;
-        font-size: clamp(11px, calc(100vw / 28), 16px);
-        justify-self: start;
     }
 
     .nav-right .social-links {
@@ -577,7 +561,7 @@ img {
 
     .nav-right .language-switcher {
         grid-area: language;
-        justify-content: end;
+        justify-content: center;
     }
 
     .social-link {
