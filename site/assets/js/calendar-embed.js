@@ -72,8 +72,8 @@
       // Messages FROM inner iframe → forward to parent or handle locally
       if (event.source !== iframe.contentWindow) return;
 
-      // Forward day-click to parent (admin)
-      if (event.data.type === 'calendar-day-clicked') {
+      // Forward day-click and month-change to parent (admin)
+      if (event.data.type === 'calendar-day-clicked' || event.data.type === 'calendar-month-changed') {
         try { window.parent.postMessage(event.data, '*'); } catch (e) { /* ignore */ }
         return;
       }
