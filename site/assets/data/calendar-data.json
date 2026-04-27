@@ -199,6 +199,10 @@
           "text": "切片優惠組合",
           "color": "#e67700",
           "text_en": "Slice combo"
+        },
+        {
+          "text": "本周切片口味",
+          "color": "#0066cc"
         }
       ]
     },
