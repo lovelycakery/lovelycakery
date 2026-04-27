@@ -212,11 +212,13 @@
       "items": [
         {
           "text": "✨正常營業✨",
-          "color": "#ea5394"
+          "color": "#ea5394",
+          "text_en": "Open"
         },
         {
           "text": "勞工節",
-          "color": "#6b5d4f"
+          "color": "#6b5d4f",
+          "text_en": "Labor Day"
         }
       ]
     },
@@ -225,7 +227,8 @@
       "items": [
         {
           "text": "10am -2pm",
-          "color": "#1a8a1a"
+          "color": "#1a8a1a",
+          "text_en": "10am-2pm"
         }
       ]
     },
@@ -234,7 +237,8 @@
       "items": [
         {
           "text": "休息",
-          "color": "#cc0000"
+          "color": "#cc0000",
+          "text_en": "Closed"
         }
       ]
     },
@@ -243,7 +247,8 @@
       "items": [
         {
           "text": "切片優惠組合",
-          "color": "#e67700"
+          "color": "#e67700",
+          "text_en": "Slice Combo Deal"
         }
       ]
     },
@@ -252,7 +257,8 @@
       "items": [
         {
           "text": "10am -2pm",
-          "color": "#1a8a1a"
+          "color": "#1a8a1a",
+          "text_en": "10am - 2pm"
         }
       ]
     },
@@ -261,11 +267,13 @@
       "items": [
         {
           "text": "💕母親節💕",
-          "color": "#cc0000"
+          "color": "#cc0000",
+          "text_en": "💕Mother's Day💕"
         },
         {
           "text": "10am -2pm",
-          "color": "#1a8a1a"
+          "color": "#1a8a1a",
+          "text_en": "10am–2pm"
         }
       ]
     },
@@ -274,7 +282,8 @@
       "items": [
         {
           "text": "休息",
-          "color": "#cc0000"
+          "color": "#cc0000",
+          "text_en": "Closed"
         }
       ]
     },
@@ -283,7 +292,8 @@
       "items": [
         {
           "text": "切片優惠組合",
-          "color": "#e67700"
+          "color": "#e67700",
+          "text_en": "Slice combo"
         }
       ]
     },
@@ -292,7 +302,8 @@
       "items": [
         {
           "text": "10am -2pm",
-          "color": "#1a8a1a"
+          "color": "#1a8a1a",
+          "text_en": "10am-2pm"
         }
       ]
     },
@@ -301,7 +312,8 @@
       "items": [
         {
           "text": "10am -2pm",
-          "color": "#1a8a1a"
+          "color": "#1a8a1a",
+          "text_en": "10am–2pm"
         }
       ]
     },
@@ -310,7 +322,8 @@
       "items": [
         {
           "text": "休息",
-          "color": "#cc0000"
+          "color": "#cc0000",
+          "text_en": "Closed"
         }
       ]
     },
@@ -319,7 +332,8 @@
       "items": [
         {
           "text": "切片優惠組合",
-          "color": "#e67700"
+          "color": "#e67700",
+          "text_en": "Slice combo deal"
         }
       ]
     },
@@ -328,7 +342,8 @@
       "items": [
         {
           "text": "10am -2pm",
-          "color": "#1a8a1a"
+          "color": "#1a8a1a",
+          "text_en": "10am - 2pm"
         }
       ]
     },
@@ -337,7 +352,8 @@
       "items": [
         {
           "text": "10am -2pm",
-          "color": "#1a8a1a"
+          "color": "#1a8a1a",
+          "text_en": "10am–2pm"
         }
       ]
     },
@@ -346,7 +362,8 @@
       "items": [
         {
           "text": "休息",
-          "color": "#cc0000"
+          "color": "#cc0000",
+          "text_en": "Closed"
         }
       ]
     },
@@ -355,7 +372,8 @@
       "items": [
         {
           "text": "切片優惠組合",
-          "color": "#e67700"
+          "color": "#e67700",
+          "text_en": "Slice combo"
         }
       ]
     },
@@ -364,7 +382,8 @@
       "items": [
         {
           "text": "10am -2pm",
-          "color": "#1a8a1a"
+          "color": "#1a8a1a",
+          "text_en": "10am-2pm"
         }
       ]
     },
@@ -373,7 +392,8 @@
       "items": [
         {
           "text": "10am -2pm",
-          "color": "#1a8a1a"
+          "color": "#1a8a1a",
+          "text_en": "10am–2pm"
         }
       ]
     }
