@@ -27,23 +27,23 @@
     }
   }
 
-  function createImageModal(item) {
+  function createImageModal(item, type) {
     const currentLang = localStorage.getItem('language') || 'zh';
     const modal = document.createElement('div');
     modal.className = 'image-modal';
-    
+
     // 根據語言獲取名稱和說明
     const itemNameZh = item.name || '未命名';
     const itemNameEn = item.name_en || item.name || 'Untitled';
     const itemName = currentLang === 'en' ? itemNameEn : itemNameZh;
-    
+
     const itemDescriptionZh = item.description || '';
     const itemDescriptionEn = item.description_en || item.description || '';
     const itemDescription = currentLang === 'en' ? itemDescriptionEn : itemDescriptionZh;
-    
-    // 生成標籤 HTML，支持國際化
+
+    // 生成標籤 HTML，支持國際化（sets 不需要標籤）
     let tagsHTML = '';
-    if (item.tags && item.tags.length > 0) {
+    if (type !== 'sets' && item.tags && item.tags.length > 0) {
       const tags = item.tags.map(tag => {
         const tagText = getTagText(tag, currentLang);
         const tagTextZh = TAG_I18N[tag] ? TAG_I18N[tag].zh : tag;
@@ -314,20 +314,22 @@
     imageWrapper.appendChild(tagsContainer);
   }
 
-  function renderGallery(items, container) {
+  function renderGallery(items, container, type) {
     container.innerHTML = '';
-    
+
     // 獲取當前語言
     const currentLang = localStorage.getItem('language') || 'zh';
-    
+
     // 檢測是否為 admin 模式，以及是編輯模式還是預覽模式
     const urlParams = new URLSearchParams(window.location.search);
     const isAdminMode = urlParams.get('adminPreview') === '1';
     const adminMode = urlParams.get('mode'); // 'edit' 或 'preview'
     const isEditMode = isAdminMode && adminMode === 'edit'; // 只有在編輯模式下才啟用拖曳和點擊編輯
-    
-    // 渲染圖例（在頁面上方）
-    renderTagLegend(container);
+
+    // 渲染圖例（在頁面上方；sets 類型不需要標籤圖例）
+    if (type !== 'sets') {
+      renderTagLegend(container);
+    }
     
     items.forEach((item, index) => {
       const itemEl = document.createElement('div');
@@ -343,8 +345,8 @@
       const imageName = currentLang === 'en' ? imageNameEn : imageNameZh;
       const imageAlt = imageName + (currentLang === 'en' ? ' - Lovely Cakery' : ' - Lovely Cakery 手工千層');
       
-      // 將標籤儲存到 data 屬性中，用於篩選
-      if (item.tags && Array.isArray(item.tags) && item.tags.length > 0) {
+      // 將標籤儲存到 data 屬性中，用於篩選（sets 不需要）
+      if (type !== 'sets' && item.tags && Array.isArray(item.tags) && item.tags.length > 0) {
         itemEl.dataset.tags = item.tags.join(',');
       }
       
@@ -366,8 +368,8 @@
       img.onload = () => imageWrapper.classList.add('loaded');
       imageWrapper.appendChild(img);
 
-      // 如果有標籤，在圖片上顯示標籤
-      if (item.tags && Array.isArray(item.tags) && item.tags.length > 0) {
+      // 如果有標籤，在圖片上顯示標籤（sets 不需要）
+      if (type !== 'sets' && item.tags && Array.isArray(item.tags) && item.tags.length > 0) {
         renderImageTags(imageWrapper, item.tags);
       }
 
@@ -550,7 +552,7 @@
       } else {
         // 非編輯模式（包括預覽模式和訪客模式）：只有點圖片才開 modal
         imageWrapper.addEventListener('click', () => {
-          createImageModal(item);
+          createImageModal(item, type);
         });
       }
       
@@ -672,7 +674,7 @@
         (lang === 'en' ? 'Coming Soon — Stay Tuned!' : '🍰 新品籌備中，敬請期待～ ✨') + '</p>';
       return;
     }
-    renderGallery(items, container);
+    renderGallery(items, container, type);
 
     // 用 IntersectionObserver 控制圖片載入，避免同時發出太多請求
     const lazyImages = container.querySelectorAll('img[data-src]');
@@ -820,7 +822,8 @@
     if (e.data && e.data.type === 'admin-gallery-update' && Array.isArray(e.data.items)) {
       var container2 = document.querySelector('.gallery-grid');
       if (container2) {
-        renderGallery(e.data.items, container2);
+        var galleryType = container2.getAttribute('data-gallery-type') || 'products';
+        renderGallery(e.data.items, container2, galleryType);
         if (window.LovelyI18n) {
           window.LovelyI18n.applyLanguage(localStorage.getItem('language') || 'zh');
         }
