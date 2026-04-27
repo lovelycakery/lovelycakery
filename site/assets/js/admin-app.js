@@ -10,15 +10,17 @@
   const SITE = 'site';
   const DEFAULT_TAGS = ['奶蛋素', '無咖啡因', '無酒精'];
 
-  // 圖片型 tab：seasonal / products / sets。價格欄位僅 seasonal/products 使用
+  // 圖片型 tab：seasonal / products / sets。價格／標籤欄位僅 seasonal/products 使用
   const IMAGE_TYPES = ['seasonal', 'products', 'sets'];
   const TYPE_LABEL = { seasonal: '新品上市', products: '全部品項', sets: '優惠組合' };
   const TYPE_DATAFILE = { seasonal: 'seasonal-data.json', products: 'products-data.json', sets: 'sets-data.json' };
   const TYPE_IMAGEDIR = { seasonal: 'assets/images/seasonal', products: 'assets/images/products', sets: 'assets/images/sets' };
   const TYPES_WITH_PRICE = ['seasonal', 'products'];
+  const TYPES_WITH_TAGS = ['seasonal', 'products'];
 
   function isImageTab(tab) { return IMAGE_TYPES.indexOf(tab) !== -1; }
   function tabTypeHasPrice(tab) { return TYPES_WITH_PRICE.indexOf(tab) !== -1; }
+  function tabTypeHasTags(tab) { return TYPES_WITH_TAGS.indexOf(tab) !== -1; }
 
   // ── State ─────────────────────────────────────────────────────────
 
@@ -827,7 +829,9 @@
     }
     if ($('imageDescInput').value.trim() !== (item.description || '').trim()) return true;
     if ($('imageDescEnInput').value.trim() !== (item.description_en || '').trim()) return true;
-    if (tags.length !== origTags.length || tags.some(function (t) { return origTags.indexOf(t) === -1; })) return true;
+    if (tabTypeHasTags(type)) {
+      if (tags.length !== origTags.length || tags.some(function (t) { return origTags.indexOf(t) === -1; })) return true;
+    }
     return false;
   }
 
@@ -1407,6 +1411,12 @@
       // 在沒有價格的 tab（如 sets）隱藏價格區塊
       var priceSection = $('priceSection');
       if (priceSection) priceSection.style.display = tabTypeHasPrice(tabName) ? '' : 'none';
+      // 在沒有標籤的 tab（如 sets）隱藏標籤編輯與管理區塊
+      var hasTags = tabTypeHasTags(tabName);
+      var tagSection = $('tagSection');
+      if (tagSection) tagSection.style.display = hasTags ? '' : 'none';
+      var tagManagerSection = $('tagManagerSection');
+      if (tagManagerSection) tagManagerSection.style.display = hasTags ? '' : 'none';
       // Only load from GitHub if we haven't loaded yet (or if not dirty)
       if (!dirty[tabName] && (!state.imageData[tabName].items || state.imageData[tabName].items.length === 0)) {
         loadImageData(tabName);
