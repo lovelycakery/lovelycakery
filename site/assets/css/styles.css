@@ -991,7 +991,9 @@ img {
     font-weight: 700;
     color: #3d2817;
     letter-spacing: -0.5px;
-    margin-bottom: 16px;
+    padding-bottom: 24px;
+    margin-bottom: 32px;
+    border-bottom: 1px solid rgba(61, 40, 23, 0.12);
 }
 
 @media (max-width: 968px) {
