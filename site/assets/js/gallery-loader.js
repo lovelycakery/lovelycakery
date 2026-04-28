@@ -217,20 +217,23 @@
       let msg = (next && next.classList && next.classList.contains('gallery-empty-msg')) ? next : null;
       const showMsg = items.length > 0 && visibleCount === 0;
       if (showMsg) {
+        // 把 grid 的 padding-bottom 收掉，讓提示緊貼分隔線下方
+        grid.classList.add('is-filtered-empty');
         if (!msg) {
           const lang = localStorage.getItem('language') || 'zh';
           msg = document.createElement('p');
           msg.className = 'gallery-empty-msg';
           msg.setAttribute('data-en', 'No items match.');
-          msg.setAttribute('data-zh', '目前沒有符合的商品喔');
-          msg.textContent = lang === 'en' ? 'No items match.' : '目前沒有符合的商品喔';
+          msg.setAttribute('data-zh', '目前沒有符合的商品喔～');
+          msg.textContent = lang === 'en' ? 'No items match.' : '目前沒有符合的商品喔～';
           grid.parentNode.insertBefore(msg, grid.nextSibling);
           if (window.LovelyI18n) window.LovelyI18n.applyLanguage(lang, msg);
         } else {
           msg.style.display = '';
         }
-      } else if (msg) {
-        msg.style.display = 'none';
+      } else {
+        grid.classList.remove('is-filtered-empty');
+        if (msg) msg.style.display = 'none';
       }
     }
   }

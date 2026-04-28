@@ -978,13 +978,19 @@ img {
 /* 篩選後沒符合商品時的提示（放 grid 之後，block-level 全寬置中） */
 .gallery-empty-msg {
     text-align: center;
-    color: #8b6f47;
-    font-family: 'Playfair Display', 'Noto Serif TC', 'PingFang TC', serif;
-    font-size: 18px;
-    font-weight: 400;
-    letter-spacing: 2px;
-    padding: 48px 20px;
+    color: #5d3f1f;
+    font-family: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', '微軟正黑體', sans-serif;
+    font-size: 17px;
+    font-weight: 300;
+    letter-spacing: 3px;
+    padding: 24px 20px 48px;
     margin: 0;
+}
+
+/* 篩選後沒商品的 grid：收掉預設 padding-bottom 讓提示緊貼分隔線 */
+.gallery-grid.is-filtered-empty {
+    padding-bottom: 0;
+    min-height: 0;
 }
 
 .is-test-mode .all-items-section-title {
