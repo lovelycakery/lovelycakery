@@ -16,7 +16,7 @@
     <link rel="preload" href="assets/data/products-data.json" as="fetch" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="assets/css/styles.css?v=20260428-5">
+    <link rel="stylesheet" href="assets/css/styles.css?v=20260428-6">
     <!-- Google Fonts loaded by site-header.js -->
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=AW-10994472042"></script>
@@ -61,15 +61,15 @@
     </main>
     <noscript><p style="text-align:center;padding:40px;font-size:16px;color:#3d2817;">本網站需要 JavaScript 才能正常顯示。請啟用 JavaScript 後重新整理頁面。<br>This website requires JavaScript. Please enable it and reload.</p></noscript>
 
-    <!-- 隔離 script：只有 admin 測試模式才顯示合併版分頁，其他情況（訪客/編輯/預覽）移除 admin-only 元素 -->
+    <!-- admin 編輯/預覽模式（非測試）：移除分類導覽和新品區，只顯示當前 tab 的單一 grid -->
+    <!-- 公開頁與 admin 測試模式：顯示完整合併版（新品上市 + 季節品項 + 分類 tabs） -->
     <script>
     (function () {
         var params = new URLSearchParams(window.location.search);
-        var showMerged = params.get('adminPreview') === '1' && params.get('mode') === 'test';
-        if (!showMerged) {
+        var isAdminNonTest = params.get('adminPreview') === '1' && params.get('mode') !== 'test';
+        if (isAdminNonTest) {
             document.querySelectorAll('.admin-only').forEach(function (el) { el.remove(); });
         } else {
-            // 測試模式：給 body 加 class 讓 CSS 切換樣式（隱藏 page-header、放大 section title）
             document.body.classList.add('is-test-mode');
         }
     })();
