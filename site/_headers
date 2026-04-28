@@ -1,0 +1,20 @@
+# Cloudflare Pages 快取策略
+#
+# - HTML：max-age=0 + must-revalidate
+#   瀏覽器每次都跟 server 用 ETag 驗證，沒變就回 304（極快、幾乎不耗頻寬），
+#   有變就拿新版。解決「舊 HTML 引用舊版 ?v=...」的 cache 死角。
+#
+# - assets/*：用 Cloudflare Pages 預設快取（搭配 HTML 內的 ?v=... cache buster）
+#   不在這裡額外設定，避免覆蓋掉現有 bump-calendar-cache.sh 的版本號機制。
+#   data/* 因為 admin 透過 GitHub API 即時更新，獨立設較短快取。
+#
+# 文件：https://developers.cloudflare.com/pages/configuration/headers/
+
+/
+  Cache-Control: public, max-age=0, must-revalidate
+
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/assets/data/*
+  Cache-Control: public, max-age=60, must-revalidate
