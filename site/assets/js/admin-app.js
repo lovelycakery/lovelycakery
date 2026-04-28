@@ -651,13 +651,11 @@
 
   function renderSubImagesList() {
     var list = $('subImagesList');
-    var countEl = $('subImageCount');
     var deleteBtn = $('subImagesDeleteBtn');
     if (!list) return;
     list.innerHTML = '';
     var item = getEditingItem();
     var subs = (item && Array.isArray(item.subImages)) ? item.subImages : [];
-    if (countEl) countEl.textContent = subs.length;
     if (deleteBtn) deleteBtn.disabled = true;
 
     if (subs.length === 0) {
@@ -738,7 +736,6 @@
     if (!deleteBtn) return;
     var checked = document.querySelectorAll('#subImagesList .sub-image-check:checked').length;
     deleteBtn.disabled = checked === 0;
-    deleteBtn.textContent = checked > 0 ? '刪除選取 (' + checked + ')' : '刪除選取';
   }
 
   function reorderSubImages(fromIdx, toIdx) {
