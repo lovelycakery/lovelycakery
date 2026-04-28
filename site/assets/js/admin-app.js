@@ -120,6 +120,12 @@
       for (var j = 0; j < item.tags.length; j++) {
         if (typeof item.tags[j] !== 'string' || !item.tags[j].trim()) throw new Error('Tag must be a non-empty string');
       }
+      if (item.subImages !== undefined) {
+        if (!Array.isArray(item.subImages)) throw new Error('Item subImages must be an array');
+        for (var k = 0; k < item.subImages.length; k++) {
+          if (typeof item.subImages[k] !== 'string' || !item.subImages[k].trim()) throw new Error('subImages must be non-empty strings');
+        }
+      }
     }
   }
 
@@ -625,6 +631,216 @@
 
   // ── Image edit panel ──────────────────────────────────────────────
 
+  // ── Sub-images ────────────────────────────────────────────────────
+  // 子圖以陣列存於 item.subImages（路徑字串）。新上傳的子圖另存 blob URL 至
+  // item._subImagesPreview（與 subImages 同序，發布前用於即時預覽，commit 時被剝除）。
+
+  var subImageDragFromIndex = -1;
+
+  function getEditingItem() {
+    if (state.editingImageIndex < 0) return null;
+    var type = isImageTab(state.currentTab) ? state.currentTab : 'products';
+    var items = state.imageData[type] && state.imageData[type].items;
+    return items ? items[state.editingImageIndex] : null;
+  }
+
+  function getSubImageDisplaySrc(item, idx) {
+    var preview = Array.isArray(item._subImagesPreview) ? item._subImagesPreview[idx] : null;
+    return preview || (item.subImages && item.subImages[idx]) || '';
+  }
+
+  function renderSubImagesList() {
+    var list = $('subImagesList');
+    var countEl = $('subImageCount');
+    var deleteBtn = $('subImagesDeleteBtn');
+    if (!list) return;
+    list.innerHTML = '';
+    var item = getEditingItem();
+    var subs = (item && Array.isArray(item.subImages)) ? item.subImages : [];
+    if (countEl) countEl.textContent = subs.length;
+    if (deleteBtn) deleteBtn.disabled = true;
+
+    if (subs.length === 0) {
+      var empty = document.createElement('div');
+      empty.className = 'sub-images-empty';
+      empty.textContent = '尚無子圖';
+      list.appendChild(empty);
+      return;
+    }
+
+    subs.forEach(function (path, idx) {
+      var row = document.createElement('div');
+      row.className = 'sub-image-row';
+      row.draggable = true;
+      row.dataset.index = idx;
+
+      var handle = document.createElement('span');
+      handle.className = 'sub-image-handle';
+      handle.title = '拖曳調整順序';
+      handle.textContent = '⋮⋮';
+
+      var checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.className = 'sub-image-check';
+      checkbox.dataset.index = idx;
+
+      var thumb = document.createElement('img');
+      thumb.className = 'sub-image-thumb';
+      thumb.alt = '';
+      thumb.draggable = false;
+      thumb.src = getSubImageDisplaySrc(item, idx);
+
+      var label = document.createElement('span');
+      label.className = 'sub-image-label';
+      label.textContent = '子圖 ' + (idx + 1);
+
+      row.appendChild(handle);
+      row.appendChild(checkbox);
+      row.appendChild(thumb);
+      row.appendChild(label);
+
+      // 拖曳排序
+      row.addEventListener('dragstart', function (e) {
+        subImageDragFromIndex = idx;
+        row.classList.add('dragging');
+        try { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', String(idx)); } catch (_) { /* */ }
+      });
+      row.addEventListener('dragend', function () {
+        row.classList.remove('dragging');
+        list.querySelectorAll('.sub-image-row').forEach(function (el) { el.classList.remove('drag-over'); });
+        subImageDragFromIndex = -1;
+      });
+      row.addEventListener('dragover', function (e) {
+        e.preventDefault();
+        try { e.dataTransfer.dropEffect = 'move'; } catch (_) { /* */ }
+        row.classList.add('drag-over');
+      });
+      row.addEventListener('dragleave', function () {
+        row.classList.remove('drag-over');
+      });
+      row.addEventListener('drop', function (e) {
+        e.preventDefault();
+        row.classList.remove('drag-over');
+        var from = subImageDragFromIndex;
+        var to = parseInt(row.dataset.index, 10);
+        if (isNaN(from) || isNaN(to) || from === to) return;
+        reorderSubImages(from, to);
+      });
+
+      checkbox.addEventListener('change', updateSubImagesDeleteBtn);
+
+      list.appendChild(row);
+    });
+  }
+
+  function updateSubImagesDeleteBtn() {
+    var deleteBtn = $('subImagesDeleteBtn');
+    if (!deleteBtn) return;
+    var checked = document.querySelectorAll('#subImagesList .sub-image-check:checked').length;
+    deleteBtn.disabled = checked === 0;
+    deleteBtn.textContent = checked > 0 ? '刪除選取 (' + checked + ')' : '刪除選取';
+  }
+
+  function reorderSubImages(fromIdx, toIdx) {
+    var item = getEditingItem();
+    if (!item || !Array.isArray(item.subImages)) return;
+    var moved = item.subImages.splice(fromIdx, 1)[0];
+    item.subImages.splice(toIdx, 0, moved);
+    if (Array.isArray(item._subImagesPreview)) {
+      var movedPrev = item._subImagesPreview.splice(fromIdx, 1)[0];
+      item._subImagesPreview.splice(toIdx, 0, movedPrev);
+    }
+    var type = isImageTab(state.currentTab) ? state.currentTab : 'products';
+    dirty[type] = true;
+    updatePublishButton();
+    renderSubImagesList();
+    sendImageDataToPreview(type);
+  }
+
+  function nextSubImageFilename(item, type) {
+    var base = sanitizeFilename(item.name) || 'untitled';
+    var taken = {};
+    (item.subImages || []).forEach(function (p) { taken[p.split('/').pop()] = true; });
+    dirty.pendingImages.forEach(function (pi) {
+      var fname = pi.repoPath.split('/').pop();
+      if (fname) taken[fname] = true;
+    });
+    var n = 2;
+    while (taken[base + '-' + n + '.jpg']) n++;
+    return base + '-' + n + '.jpg';
+  }
+
+  async function handleSubImageUpload(files) {
+    var item = getEditingItem();
+    if (!item) { alert('請先選取一個商品'); return; }
+    if (!files || files.length === 0) return;
+    var type = isImageTab(state.currentTab) ? state.currentTab : 'products';
+    var imageDir = TYPE_IMAGEDIR[type] || 'assets/images/products';
+    if (!Array.isArray(item.subImages)) item.subImages = [];
+    if (!Array.isArray(item._subImagesPreview)) item._subImagesPreview = [];
+
+    for (var i = 0; i < files.length; i++) {
+      var file = files[i];
+      logStatus('⏳ 壓縮子圖：' + file.name + '…');
+      try {
+        var compressed = await ImageCompress.compress(file);
+        var filename = nextSubImageFilename(item, type);
+        var repoPath = imageDir + '/' + filename;
+        var fullRepoPath = SITE + '/' + repoPath;
+        // 子圖只存桌機尺寸（modal 顯示用全尺寸，不需 sm/）
+        dirty.pendingImages.push({ repoPath: fullRepoPath, base64: compressed.desktop.base64 });
+        item.subImages.push(repoPath);
+        item._subImagesPreview.push(URL.createObjectURL(compressed.desktop.blob));
+        logStatus('✅ 已壓縮子圖：' + file.name + ' → ' + filename);
+      } catch (e) {
+        showError('壓縮失敗：' + (e.message || String(e)));
+      }
+    }
+
+    dirty[type] = true;
+    updatePublishButton();
+    renderSubImagesList();
+    sendImageDataToPreview(type);
+    showSuccess('已新增 ' + files.length + ' 張子圖（本地）');
+  }
+
+  function deleteSelectedSubImages() {
+    var item = getEditingItem();
+    if (!item || !Array.isArray(item.subImages)) return;
+    var checks = document.querySelectorAll('#subImagesList .sub-image-check:checked');
+    if (checks.length === 0) return;
+    if (!confirm('確定要刪除已選的 ' + checks.length + ' 張子圖嗎？')) return;
+
+    var indices = Array.from(checks).map(function (c) { return parseInt(c.dataset.index, 10); }).filter(function (n) { return !isNaN(n); });
+    indices.sort(function (a, b) { return b - a; }); // 由大到小，避免 splice 後索引位移
+    indices.forEach(function (idx) {
+      var path = item.subImages[idx];
+      if (path) {
+        // 若這張子圖是「未發布」的，從 pendingImages 取消上傳；否則加入 pendingDeletes
+        var fullPath = SITE + '/' + path;
+        var pendingIdx = dirty.pendingImages.findIndex(function (pi) { return pi.repoPath === fullPath; });
+        if (pendingIdx >= 0) {
+          dirty.pendingImages.splice(pendingIdx, 1);
+        } else {
+          dirty.pendingDeletes.push(fullPath);
+        }
+      }
+      item.subImages.splice(idx, 1);
+      if (Array.isArray(item._subImagesPreview)) {
+        var url = item._subImagesPreview[idx];
+        if (url && url.indexOf('blob:') === 0) { try { URL.revokeObjectURL(url); } catch (_) { /* */ } }
+        item._subImagesPreview.splice(idx, 1);
+      }
+    });
+
+    var type = isImageTab(state.currentTab) ? state.currentTab : 'products';
+    dirty[type] = true;
+    updatePublishButton();
+    renderSubImagesList();
+    sendImageDataToPreview(type);
+    showSuccess('已刪除 ' + indices.length + ' 張子圖（本地）');
+  }
+
   // ── Tag editor ────────────────────────────────────────────────────
 
   function renderTagChips() {
@@ -857,6 +1073,7 @@
     $('imageDescEnInput').value = item.description_en || '';
     state.editingTags = (item.tags && Array.isArray(item.tags)) ? item.tags.slice() : [];
     renderTagChips();
+    renderSubImagesList();
     $('imageEditForm').style.display = 'block';
     $('imageEditSaveBtn').disabled = false;
     $('imageEditDeleteBtn').disabled = false;
@@ -871,6 +1088,7 @@
     ['imageNameInput', 'imageNameEnInput', 'imagePriceSize6Input', 'imagePriceSize8Input', 'imagePriceSliceInput', 'imageDescInput', 'imageDescEnInput'].forEach(function (id) { $(id).value = ''; });
     state.editingTags = [];
     renderTagChips();
+    renderSubImagesList();
     $('imageEditForm').style.display = 'none';
     $('imageEditSaveBtn').disabled = true;
     $('imageEditDeleteBtn').disabled = true;
@@ -922,6 +1140,15 @@
     if (!confirm('確定要刪除「' + item.name + '」嗎？')) return;
 
     dirty.pendingDeletes.push(SITE + '/' + item.image);
+    // 連帶刪除所有子圖檔案
+    if (Array.isArray(item.subImages)) {
+      item.subImages.forEach(function (p) {
+        var fullPath = SITE + '/' + p;
+        var pendingIdx = dirty.pendingImages.findIndex(function (pi) { return pi.repoPath === fullPath; });
+        if (pendingIdx >= 0) dirty.pendingImages.splice(pendingIdx, 1);
+        else dirty.pendingDeletes.push(fullPath);
+      });
+    }
     state.imageData[type].items.splice(index, 1);
     dirty[type] = true;
     updatePublishButton();
@@ -980,6 +1207,14 @@
       var item = state.imageData[type].items[idx];
       if (item) {
         dirty.pendingDeletes.push(SITE + '/' + item.image);
+        if (Array.isArray(item.subImages)) {
+          item.subImages.forEach(function (p) {
+            var fullPath = SITE + '/' + p;
+            var pendingIdx = dirty.pendingImages.findIndex(function (pi) { return pi.repoPath === fullPath; });
+            if (pendingIdx >= 0) dirty.pendingImages.splice(pendingIdx, 1);
+            else dirty.pendingDeletes.push(fullPath);
+          });
+        }
         state.imageData[type].items.splice(idx, 1);
       }
     });
@@ -1219,6 +1454,11 @@
       var clean = Object.assign({}, item);
       delete clean._previewUrl;
       delete clean._sha;
+      delete clean._subImagesPreview;
+      // 空的 subImages 陣列就不寫入 JSON，保持精簡
+      if (Array.isArray(clean.subImages) && clean.subImages.length === 0) {
+        delete clean.subImages;
+      }
       return clean;
     });
   }
@@ -1736,6 +1976,25 @@
 
     // Publish button
     $('publishBtn').addEventListener('click', publish);
+
+    // Sub-images: 新增 / 刪除選取
+    if ($('subImagesAddBtn')) {
+      $('subImagesAddBtn').addEventListener('click', function () {
+        var fi = $('subImagesFileInput');
+        if (fi) fi.click();
+      });
+    }
+    if ($('subImagesFileInput')) {
+      $('subImagesFileInput').addEventListener('change', function () {
+        var fi = $('subImagesFileInput');
+        var files = Array.from(fi.files || []);
+        if (files.length > 0) handleSubImageUpload(files);
+        fi.value = '';
+      });
+    }
+    if ($('subImagesDeleteBtn')) {
+      $('subImagesDeleteBtn').addEventListener('click', deleteSelectedSubImages);
+    }
 
     // Image upload
     var uploadArea = $('imageUploadArea'), fileInput = $('imageFileInput');

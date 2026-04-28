@@ -144,6 +144,16 @@
                             </div>
                         </div>
 
+                        <div class="panel__section" id="subImagesSection">
+                            <label class="label">子圖片 (<span id="subImageCount">0</span>)</label>
+                            <div class="sub-images-list" id="subImagesList"></div>
+                            <div class="sub-images-actions">
+                                <button id="subImagesDeleteBtn" class="btn btn-secondary btn-sm" type="button" disabled>刪除選取</button>
+                                <button id="subImagesAddBtn" class="btn btn-secondary btn-sm" type="button">+ 新增子圖</button>
+                            </div>
+                            <input type="file" id="subImagesFileInput" accept="image/jpeg,image/png,image/webp" multiple style="display: none;">
+                        </div>
+
                         <div class="panel__section panel__actions">
                             <button id="imageEditSaveBtn" class="btn btn-primary" type="button" disabled>儲存</button>
                             <button id="imageEditDeleteBtn" class="btn btn-danger" type="button" disabled>刪除</button>

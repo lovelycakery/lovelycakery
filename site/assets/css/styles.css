@@ -1986,12 +1986,122 @@ img {
     aspect-ratio: 1;
     overflow: hidden;
     border-radius: 16px 16px 0 0;
+    position: relative;
+    background: #f4ede4;
 }
 
 .image-modal__image {
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+/* 輪播：所有 slide 疊在一起，only is-active 顯示 */
+.image-modal__slides {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.image-modal__slide {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    pointer-events: none;
+    -webkit-user-drag: none;
+    user-select: none;
+}
+
+.image-modal__slide.is-active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* 左右點擊區（覆蓋圖片左右兩半），不顯示但可點 */
+.image-modal__zone {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 40%;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.image-modal__zone--prev { left: 0; }
+.image-modal__zone--next { right: 0; }
+
+/* 左右箭頭按鈕：桌機 hover 時較明顯，手機隱藏（用滑動） */
+.image-modal__nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.85);
+    color: #3d2817;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: background 0.2s, transform 0.15s;
+    opacity: 0;
+}
+
+.image-modal__image-wrapper:hover .image-modal__nav {
+    opacity: 1;
+}
+
+.image-modal__nav:hover {
+    background: #ffffff;
+    transform: translateY(-50%) scale(1.05);
+}
+
+.image-modal__nav--prev { left: 12px; }
+.image-modal__nav--next { right: 12px; }
+
+/* 小圓點指示器 */
+.image-modal__dots {
+    position: absolute;
+    left: 50%;
+    bottom: 12px;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+    z-index: 3;
+}
+
+.image-modal__dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.55);
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.image-modal__dot.is-active {
+    background: #ffffff;
+    transform: scale(1.25);
+}
+
+@media (max-width: 768px) {
+    .image-modal__nav {
+        opacity: 1;
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
 }
 
 .image-modal__info {

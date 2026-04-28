@@ -404,6 +404,92 @@ body {
   flex: 1;
 }
 
+/* ── Sub-images list ─────────────────────────────────────────────── */
+
+.sub-images-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+  margin-bottom: 8px;
+  max-height: 280px;
+  overflow-y: auto;
+  border: 1px solid var(--border, #e0d4c0);
+  border-radius: 6px;
+  padding: 6px;
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.sub-images-empty {
+  color: #8c7860;
+  font-size: 13px;
+  text-align: center;
+  padding: 10px 0;
+}
+
+.sub-image-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: #ffffff;
+  border: 1px solid #ece2d0;
+  border-radius: 6px;
+  cursor: grab;
+  transition: background 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+
+.sub-image-row:active {
+  cursor: grabbing;
+}
+
+.sub-image-row.dragging {
+  opacity: 0.5;
+}
+
+.sub-image-row.drag-over {
+  box-shadow: 0 0 0 2px rgba(212, 165, 116, 0.7) inset;
+  background: #fff8ec;
+}
+
+.sub-image-handle {
+  color: #b6a687;
+  font-size: 14px;
+  letter-spacing: -2px;
+  user-select: none;
+  cursor: grab;
+}
+
+.sub-image-check {
+  margin: 0;
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+}
+
+.sub-image-thumb {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #ece2d0;
+  flex-shrink: 0;
+}
+
+.sub-image-label {
+  font-size: 13px;
+  color: #5a4a35;
+}
+
+.sub-images-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.sub-images-actions .btn {
+  flex: 1;
+}
+
 /* ── Buttons ─────────────────────────────────────────────────────── */
 
 .btn {

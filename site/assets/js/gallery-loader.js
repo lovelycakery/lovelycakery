@@ -54,7 +54,7 @@
       }).join('');
       tagsHTML = `<div class="image-modal__tags">${tags}</div>`;
     }
-    
+
     // 處理價格顯示（直接列出所有尺寸價格）
     let priceHTML = '';
     if (item.prices && typeof item.prices === 'object') {
@@ -84,13 +84,46 @@
         `;
       }
     }
-    
+
+    // 收集主圖 + 子圖（優先使用 _previewUrl 做即時預覽，未提供則用實際路徑）
+    // _subImagesPreview 對應 subImages 順序，未上傳的條目為 falsy
+    const slideEntries = [];
+    slideEntries.push({ src: item._previewUrl || item.image, alt: itemName });
+    if (Array.isArray(item.subImages)) {
+      item.subImages.forEach((p, i) => {
+        const previewArr = Array.isArray(item._subImagesPreview) ? item._subImagesPreview : [];
+        slideEntries.push({ src: previewArr[i] || p, alt: itemName + ' - ' + (i + 2) });
+      });
+    }
+    const totalSlides = slideEntries.length;
+    const hasMultiple = totalSlides > 1;
+
+    const slidesHTML = slideEntries.map((s, i) => (
+      `<img src="${s.src}" alt="${s.alt}" class="image-modal__slide${i === 0 ? ' is-active' : ''}" draggable="false">`
+    )).join('');
+
+    let navHTML = '';
+    let dotsHTML = '';
+    if (hasMultiple) {
+      navHTML = `
+        <button class="image-modal__nav image-modal__nav--prev" aria-label="上一張" type="button">&#10094;</button>
+        <button class="image-modal__nav image-modal__nav--next" aria-label="下一張" type="button">&#10095;</button>
+        <div class="image-modal__zone image-modal__zone--prev" aria-hidden="true"></div>
+        <div class="image-modal__zone image-modal__zone--next" aria-hidden="true"></div>
+      `;
+      dotsHTML = '<div class="image-modal__dots">' +
+        slideEntries.map((_, i) => `<span class="image-modal__dot${i === 0 ? ' is-active' : ''}" data-index="${i}"></span>`).join('') +
+        '</div>';
+    }
+
     modal.innerHTML = `
       <div class="image-modal__overlay"></div>
       <div class="image-modal__content">
         <button class="image-modal__close" aria-label="關閉">&times;</button>
-        <div class="image-modal__image-wrapper">
-          <img src="${item.image}" alt="${itemName}" class="image-modal__image">
+        <div class="image-modal__image-wrapper${hasMultiple ? ' has-multiple' : ''}">
+          <div class="image-modal__slides">${slidesHTML}</div>
+          ${navHTML}
+          ${dotsHTML}
         </div>
         <div class="image-modal__info">
           <h3 class="image-modal__name" data-en="${itemNameEn}" data-zh="${itemNameZh}">${itemName}</h3>
@@ -100,15 +133,65 @@
         </div>
       </div>
     `;
-    
+
     let modalOpen = true;
+    let currentSlide = 0;
+
+    const slideEls = modal.querySelectorAll('.image-modal__slide');
+    const dotEls = modal.querySelectorAll('.image-modal__dot');
+
+    function showSlide(idx) {
+      if (idx < 0) idx = totalSlides - 1;
+      if (idx >= totalSlides) idx = 0;
+      currentSlide = idx;
+      slideEls.forEach((el, i) => el.classList.toggle('is-active', i === idx));
+      dotEls.forEach((el, i) => el.classList.toggle('is-active', i === idx));
+    }
+
+    if (hasMultiple) {
+      modal.querySelector('.image-modal__nav--prev').addEventListener('click', (ev) => { ev.stopPropagation(); showSlide(currentSlide - 1); });
+      modal.querySelector('.image-modal__nav--next').addEventListener('click', (ev) => { ev.stopPropagation(); showSlide(currentSlide + 1); });
+      modal.querySelector('.image-modal__zone--prev').addEventListener('click', (ev) => { ev.stopPropagation(); showSlide(currentSlide - 1); });
+      modal.querySelector('.image-modal__zone--next').addEventListener('click', (ev) => { ev.stopPropagation(); showSlide(currentSlide + 1); });
+      dotEls.forEach((dot) => {
+        dot.addEventListener('click', (ev) => {
+          ev.stopPropagation();
+          const idx = parseInt(dot.dataset.index, 10);
+          if (!isNaN(idx)) showSlide(idx);
+        });
+      });
+
+      // Touch swipe
+      const wrapper = modal.querySelector('.image-modal__image-wrapper');
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let touchActive = false;
+      wrapper.addEventListener('touchstart', (ev) => {
+        if (ev.touches.length !== 1) return;
+        touchActive = true;
+        touchStartX = ev.touches[0].clientX;
+        touchStartY = ev.touches[0].clientY;
+      }, { passive: true });
+      wrapper.addEventListener('touchend', (ev) => {
+        if (!touchActive) return;
+        touchActive = false;
+        const t = ev.changedTouches[0];
+        const dx = t.clientX - touchStartX;
+        const dy = t.clientY - touchStartY;
+        // 水平位移 > 50px 且大於垂直位移才算滑動，避免跟垂直捲動衝突
+        if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
+          if (dx < 0) showSlide(currentSlide + 1);
+          else showSlide(currentSlide - 1);
+        }
+      });
+    }
 
     const closeModal = () => {
       if (!modalOpen) return;
       modalOpen = false;
       if (modal.parentNode) document.body.removeChild(modal);
       document.body.style.overflow = '';
-      document.removeEventListener('keydown', escHandler);
+      document.removeEventListener('keydown', keyHandler);
       window.removeEventListener('popstate', popstateHandler);
     };
 
@@ -119,8 +202,10 @@
       history.back();
     };
 
-    const escHandler = (e) => {
-      if (e.key === 'Escape') closeAndBack();
+    const keyHandler = (e) => {
+      if (e.key === 'Escape') { closeAndBack(); return; }
+      if (hasMultiple && e.key === 'ArrowLeft') { e.preventDefault(); showSlide(currentSlide - 1); }
+      if (hasMultiple && e.key === 'ArrowRight') { e.preventDefault(); showSlide(currentSlide + 1); }
     };
 
     // 手機滑返回 / 返回鍵 → popstate 觸發 → 關閉 modal
@@ -133,7 +218,7 @@
       if (!e.target.closest('.image-modal__content')) closeAndBack();
     });
     modal.querySelector('.image-modal__close').addEventListener('click', closeAndBack);
-    document.addEventListener('keydown', escHandler);
+    document.addEventListener('keydown', keyHandler);
     window.addEventListener('popstate', popstateHandler);
 
     // 推一筆歷史記錄，讓返回手勢可以攔截
@@ -533,7 +618,7 @@
         itemEl.addEventListener('click', (e) => {
           const now = Date.now();
           const timeSinceDragStart = dragStartTime > 0 ? now - dragStartTime : Infinity;
-          
+
           // 檢查是否為拖曳操作：
           // - hasDragged = true：已發生拖曳移動
           // - timeSinceDragStart < 200ms：拖曳開始後短時間內點擊（可能是拖曳的一部分）
@@ -542,18 +627,17 @@
             e.stopPropagation();
             return; // 不觸發點擊編輯
           }
-          
+
           // 驗證索引有效性
           if (typeof index !== 'number' || index < 0) {
             console.warn('Invalid image index for edit:', index);
             return;
           }
-          
-          // 在編輯模式下，阻止默認行為和事件冒泡，避免觸發 modal
+
           e.preventDefault();
           e.stopPropagation();
-          
-          // 通知父窗口打開編輯面板（僅在編輯模式）
+
+          // 通知父窗口打開編輯面板
           if (window.parent && window.parent !== window) {
             window.parent.postMessage({
               type: 'gallery-edit',
@@ -561,6 +645,12 @@
             }, '*');
           } else {
             console.warn('Cannot send edit message: not in iframe context');
+          }
+
+          // 點擊圖片時也開啟 modal（與公開頁一致，方便預覽子圖）
+          // 點到名稱列（itemInfo）時不開
+          if (e.target.closest('.gallery-image-wrapper')) {
+            createImageModal(item, type);
           }
         });
       } else {
