@@ -1009,14 +1009,13 @@ img {
     margin: 24px auto 0;
     width: 80%;
     max-width: 800px;
-    height: 3px;
+    height: 1px;
     background: linear-gradient(to right,
         transparent 0%,
-        rgba(61, 40, 23, 0.15) 15%,
-        rgba(61, 40, 23, 0.6) 50%,
-        rgba(61, 40, 23, 0.15) 85%,
+        rgba(61, 40, 23, 0.4) 15%,
+        rgba(61, 40, 23, 0.9) 50%,
+        rgba(61, 40, 23, 0.4) 85%,
         transparent 100%);
-    border-radius: 2px;
 }
 
 @media (max-width: 968px) {
