@@ -999,9 +999,23 @@ img {
     font-weight: 700;
     color: #3d2817;
     letter-spacing: -0.5px;
-    padding-bottom: 24px;
     margin-bottom: 32px;
-    border-bottom: 1px solid rgba(61, 40, 23, 0.12);
+}
+
+/* 漸層分隔線：兩端淡出、中間較深，視覺上有「中粗兩細」感 */
+.is-test-mode .all-items-section-title::after {
+    content: '';
+    display: block;
+    margin: 24px auto 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(to right,
+        transparent 0%,
+        rgba(61, 40, 23, 0.05) 15%,
+        rgba(61, 40, 23, 0.35) 50%,
+        rgba(61, 40, 23, 0.05) 85%,
+        transparent 100%);
+    border-radius: 2px;
 }
 
 @media (max-width: 968px) {
