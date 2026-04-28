@@ -62,11 +62,11 @@
     </main>
     <noscript><p style="text-align:center;padding:40px;font-size:16px;color:#3d2817;">本網站需要 JavaScript 才能正常顯示。請啟用 JavaScript 後重新整理頁面。<br>This website requires JavaScript. Please enable it and reload.</p></noscript>
 
-    <!-- 隔離 script：只有 admin 預覽模式才顯示合併版分頁，其他情況移除 admin-only 元素 -->
+    <!-- 隔離 script：只有 admin 測試模式才顯示合併版分頁，其他情況（訪客/編輯/預覽）移除 admin-only 元素 -->
     <script>
     (function () {
         var params = new URLSearchParams(window.location.search);
-        var showMerged = params.get('adminPreview') === '1' && params.get('mode') === 'preview';
+        var showMerged = params.get('adminPreview') === '1' && params.get('mode') === 'test';
         if (!showMerged) {
             document.querySelectorAll('.admin-only').forEach(function (el) { el.remove(); });
         }
