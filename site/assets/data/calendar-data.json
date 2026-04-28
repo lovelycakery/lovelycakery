@@ -158,7 +158,9 @@
         {
           "text": "本周切片口味",
           "color": "#0066cc",
-          "detail": "玫瑰乳酪/檸檬香梨/夏日繽紛水果/法式蘋果塔/提拉米蘇/抹茶水果"
+          "detail": "玫瑰乳酪/檸檬香梨/夏日繽紛水果/法式蘋果塔/提拉米蘇/抹茶水果",
+          "text_en": "Slice Flavors",
+          "detail_en": "Rose Cheese / Lemon Pear / Summer Fruit Medley / French Apple Tart / Tiramisu / Matcha Fruit"
         }
       ]
     },
@@ -203,7 +205,9 @@
         {
           "text": "本周切片口味",
           "color": "#0066cc",
-          "detail": "隱藏版新口味/微醺栗香/早春/抹茶提拉米蘇/花生OREO/夏日繽紛伯爵茶"
+          "detail": "隱藏版新口味/微醺栗香/早春/抹茶提拉米蘇/花生OREO/夏日繽紛伯爵茶",
+          "text_en": "Slice flavors",
+          "detail_en": "Hidden new flavor / Tipsy chestnut / Early spring / Matcha tiramisu / Peanut OREO / Summer vibrant Earl Grey tea"
         }
       ]
     },
