@@ -965,7 +965,13 @@ img {
     display: none;
 }
 
-.is-test-mode .all-items-section:first-of-type {
+/* 共享 legend 補償 fixed .order-tags 的高度，避免被遮 */
+.is-test-mode .tag-legend--shared {
+    margin-top: calc(var(--tags-h, 80px) + 32px);
+}
+
+/* 沒 legend 的情況（理論上不會發生在合併頁，但保險起見） */
+.is-test-mode .all-items-section:first-of-type:not(.tag-legend--shared + .all-items-section) {
     margin-top: calc(var(--tags-h, 80px) + 32px);
 }
 

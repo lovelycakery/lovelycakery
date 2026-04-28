@@ -303,7 +303,8 @@
     imageWrapper.appendChild(tagsContainer);
   }
 
-  function renderGallery(items, container, type) {
+  function renderGallery(items, container, type, options) {
+    options = options || {};
     container.innerHTML = '';
 
     // 獲取當前語言
@@ -316,7 +317,8 @@
     const isEditMode = isAdminMode && adminMode === 'edit'; // 只有在編輯模式下才啟用拖曳和點擊編輯
 
     // 渲染圖例（在頁面上方；sets 類型不需要標籤圖例）
-    if (type !== 'sets') {
+    // 合併版（autoInit 已 render 共享 legend）會傳 skipLegend，避免重複
+    if (type !== 'sets' && !options.skipLegend) {
       renderTagLegend(container);
     }
     
@@ -625,7 +627,8 @@
     }
   }
 
-  async function initGallery(type) {
+  async function initGallery(type, options) {
+    options = options || {};
     // 精確選取對應 type 的 grid（同頁可能有多個 grid）
     const container = document.querySelector('.gallery-grid[data-gallery-type="' + type + '"]')
       || document.querySelector('.gallery-grid');
@@ -665,7 +668,7 @@
         (lang === 'en' ? 'Coming Soon — Stay Tuned!' : '🍰 新品籌備中，敬請期待～ ✨') + '</p>';
       return;
     }
-    renderGallery(items, container, type);
+    renderGallery(items, container, type, options);
 
     // 用 IntersectionObserver 控制圖片載入，避免同時發出太多請求
     const lazyImages = container.querySelectorAll('img[data-src]');
@@ -910,14 +913,74 @@
     init: initGallery,
   };
 
+  // 共享圖例：合併頁（多 grid）才用。一個 legend 控制所有 grid 的篩選。
+  function renderSharedLegend(grids) {
+    // 移除任何既有 legend，確保只剩一個共享版
+    document.querySelectorAll('.tag-legend').forEach(function (el) { el.remove(); });
+
+    var currentLang = localStorage.getItem('language') || 'zh';
+
+    var legend = document.createElement('div');
+    legend.className = 'tag-legend tag-legend--shared';
+
+    var legendItems = Object.keys(TAG_COLORS).map(function (tag) {
+      var color = TAG_COLORS[tag];
+      var tagText = getTagText(tag, currentLang);
+      var tagTextZh = TAG_I18N[tag] ? TAG_I18N[tag].zh : tag;
+      var tagTextEn = TAG_I18N[tag] ? TAG_I18N[tag].en : tag;
+      return '<div class="tag-legend-item">' +
+          '<label class="tag-legend-checkbox-label">' +
+            '<input type="checkbox" class="tag-legend-checkbox" value="' + tag + '" data-tag="' + tag + '">' +
+            '<span class="tag-badge tag-legend-badge" data-en="' + tagTextEn + '" data-zh="' + tagTextZh + '" style="background-color: ' + color.bg + '; color: ' + color.text + '; box-shadow: 0 2px 8px ' + color.shadow + '; --tag-bg-color: ' + color.bg + ';">' + tagText + '</span>' +
+          '</label>' +
+        '</div>';
+    }).join('');
+
+    legend.innerHTML = '<div class="tag-legend-items">' + legendItems +
+      '<span class="tag-legend-hint" data-en="clickable" data-zh="可勾選">可勾選</span></div>';
+
+    // 插入到 .order-tags 之後（fixed nav 底下），fallback 放第一個 grid 之前
+    var anchor = document.querySelector('.order-tags');
+    if (anchor && anchor.parentNode) {
+      anchor.parentNode.insertBefore(legend, anchor.nextSibling);
+    } else if (grids[0] && grids[0].parentNode) {
+      grids[0].parentNode.insertBefore(legend, grids[0]);
+    }
+
+    // 綁 checkbox：篩選同步套到所有 grid
+    var checkboxes = legend.querySelectorAll('.tag-legend-checkbox');
+    checkboxes.forEach(function (checkbox) {
+      checkbox.addEventListener('change', function () {
+        var selectedTags = Array.from(checkboxes)
+          .filter(function (cb) { return cb.checked; })
+          .map(function (cb) { return cb.value; });
+        grids.forEach(function (grid) {
+          filterGallery(selectedTags, grid);
+        });
+      });
+    });
+
+    if (window.LovelyI18n) {
+      window.LovelyI18n.applyLanguage(currentLang, legend);
+    }
+  }
+
   // Auto-init: detect gallery type from data attribute on .gallery-grid
   // This allows using defer on the script tag without needing an inline script.
   // Usage: <div class="gallery-grid" data-gallery-type="seasonal">
   // 支援同頁多個 grid（例如 all-items.html admin 預覽合併版）
   function autoInit() {
-    var containers = document.querySelectorAll('.gallery-grid[data-gallery-type]');
+    var containers = Array.from(document.querySelectorAll('.gallery-grid[data-gallery-type]'));
+    var isMergedView = containers.length > 1;
+
+    // 合併版：先 render 共享 legend（內容 hard-coded，不需等 fetch），各 grid 再 init 時 skip 自己的 legend
+    if (isMergedView) {
+      var grids = containers.filter(function (c) { return c.getAttribute('data-gallery-type') !== 'sets'; });
+      if (grids.length > 0) renderSharedLegend(grids);
+    }
+
     containers.forEach(function (container) {
-      initGallery(container.getAttribute('data-gallery-type'));
+      initGallery(container.getAttribute('data-gallery-type'), { skipLegend: isMergedView });
     });
   }
 
