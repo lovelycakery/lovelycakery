@@ -27,7 +27,15 @@
     }
   }
 
-  function createImageModal(item, type) {
+  // 目前開啟的 modal 狀態（admin 修改子圖時用來原地刷新）
+  let activeModalRef = null;
+
+  function createImageModal(item, type, opts) {
+    opts = opts || {};
+    const itemIndex = (typeof opts.index === 'number') ? opts.index : -1;
+    const initialSlide = (typeof opts.initialSlide === 'number') ? opts.initialSlide : 0;
+    const skipHistory = !!opts.skipHistory;
+
     const currentLang = localStorage.getItem('language') || 'zh';
     const modal = document.createElement('div');
     modal.className = 'image-modal';
@@ -135,7 +143,7 @@
     `;
 
     let modalOpen = true;
-    let currentSlide = 0;
+    let currentSlide = Math.max(0, Math.min(initialSlide, totalSlides - 1));
 
     const slidesTrack = modal.querySelector('.image-modal__slides');
     const dotEls = modal.querySelectorAll('.image-modal__dot');
@@ -156,7 +164,14 @@
     }
 
     // 初始位置（不跑動畫）
-    applyTrackTransform(0, 0);
+    // 暫時關掉 transition，避免 initialSlide > 0 時看到滑動軌跡
+    const prevTransition = slidesTrack.style.transition;
+    slidesTrack.style.transition = 'none';
+    applyTrackTransform(currentSlide, 0);
+    dotEls.forEach((el, i) => el.classList.toggle('is-active', i === currentSlide));
+    // 強制 reflow 後恢復 transition
+    void slidesTrack.offsetWidth;
+    slidesTrack.style.transition = prevTransition;
 
     if (hasMultiple) {
       modal.querySelector('.image-modal__nav--prev').addEventListener('click', (ev) => { ev.stopPropagation(); showSlide(currentSlide - 1); });
@@ -239,13 +254,16 @@
       document.body.style.overflow = '';
       document.removeEventListener('keydown', keyHandler);
       window.removeEventListener('popstate', popstateHandler);
+      if (activeModalRef && activeModalRef.modal === modal) activeModalRef = null;
     };
 
     // X / overlay / Escape 關閉時，要 history.back() 消掉 pushState 的記錄
+    // 但若這個 modal 是「無感刷新」開啟的（skipHistory），就不要 back
     const closeAndBack = () => {
       if (!modalOpen) return;
+      const needsBack = !skipHistory;
       closeModal();
-      history.back();
+      if (needsBack) history.back();
     };
 
     const keyHandler = (e) => {
@@ -267,11 +285,20 @@
     document.addEventListener('keydown', keyHandler);
     window.addEventListener('popstate', popstateHandler);
 
-    // 推一筆歷史記錄，讓返回手勢可以攔截
-    history.pushState({ modal: true }, '');
+    // 推一筆歷史記錄，讓返回手勢可以攔截（無感刷新時跳過，沿用原本那筆）
+    if (!skipHistory) history.pushState({ modal: true }, '');
 
     document.body.appendChild(modal);
     document.body.style.overflow = 'hidden';
+
+    // 登記目前開啟的 modal，admin 修改子圖時可原地刷新
+    activeModalRef = {
+      modal: modal,
+      itemIndex: itemIndex,
+      type: type,
+      getCurrentSlide: () => currentSlide,
+      silentClose: closeModal,
+    };
   }
 
   // 標籤顏色定義（精緻可愛風格 - 單色）
@@ -696,13 +723,13 @@
           // 點擊圖片時也開啟 modal（與公開頁一致，方便預覽子圖）
           // 點到名稱列（itemInfo）時不開
           if (e.target.closest('.gallery-image-wrapper')) {
-            createImageModal(item, type);
+            createImageModal(item, type, { index: index });
           }
         });
       } else {
         // 非編輯模式（包括預覽模式和訪客模式）：只有點圖片才開 modal
         imageWrapper.addEventListener('click', () => {
-          createImageModal(item, type);
+          createImageModal(item, type, { index: index });
         });
       }
       
@@ -828,9 +855,14 @@
       return;
     }
     renderGallery(items, container, type, options);
+    setupLazyImages(container);
+  }
 
-    // 用 IntersectionObserver 控制圖片載入，避免同時發出太多請求
+  // 用 IntersectionObserver 控制圖片載入，避免同時發出太多請求
+  // 注意：每次 renderGallery 重建 DOM 後都要重新呼叫，否則新的 img[data-src] 不會被載入
+  function setupLazyImages(container) {
     const lazyImages = container.querySelectorAll('img[data-src]');
+    if (lazyImages.length === 0) return;
     const imageObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -844,7 +876,6 @@
         }
       });
     }, { rootMargin: '200px' });
-
     lazyImages.forEach(img => imageObserver.observe(img));
   }
 
@@ -977,8 +1008,25 @@
       if (container2) {
         var galleryType = container2.getAttribute('data-gallery-type') || 'products';
         renderGallery(e.data.items, container2, galleryType);
+        // 重要：renderGallery 會清掉舊 DOM、重建 img[data-src]，必須重新掛 IntersectionObserver
+        // 否則新的 img 永遠不會被觸發載入（會卡在 spinner）
+        setupLazyImages(container2);
         if (window.LovelyI18n) {
           window.LovelyI18n.applyLanguage(localStorage.getItem('language') || 'zh');
+        }
+        // 若目前有開啟的 modal，原地刷新（沿用原本的 history 記錄與 slide 位置）
+        if (activeModalRef && typeof activeModalRef.itemIndex === 'number'
+            && activeModalRef.itemIndex >= 0 && activeModalRef.itemIndex < e.data.items.length) {
+          var prevIndex = activeModalRef.itemIndex;
+          var prevType = activeModalRef.type;
+          var prevSlide = activeModalRef.getCurrentSlide();
+          var newItem = e.data.items[prevIndex];
+          activeModalRef.silentClose();
+          createImageModal(newItem, prevType, {
+            index: prevIndex,
+            initialSlide: prevSlide,
+            skipHistory: true,
+          });
         }
       }
       return;
