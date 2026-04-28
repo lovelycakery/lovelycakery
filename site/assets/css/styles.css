@@ -975,13 +975,15 @@ img {
     margin-top: calc(var(--tags-h, 80px) + 32px);
 }
 
-/* 篩選後沒符合商品時的提示 */
+/* 篩選後沒符合商品時的提示（放 grid 之後，block-level 全寬置中） */
 .gallery-empty-msg {
-    grid-column: 1 / -1;
     text-align: center;
-    color: #6b5d4f;
-    font-size: 16px;
-    padding: 40px 20px;
+    color: #8b6f47;
+    font-family: 'Playfair Display', 'Noto Serif TC', 'PingFang TC', serif;
+    font-size: 18px;
+    font-weight: 400;
+    letter-spacing: 2px;
+    padding: 48px 20px;
     margin: 0;
 }
 

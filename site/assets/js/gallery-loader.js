@@ -210,22 +210,21 @@
       if (visible) visibleCount++;
     });
 
-    // 無符合商品時顯示提示（只對 grid 容器套用）
-    const grid = container && container.classList && container.classList.contains('gallery-grid')
-      ? container
-      : (root.querySelector ? root.querySelector('.gallery-grid') : null);
-    if (grid) {
-      let msg = grid.querySelector(':scope > .gallery-empty-msg');
+    // 無符合商品時顯示提示（放 grid 之後當 block-level 元素，確保跨整列、左右置中）
+    if (container && container.classList && container.classList.contains('gallery-grid')) {
+      const grid = container;
+      const next = grid.nextElementSibling;
+      let msg = (next && next.classList && next.classList.contains('gallery-empty-msg')) ? next : null;
       const showMsg = items.length > 0 && visibleCount === 0;
       if (showMsg) {
         if (!msg) {
           const lang = localStorage.getItem('language') || 'zh';
           msg = document.createElement('p');
           msg.className = 'gallery-empty-msg';
-          msg.setAttribute('data-en', 'No items match the selected filters.');
-          msg.setAttribute('data-zh', '目前沒有符合條件的商品');
-          msg.textContent = lang === 'en' ? 'No items match the selected filters.' : '目前沒有符合條件的商品';
-          grid.appendChild(msg);
+          msg.setAttribute('data-en', 'No items match.');
+          msg.setAttribute('data-zh', '目前沒有符合的商品喔');
+          msg.textContent = lang === 'en' ? 'No items match.' : '目前沒有符合的商品喔';
+          grid.parentNode.insertBefore(msg, grid.nextSibling);
           if (window.LovelyI18n) window.LovelyI18n.applyLanguage(lang, msg);
         } else {
           msg.style.display = '';
