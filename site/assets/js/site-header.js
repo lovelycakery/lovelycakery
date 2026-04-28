@@ -35,8 +35,9 @@
     // 偵測 admin 測試模式（合併版預覽）
     const adminParams = new URLSearchParams(window.location.search);
     const isTestMode = adminParams.get('adminPreview') === '1' && adminParams.get('mode') === 'test';
-    // 測試模式下，nav link 帶上 query string，避免點導覽列後失去 admin context
-    const adminQuery = isTestMode ? '?adminPreview=1&mode=test' : '';
+    // 測試模式下，nav link 帶上 query string + 時間戳，避免點導覽列後失去 admin context
+    // 加 ts 是為了繞過瀏覽器 HTML cache（admin iframe 切換 tab 也是這個機制）
+    const adminQuery = isTestMode ? '?adminPreview=1&mode=test&ts=' + Date.now() : '';
 
     let items = [
       { href: 'index.html', zh: '首頁', en: 'Home', isIcon: true, iconType: 'home' },
