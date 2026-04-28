@@ -1007,13 +1007,14 @@ img {
     content: '';
     display: block;
     margin: 24px auto 0;
-    width: 100%;
-    height: 2px;
+    width: 80%;
+    max-width: 800px;
+    height: 3px;
     background: linear-gradient(to right,
         transparent 0%,
-        rgba(61, 40, 23, 0.05) 15%,
-        rgba(61, 40, 23, 0.35) 50%,
-        rgba(61, 40, 23, 0.05) 85%,
+        rgba(61, 40, 23, 0.15) 15%,
+        rgba(61, 40, 23, 0.6) 50%,
+        rgba(61, 40, 23, 0.15) 85%,
         transparent 100%);
     border-radius: 2px;
 }
