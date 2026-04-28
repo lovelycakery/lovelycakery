@@ -14,6 +14,7 @@
     <link rel="icon" href="favicon.ico" sizes="any">
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link rel="preload" href="assets/data/products-data.json" as="fetch" crossorigin>
+    <link rel="preload" href="assets/data/sets-data.json" as="fetch" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="assets/css/styles.css?v=20260428-6">
@@ -37,21 +38,21 @@
                 <p class="page-subtitle" data-en="Layer by layer, made with love." data-zh="層層手作，每一層，都是用心。">層層手作，每一層，都是用心。</p>
             </div>
 
-            <!-- 分頁標籤（admin 預覽模式才顯示） -->
+            <!-- 分頁標籤 -->
             <nav class="order-tags admin-only" aria-label="商品分類">
-                <a class="order-tag" href="#seasonal" data-en="Seasonal" data-zh="新品上市">新品上市</a>
+                <a class="order-tag" href="#sets" data-en="Special Sets" data-zh="優惠組合">優惠組合</a>
                 <a class="order-tag" href="#products" data-en="Menu" data-zh="季節品項">季節品項</a>
             </nav>
 
-            <!-- 新品上市區（admin 預覽模式才顯示） -->
-            <section id="seasonal" class="all-items-section admin-only">
-                <h2 class="all-items-section-title" data-en="Seasonal Specials" data-zh="新品上市">新品上市</h2>
-                <div class="gallery-grid" data-gallery-type="seasonal">
+            <!-- 優惠組合區 -->
+            <section id="sets" class="all-items-section admin-only">
+                <h2 class="all-items-section-title" data-en="Special Sets" data-zh="優惠組合">優惠組合</h2>
+                <div class="gallery-grid" data-gallery-type="sets">
                     <!-- Images loaded dynamically by gallery-loader.js -->
                 </div>
             </section>
 
-            <!-- 季節品項標題（admin 預覽模式才顯示） -->
+            <!-- 季節品項標題 -->
             <h2 id="products" class="all-items-section-title admin-only" data-en="Menu" data-zh="季節品項">季節品項</h2>
 
             <div class="gallery-grid" data-gallery-type="products">
