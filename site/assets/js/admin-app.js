@@ -253,6 +253,7 @@
     if (!iframe || !iframe.contentWindow) return;
     iframe.contentWindow.postMessage({
       type: 'admin-gallery-update',
+      galleryType: type,
       items: state.imageData[type].items,
     }, '*');
   }
@@ -1295,7 +1296,7 @@
     // 用 DOM 移動元素而非重新渲染，避免圖片重載失效
     var iframe = $('previewFrame');
     if (iframe && iframe.contentWindow) {
-      iframe.contentWindow.postMessage({ type: 'admin-gallery-reorder-dom', fromIndex: fromIndex, toIndex: toIndex }, '*');
+      iframe.contentWindow.postMessage({ type: 'admin-gallery-reorder-dom', galleryType: type, fromIndex: fromIndex, toIndex: toIndex }, '*');
     }
   }
 

@@ -979,7 +979,11 @@
     
     // Admin: reorder by moving DOM elements (avoids full re-render which breaks images)
     if (e.data && e.data.type === 'admin-gallery-reorder-dom') {
-      var container = document.querySelector('.gallery-grid');
+      var rType = e.data.galleryType
+        || (document.querySelector('.gallery-grid[data-gallery-type]') && document.querySelector('.gallery-grid[data-gallery-type]').getAttribute('data-gallery-type'))
+        || 'products';
+      var container = document.querySelector('.gallery-grid[data-gallery-type="' + rType + '"]')
+        || document.querySelector('.gallery-grid');
       if (!container) return;
       var items = container.querySelectorAll('.gallery-item');
       var from = e.data.fromIndex;
@@ -1004,10 +1008,17 @@
 
     // Admin: full re-render (for upload/delete — use sparingly)
     if (e.data && e.data.type === 'admin-gallery-update' && Array.isArray(e.data.items)) {
-      var container2 = document.querySelector('.gallery-grid');
+      // 在合併版（test mode）有多個 grid，要用 galleryType 精確找到對應 grid，
+      // 否則會把 products 資料寫進 seasonal grid 等錯誤
+      var galleryType = e.data.galleryType
+        || (document.querySelector('.gallery-grid[data-gallery-type]') && document.querySelector('.gallery-grid[data-gallery-type]').getAttribute('data-gallery-type'))
+        || 'products';
+      var container2 = document.querySelector('.gallery-grid[data-gallery-type="' + galleryType + '"]');
       if (container2) {
-        var galleryType = container2.getAttribute('data-gallery-type') || 'products';
-        renderGallery(e.data.items, container2, galleryType);
+        var allGrids = document.querySelectorAll('.gallery-grid[data-gallery-type]');
+        var isMergedView = allGrids.length > 1;
+        // 合併版要 skipLegend，避免重複塞圖例
+        renderGallery(e.data.items, container2, galleryType, { skipLegend: isMergedView });
         // 重要：renderGallery 會清掉舊 DOM、重建 img[data-src]，必須重新掛 IntersectionObserver
         // 否則新的 img 永遠不會被觸發載入（會卡在 spinner）
         setupLazyImages(container2);
@@ -1015,7 +1026,8 @@
           window.LovelyI18n.applyLanguage(localStorage.getItem('language') || 'zh');
         }
         // 若目前有開啟的 modal，原地刷新（沿用原本的 history 記錄與 slide 位置）
-        if (activeModalRef && typeof activeModalRef.itemIndex === 'number'
+        if (activeModalRef && activeModalRef.type === galleryType
+            && typeof activeModalRef.itemIndex === 'number'
             && activeModalRef.itemIndex >= 0 && activeModalRef.itemIndex < e.data.items.length) {
           var prevIndex = activeModalRef.itemIndex;
           var prevType = activeModalRef.type;
