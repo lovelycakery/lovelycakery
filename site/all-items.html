@@ -69,6 +69,9 @@
         var showMerged = params.get('adminPreview') === '1' && params.get('mode') === 'test';
         if (!showMerged) {
             document.querySelectorAll('.admin-only').forEach(function (el) { el.remove(); });
+        } else {
+            // 測試模式：給 body 加 class 讓 CSS 切換樣式（隱藏 page-header、放大 section title）
+            document.body.classList.add('is-test-mode');
         }
     })();
     </script>
