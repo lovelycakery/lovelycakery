@@ -14,7 +14,6 @@
     <link rel="icon" href="favicon.ico" sizes="any">
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link rel="preload" href="assets/data/products-data.json" as="fetch" crossorigin>
-    <link rel="preload" href="assets/data/sets-data.json" as="fetch" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="assets/css/styles.css?v=20260428-6">
@@ -40,14 +39,14 @@
 
             <!-- 分頁標籤 -->
             <nav class="order-tags admin-only" aria-label="商品分類">
-                <a class="order-tag" href="#sets" data-en="Special Sets" data-zh="優惠組合">優惠組合</a>
+                <a class="order-tag" href="#seasonal" data-en="Seasonal" data-zh="新品上市">新品上市</a>
                 <a class="order-tag" href="#products" data-en="Menu" data-zh="季節品項">季節品項</a>
             </nav>
 
-            <!-- 優惠組合區 -->
-            <section id="sets" class="all-items-section admin-only">
-                <h2 class="all-items-section-title" data-en="Special Sets" data-zh="優惠組合">優惠組合</h2>
-                <div class="gallery-grid" data-gallery-type="sets">
+            <!-- 新品上市區 -->
+            <section id="seasonal" class="all-items-section admin-only">
+                <h2 class="all-items-section-title" data-en="Seasonal Specials" data-zh="新品上市">新品上市</h2>
+                <div class="gallery-grid" data-gallery-type="seasonal">
                     <!-- Images loaded dynamically by gallery-loader.js -->
                 </div>
             </section>
@@ -76,7 +75,7 @@
     })();
     </script>
 
-    <script defer src="assets/js/site-header.js?v=20260428-3"></script>
+    <script defer src="assets/js/site-header.js?v=20260428-4"></script>
     <script defer src="assets/js/i18n.js"></script>
     <script defer src="assets/js/gallery-loader.js?v=20260428-8"></script>
     <script defer src="assets/js/image-protection.js"></script>

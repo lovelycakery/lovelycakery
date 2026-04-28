@@ -49,13 +49,8 @@
       { href: 'contact.html', zh: '地圖', en: 'Map' },
     ];
 
-    if (isTestMode) {
-      // 測試模式：「新品上市」已合併進「全部品項」，隱藏
-      items = items.filter(function (it) { return it.href !== 'seasonal.html'; });
-    } else {
-      // 訪客 / 編輯 / 預覽模式：「優惠組合」目前不公開
-      items = items.filter(function (it) { return it.href !== 'sets.html'; });
-    }
+    // 「新品上市」已整合進「全部品項」，主導航改顯示「優惠組合」
+    items = items.filter(function (it) { return it.href !== 'seasonal.html'; });
 
     const parts = [];
     items.forEach((it, idx) => {
