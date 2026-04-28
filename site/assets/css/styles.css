@@ -922,6 +922,45 @@ img {
 }
 
 /* ============================================
+   全部品項合併頁（admin 預覽模式）：分頁區塊
+   訪客模式下 .admin-only 會被移除，這些樣式只作用於 admin 預覽
+   ============================================ */
+.all-items-section {
+    margin: 28px auto;
+    width: 100%;
+    scroll-margin-top: calc(var(--header-h, 100px) + var(--tags-h, 80px) + 8px);
+}
+
+.all-items-section-title {
+    margin: 0 0 12px;
+    font-family: 'Inter', 'Noto Sans TC', sans-serif;
+    font-size: 26px;
+    font-weight: 600;
+    color: #3d2817;
+    text-align: center;
+    scroll-margin-top: calc(var(--header-h, 100px) + var(--tags-h, 80px) + 8px);
+}
+
+.all-items-section-subtitle {
+    margin: 0 0 24px;
+    text-align: center;
+    color: #6b5d4f;
+    font-size: 16px;
+}
+
+@media (max-width: 768px) {
+    .all-items-section {
+        margin: 20px auto;
+    }
+    .all-items-section-title {
+        font-size: 21px;
+    }
+    .all-items-section-subtitle {
+        font-size: 14px;
+    }
+}
+
+/* ============================================
    新品上市（seasonal）/ 優惠組合（sets）：標籤微幅溢出照片邊緣
    與 all-items 相同結構：外框不裁切、圓角與陰影移到 <img> 本身
    ============================================ */

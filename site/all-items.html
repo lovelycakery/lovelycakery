@@ -37,16 +37,59 @@
                 <p class="page-subtitle" data-en="Layer by layer, made with love." data-zh="層層手作，每一層，都是用心。">層層手作，每一層，都是用心。</p>
             </div>
 
+            <!-- 分頁標籤（admin 預覽模式才顯示） -->
+            <nav class="order-tags admin-only" aria-label="商品分類">
+                <a class="order-tag" href="#seasonal" data-en="Seasonal" data-zh="新品上市">新品上市</a>
+                <a class="order-tag" href="#products" data-en="Menu" data-zh="季節品項">季節品項</a>
+            </nav>
+
+            <!-- 新品上市區（admin 預覽模式才顯示） -->
+            <section id="seasonal" class="all-items-section admin-only">
+                <h2 class="all-items-section-title" data-en="Seasonal Specials" data-zh="新品上市">新品上市</h2>
+                <p class="all-items-section-subtitle" data-en="Taste the season." data-zh="品嚐當季的美好。">品嚐當季的美好。</p>
+                <div class="gallery-grid" data-gallery-type="seasonal">
+                    <!-- Images loaded dynamically by gallery-loader.js -->
+                </div>
+            </section>
+
+            <!-- 季節品項標題（admin 預覽模式才顯示） -->
+            <h2 id="products" class="all-items-section-title admin-only" data-en="Menu" data-zh="季節品項">季節品項</h2>
+
             <div class="gallery-grid" data-gallery-type="products">
                 <!-- Images loaded dynamically by gallery-loader.js -->
             </div>
         </div>
     </main>
     <noscript><p style="text-align:center;padding:40px;font-size:16px;color:#3d2817;">本網站需要 JavaScript 才能正常顯示。請啟用 JavaScript 後重新整理頁面。<br>This website requires JavaScript. Please enable it and reload.</p></noscript>
+
+    <!-- 隔離 script：只有 admin 預覽模式才顯示合併版分頁，其他情況移除 admin-only 元素 -->
+    <script>
+    (function () {
+        var params = new URLSearchParams(window.location.search);
+        var showMerged = params.get('adminPreview') === '1' && params.get('mode') === 'preview';
+        if (!showMerged) {
+            document.querySelectorAll('.admin-only').forEach(function (el) { el.remove(); });
+        }
+    })();
+    </script>
+
     <script defer src="assets/js/site-header.js"></script>
     <script defer src="assets/js/i18n.js"></script>
     <script defer src="assets/js/gallery-loader.js"></script>
     <script defer src="assets/js/image-protection.js"></script>
+
+    <!-- 計算 fixed 分頁列高度，提供給 .all-items-section 的 scroll-margin-top 使用 -->
+    <script>
+    (function () {
+        function updateTagsHeight() {
+            var tags = document.querySelector('.order-tags');
+            if (!tags) return;
+            document.documentElement.style.setProperty('--tags-h', tags.getBoundingClientRect().height + 'px');
+        }
+        document.addEventListener('DOMContentLoaded', updateTagsHeight);
+        if (document.fonts) document.fonts.ready.then(updateTagsHeight);
+        window.addEventListener('resize', updateTagsHeight);
+    })();
+    </script>
 </body>
 </html>
-

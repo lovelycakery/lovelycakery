@@ -194,10 +194,11 @@
     return SIZE_I18N[sizeKey] ? SIZE_I18N[sizeKey][normalized] : sizeKey;
   }
 
-  // 篩選圖片
-  function filterGallery(selectedTags) {
-    const items = document.querySelectorAll('.gallery-item');
-    
+  // 篩選圖片（若提供 container 則只篩選該 grid 內的項目，否則全頁）
+  function filterGallery(selectedTags, container) {
+    const root = container || document;
+    const items = root.querySelectorAll('.gallery-item');
+
     if (selectedTags.length === 0) {
       // 沒有選中任何標籤，顯示所有圖片
       items.forEach(item => {
@@ -216,10 +217,10 @@
 
   // 渲染圖例（可勾選）
   function renderTagLegend(container) {
-    // 檢查是否已經有圖例
-    const existingLegend = document.querySelector('.tag-legend');
-    if (existingLegend) {
-      existingLegend.remove();
+    // 移除這個 grid 對應的舊圖例（grid 的前一個 sibling）
+    const prevSibling = container.previousElementSibling;
+    if (prevSibling && prevSibling.classList && prevSibling.classList.contains('tag-legend')) {
+      prevSibling.remove();
     }
 
     // 獲取當前語言
@@ -228,7 +229,7 @@
     // 創建圖例容器
     const legend = document.createElement('div');
     legend.className = 'tag-legend';
-    
+
     const legendItems = Object.keys(TAG_COLORS).map(tag => {
       const color = TAG_COLORS[tag];
       const tagText = getTagText(tag, currentLang);
@@ -248,29 +249,17 @@
       <div class="tag-legend-items">${legendItems}<span class="tag-legend-hint" data-en="clickable" data-zh="可勾選">可勾選</span></div>
     `;
 
-    // 插入到 page-header 下方，gallery-grid 上方
-    const pageHeader = document.querySelector('.page-header');
-    if (pageHeader) {
-      // 插入到 page-header 的下一個兄弟元素之前（通常是 gallery-grid）
-      if (pageHeader.nextSibling) {
-        pageHeader.parentNode.insertBefore(legend, pageHeader.nextSibling);
-      } else {
-        // 如果沒有下一個兄弟元素，直接插入到 page-header 後面
-        pageHeader.parentNode.appendChild(legend);
-      }
-    } else {
-      // 如果沒有 page-header，插入到 container 前面
-      container.parentNode.insertBefore(legend, container);
-    }
+    // 插入到 grid 之前（每個 grid 自己的圖例）
+    container.parentNode.insertBefore(legend, container);
 
-    // 綁定 checkbox 事件
+    // 綁定 checkbox 事件（篩選範圍限定在這個 grid 內）
     const checkboxes = legend.querySelectorAll('.tag-legend-checkbox');
     checkboxes.forEach(checkbox => {
       checkbox.addEventListener('change', () => {
         const selectedTags = Array.from(checkboxes)
           .filter(cb => cb.checked)
           .map(cb => cb.value);
-        filterGallery(selectedTags);
+        filterGallery(selectedTags, container);
       });
     });
 
@@ -637,7 +626,9 @@
   }
 
   async function initGallery(type) {
-    const container = document.querySelector('.gallery-grid');
+    // 精確選取對應 type 的 grid（同頁可能有多個 grid）
+    const container = document.querySelector('.gallery-grid[data-gallery-type="' + type + '"]')
+      || document.querySelector('.gallery-grid');
     if (!container) return;
 
     const items = await loadGalleryData(type);
@@ -922,11 +913,12 @@
   // Auto-init: detect gallery type from data attribute on .gallery-grid
   // This allows using defer on the script tag without needing an inline script.
   // Usage: <div class="gallery-grid" data-gallery-type="seasonal">
+  // 支援同頁多個 grid（例如 all-items.html admin 預覽合併版）
   function autoInit() {
-    var container = document.querySelector('.gallery-grid[data-gallery-type]');
-    if (container) {
+    var containers = document.querySelectorAll('.gallery-grid[data-gallery-type]');
+    containers.forEach(function (container) {
       initGallery(container.getAttribute('data-gallery-type'));
-    }
+    });
   }
 
   if (document.readyState === 'loading') {
