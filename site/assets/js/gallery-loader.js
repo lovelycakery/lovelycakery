@@ -98,8 +98,8 @@
     const totalSlides = slideEntries.length;
     const hasMultiple = totalSlides > 1;
 
-    const slidesHTML = slideEntries.map((s, i) => (
-      `<img src="${s.src}" alt="${s.alt}" class="image-modal__slide${i === 0 ? ' is-active' : ''}" draggable="false">`
+    const slidesHTML = slideEntries.map((s) => (
+      `<img src="${s.src}" alt="${s.alt}" class="image-modal__slide" draggable="false">`
     )).join('');
 
     let navHTML = '';
@@ -137,16 +137,26 @@
     let modalOpen = true;
     let currentSlide = 0;
 
-    const slideEls = modal.querySelectorAll('.image-modal__slide');
+    const slidesTrack = modal.querySelector('.image-modal__slides');
     const dotEls = modal.querySelectorAll('.image-modal__dot');
+
+    function applyTrackTransform(idx, dragOffsetPx) {
+      // 用 calc：基底是 -idx*100%、加上拖曳的像素位移
+      const base = -idx * 100;
+      const offset = dragOffsetPx || 0;
+      slidesTrack.style.transform = `translateX(calc(${base}% + ${offset}px))`;
+    }
 
     function showSlide(idx) {
       if (idx < 0) idx = totalSlides - 1;
       if (idx >= totalSlides) idx = 0;
       currentSlide = idx;
-      slideEls.forEach((el, i) => el.classList.toggle('is-active', i === idx));
+      applyTrackTransform(idx, 0);
       dotEls.forEach((el, i) => el.classList.toggle('is-active', i === idx));
     }
+
+    // 初始位置（不跑動畫）
+    applyTrackTransform(0, 0);
 
     if (hasMultiple) {
       modal.querySelector('.image-modal__nav--prev').addEventListener('click', (ev) => { ev.stopPropagation(); showSlide(currentSlide - 1); });
@@ -161,28 +171,64 @@
         });
       });
 
-      // Touch swipe
+      // Touch swipe：手指拖曳時即時跟著動，放開依位移決定切換或回彈
       const wrapper = modal.querySelector('.image-modal__image-wrapper');
       let touchStartX = 0;
       let touchStartY = 0;
       let touchActive = false;
+      let touchAxis = null; // 'h' / 'v' / null（尚未決定）
+
       wrapper.addEventListener('touchstart', (ev) => {
         if (ev.touches.length !== 1) return;
         touchActive = true;
+        touchAxis = null;
         touchStartX = ev.touches[0].clientX;
         touchStartY = ev.touches[0].clientY;
       }, { passive: true });
+
+      wrapper.addEventListener('touchmove', (ev) => {
+        if (!touchActive || ev.touches.length !== 1) return;
+        const dx = ev.touches[0].clientX - touchStartX;
+        const dy = ev.touches[0].clientY - touchStartY;
+        // 第一次明確判斷主軸：避免手指原本想垂直捲動但被誤判成水平
+        if (touchAxis === null) {
+          if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return; // 還太小，先不判
+          touchAxis = Math.abs(dx) > Math.abs(dy) ? 'h' : 'v';
+          if (touchAxis === 'h') slidesTrack.classList.add('is-dragging');
+        }
+        if (touchAxis !== 'h') return;
+        // 邊界減阻：第一張往右拖、最後一張往左拖時，位移打 0.35 折
+        let drag = dx;
+        if ((currentSlide === 0 && dx > 0) || (currentSlide === totalSlides - 1 && dx < 0)) {
+          drag = dx * 0.35;
+        }
+        if (ev.cancelable) ev.preventDefault();
+        applyTrackTransform(currentSlide, drag);
+      }, { passive: false });
+
       wrapper.addEventListener('touchend', (ev) => {
         if (!touchActive) return;
         touchActive = false;
+        slidesTrack.classList.remove('is-dragging');
+        if (touchAxis !== 'h') return;
         const t = ev.changedTouches[0];
         const dx = t.clientX - touchStartX;
-        const dy = t.clientY - touchStartY;
-        // 水平位移 > 50px 且大於垂直位移才算滑動，避免跟垂直捲動衝突
-        if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
-          if (dx < 0) showSlide(currentSlide + 1);
-          else showSlide(currentSlide - 1);
+        const threshold = wrapper.offsetWidth * 0.18; // 約 18% 寬度為切換門檻
+        if (dx <= -threshold && currentSlide < totalSlides - 1) {
+          showSlide(currentSlide + 1);
+        } else if (dx >= threshold && currentSlide > 0) {
+          showSlide(currentSlide - 1);
+        } else {
+          // 不夠或在邊界 → 回彈到原位
+          applyTrackTransform(currentSlide, 0);
         }
+      });
+
+      wrapper.addEventListener('touchcancel', () => {
+        if (!touchActive) return;
+        touchActive = false;
+        slidesTrack.classList.remove('is-dragging');
+        applyTrackTransform(currentSlide, 0);
       });
     }
 
