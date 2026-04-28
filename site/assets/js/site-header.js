@@ -32,25 +32,15 @@
   }
 
   function renderNavItems(currentPage) {
-    // 偵測 admin 測試模式（合併版預覽）
-    const adminParams = new URLSearchParams(window.location.search);
-    const isTestMode = adminParams.get('adminPreview') === '1' && adminParams.get('mode') === 'test';
-    // 測試模式下，nav link 帶上 query string + 時間戳，避免點導覽列後失去 admin context
-    // 加 ts 是為了繞過瀏覽器 HTML cache（admin iframe 切換 tab 也是這個機制）
-    const adminQuery = isTestMode ? '?adminPreview=1&mode=test&ts=' + Date.now() : '';
-
-    let items = [
+    const items = [
       { href: 'index.html', zh: '首頁', en: 'Home', isIcon: true, iconType: 'home' },
       { href: 'calendar.html', zh: '月曆', en: 'Calendar' },
-      { href: 'seasonal.html', zh: '新品上市', en: 'Season' },
       { href: 'sets.html', zh: '優惠組合', en: 'Sets' },
       { href: 'all-items.html', zh: '全部品項', en: 'Menu' },
       { href: 'order.html', zh: '訂購說明', en: 'Order' },
       { href: 'contact.html', zh: '地圖', en: 'Map' },
     ];
-
-    // 「新品上市」已整合進「全部品項」，主導航改顯示「優惠組合」
-    items = items.filter(function (it) { return it.href !== 'seasonal.html'; });
+    const adminQuery = '';
 
     const parts = [];
     items.forEach((it, idx) => {

@@ -1668,21 +1668,14 @@
     state.currentMode = mode;
     $('editModeBtn').classList.toggle('active', mode === 'edit');
     $('previewModeBtn').classList.toggle('active', mode === 'preview');
-    $('testModeBtn').classList.toggle('active', mode === 'test');
-    // 編輯模式才顯示 tab 切換；預覽/測試模式都隱藏（純瀏覽用）
+    // 編輯模式才顯示 tab 切換；預覽模式隱藏（純瀏覽用）
     $('topbarCenter').style.display = mode === 'edit' ? 'flex' : 'none';
     if (mode === 'edit') {
       $('mainContainer').classList.remove('preview-mode');
       if (state.currentTab === 'calendar') { state.clickHookInstalled = false; startHookWatcher(); }
     } else {
-      // preview / test 都套 preview-mode 樣式（不能編輯）
       $('mainContainer').classList.add('preview-mode');
       if (state.hookTimer) { clearInterval(state.hookTimer); state.hookTimer = 0; state.clickHookInstalled = false; }
-    }
-    // 測試模式只有「全部品項」tab 有新版面；自動切過去避免使用者疑惑
-    if (mode === 'test' && state.currentTab !== 'products') {
-      switchTab('products');
-      return;
     }
     reloadPreview();
   }
@@ -1726,7 +1719,6 @@
   async function initApp() {
     $('editModeBtn').addEventListener('click', function () { switchMode('edit'); });
     $('previewModeBtn').addEventListener('click', function () { switchMode('preview'); });
-    $('testModeBtn').addEventListener('click', function () { switchMode('test'); });
 
     var toggle = $('statusToggle'), box = $('statusBox');
     toggle.addEventListener('click', function () {

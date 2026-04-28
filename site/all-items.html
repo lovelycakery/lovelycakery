@@ -66,8 +66,7 @@
     <script>
     (function () {
         var params = new URLSearchParams(window.location.search);
-        var isAdminNonTest = params.get('adminPreview') === '1' && params.get('mode') !== 'test';
-        if (isAdminNonTest) {
+        if (params.get('adminPreview') === '1' && params.get('mode') === 'edit') {
             document.querySelectorAll('.admin-only').forEach(function (el) { el.remove(); });
         } else {
             document.body.classList.add('is-test-mode');
@@ -75,7 +74,7 @@
     })();
     </script>
 
-    <script defer src="assets/js/site-header.js?v=20260428-4"></script>
+    <script defer src="assets/js/site-header.js?v=20260428-5"></script>
     <script defer src="assets/js/i18n.js"></script>
     <script defer src="assets/js/gallery-loader.js?v=20260428-8"></script>
     <script defer src="assets/js/image-protection.js"></script>
