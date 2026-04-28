@@ -38,20 +38,22 @@
     // 測試模式下，nav link 帶上 query string，避免點導覽列後失去 admin context
     const adminQuery = isTestMode ? '?adminPreview=1&mode=test' : '';
 
-    // 優惠組合（sets.html）暫時不在公開導覽列顯示；準備好內容後再把下面那行加回月曆與新品上市之間
-    // { href: 'sets.html', zh: '優惠組合', en: 'Sets' },
     let items = [
       { href: 'index.html', zh: '首頁', en: 'Home', isIcon: true, iconType: 'home' },
       { href: 'calendar.html', zh: '月曆', en: 'Calendar' },
       { href: 'seasonal.html', zh: '新品上市', en: 'Season' },
+      { href: 'sets.html', zh: '優惠組合', en: 'Sets' },
       { href: 'all-items.html', zh: '全部品項', en: 'Menu' },
       { href: 'order.html', zh: '訂購說明', en: 'Order' },
       { href: 'contact.html', zh: '地圖', en: 'Map' },
     ];
 
-    // 測試模式下隱藏「新品上市」（已合併進「全部品項」）
     if (isTestMode) {
+      // 測試模式：「新品上市」已合併進「全部品項」，隱藏
       items = items.filter(function (it) { return it.href !== 'seasonal.html'; });
+    } else {
+      // 訪客 / 編輯 / 預覽模式：「優惠組合」目前不公開
+      items = items.filter(function (it) { return it.href !== 'sets.html'; });
     }
 
     const parts = [];
