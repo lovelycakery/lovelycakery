@@ -967,12 +967,22 @@ img {
 
 /* 共享 legend 補償 fixed .order-tags 的高度，避免被遮 */
 .is-test-mode .tag-legend--shared {
-    margin-top: calc(var(--tags-h, 80px) + 32px);
+    margin-top: calc(var(--tags-h, 80px) + 72px);
 }
 
 /* 沒 legend 的情況（理論上不會發生在合併頁，但保險起見） */
 .is-test-mode .all-items-section:first-of-type:not(.tag-legend--shared + .all-items-section) {
     margin-top: calc(var(--tags-h, 80px) + 32px);
+}
+
+/* 篩選後沒符合商品時的提示 */
+.gallery-empty-msg {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: #6b5d4f;
+    font-size: 16px;
+    padding: 40px 20px;
+    margin: 0;
 }
 
 .is-test-mode .all-items-section-title {

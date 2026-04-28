@@ -199,20 +199,41 @@
     const root = container || document;
     const items = root.querySelectorAll('.gallery-item');
 
-    if (selectedTags.length === 0) {
-      // 沒有選中任何標籤，顯示所有圖片
-      items.forEach(item => {
-        item.style.display = '';
-      });
-      return;
-    }
-
-    // 有選中標籤，只顯示包含所有選中標籤的圖片（AND 邏輯）
+    let visibleCount = 0;
     items.forEach(item => {
-      const itemTags = item.dataset.tags ? item.dataset.tags.split(',') : [];
-      const hasAllSelectedTags = selectedTags.every(tag => itemTags.includes(tag));
-      item.style.display = hasAllSelectedTags ? '' : 'none';
+      let visible = true;
+      if (selectedTags.length > 0) {
+        const itemTags = item.dataset.tags ? item.dataset.tags.split(',') : [];
+        visible = selectedTags.every(tag => itemTags.includes(tag));
+      }
+      item.style.display = visible ? '' : 'none';
+      if (visible) visibleCount++;
     });
+
+    // 無符合商品時顯示提示（只對 grid 容器套用）
+    const grid = container && container.classList && container.classList.contains('gallery-grid')
+      ? container
+      : (root.querySelector ? root.querySelector('.gallery-grid') : null);
+    if (grid) {
+      let msg = grid.querySelector(':scope > .gallery-empty-msg');
+      const showMsg = items.length > 0 && visibleCount === 0;
+      if (showMsg) {
+        if (!msg) {
+          const lang = localStorage.getItem('language') || 'zh';
+          msg = document.createElement('p');
+          msg.className = 'gallery-empty-msg';
+          msg.setAttribute('data-en', 'No items match the selected filters.');
+          msg.setAttribute('data-zh', '目前沒有符合條件的商品');
+          msg.textContent = lang === 'en' ? 'No items match the selected filters.' : '目前沒有符合條件的商品';
+          grid.appendChild(msg);
+          if (window.LovelyI18n) window.LovelyI18n.applyLanguage(lang, msg);
+        } else {
+          msg.style.display = '';
+        }
+      } else if (msg) {
+        msg.style.display = 'none';
+      }
+    }
   }
 
   // 渲染圖例（可勾選）
