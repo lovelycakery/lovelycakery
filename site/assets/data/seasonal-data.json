@@ -56,6 +56,26 @@
       "subImages": [
         "assets/images/seasonal/檸檬香梨千層-2.jpg"
       ]
+    },
+    {
+      "image": "assets/images/seasonal/未命名設計 - 2026-04-30T083848.231.jpg",
+      "name": "夏日檸檬千層",
+      "name_en": "Summer Lemon Mille Crepes",
+      "description": "新鮮金鑽鳳梨夾心\n頂層炙燒金鑽鳳梨\n新鮮藍莓\n新鮮檸檬乳霜",
+      "description_en": "Fresh golden pineapple filling \nTorched pineapple on top,\nFresh blueberries, \nand zesty lemon cream",
+      "tags": [
+        "奶蛋素",
+        "無咖啡因",
+        "無酒精"
+      ],
+      "prices": {
+        "size6": "1780",
+        "size8": "3180",
+        "slice": "300"
+      },
+      "subImages": [
+        "assets/images/seasonal/未命名設計 - 2026-04-30T083848.231-2.jpg"
+      ]
     }
   ]
 }
