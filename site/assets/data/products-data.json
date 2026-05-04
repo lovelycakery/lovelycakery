@@ -215,6 +215,9 @@
       "tags": [
         "奶蛋素",
         "無酒精"
+      ],
+      "subImages": [
+        "assets/images/products/抹茶水果-2.jpg"
       ]
     },
     {
@@ -282,6 +285,9 @@
         "奶蛋素",
         "無咖啡因",
         "無酒精"
+      ],
+      "subImages": [
+        "assets/images/products/法式蘋果塔千層-2.jpg"
       ]
     },
     {
@@ -298,6 +304,9 @@
       "tags": [
         "奶蛋素",
         "無酒精"
+      ],
+      "subImages": [
+        "assets/images/products/花生OREO千層-2.jpg"
       ]
     }
   ]
