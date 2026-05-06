@@ -257,7 +257,9 @@
         {
           "text": "本周切片口味",
           "color": "#0066cc",
-          "detail": "比利時黑巧克力/琥珀焙香/玫瑰乳酪/杏仁茶/微醺栗香提拉米蘇/ 隱藏版新口味"
+          "detail": "比利時黑巧克力/琥珀焙香/玫瑰乳酪/杏仁茶/微醺栗香提拉米蘇/ 隱藏版新口味",
+          "text_en": "Slice flavors",
+          "detail_en": "Belgian dark chocolate, amber roast, rose cheese, almond tea, tipsy chestnut tiramisu, secret new flavor"
         }
       ]
     },

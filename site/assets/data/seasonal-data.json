@@ -76,6 +76,22 @@
       "subImages": [
         "assets/images/seasonal/未命名設計 - 2026-04-30T083848.231-2.jpg"
       ]
+    },
+    {
+      "image": "assets/images/seasonal/未命名設計 - 2026-05-06T115451.699.jpg",
+      "name": "瘋狂猴子派對",
+      "name_en": "Crazy Monkey Party",
+      "description": "一整根新鮮香蕉\n花生醬 香烤榛果\n草莓乾 焦糖脆脆\n綜合堅果碎",
+      "description_en": "Whole fresh banana with creamy peanut butter, roasted hazelnuts, dried strawberries, caramel crunch, and mixed nut pieces",
+      "tags": [],
+      "prices": {
+        "size6": "1680",
+        "size8": "2980",
+        "slice": "280"
+      },
+      "subImages": [
+        "assets/images/seasonal/未命名設計 - 2026-05-06T115451.699-2.jpg"
+      ]
     }
   ]
 }
