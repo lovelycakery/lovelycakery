@@ -409,8 +409,8 @@
       "date": "2026-05-31",
       "items": [
         {
-          "text": "10am -2pm",
-          "color": "#1a8a1a",
+          "text": "休息",
+          "color": "#cc0000",
           "text_en": "10am–2pm"
         }
       ]
