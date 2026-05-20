@@ -345,6 +345,13 @@
           "text": "切片優惠組合",
           "color": "#e67700",
           "text_en": "Slice combo deal"
+        },
+        {
+          "text": "本週切片口味",
+          "color": "#0066cc",
+          "detail": "玫瑰荔枝/琥珀焙香/夏日繽紛水果茶(鐵觀音)/微醺栗香/一根香草莢/提拉米蘇",
+          "text_en": "Slice flavors",
+          "detail_en": "Rose lychee / Amber roast / Summer fruit tea with oolong / Tipsy chestnut / Vanilla bean / Tiramisu"
         }
       ]
     },
@@ -405,6 +412,159 @@
           "text": "10am -2pm",
           "color": "#1a8a1a",
           "text_en": "10am–2pm"
+        }
+      ]
+    },
+    {
+      "date": "2026-06-01",
+      "items": [
+        {
+          "text": "休息",
+          "color": "#cc0000"
+        }
+      ]
+    },
+    {
+      "date": "2026-06-03",
+      "items": [
+        {
+          "text": "切片優惠組合",
+          "color": "#e67700"
+        }
+      ]
+    },
+    {
+      "date": "2026-06-06",
+      "items": [
+        {
+          "text": "10am -2pm",
+          "color": "#1a8a1a"
+        }
+      ]
+    },
+    {
+      "date": "2026-06-07",
+      "items": [
+        {
+          "text": "10am -2pm",
+          "color": "#1a8a1a"
+        }
+      ]
+    },
+    {
+      "date": "2026-06-08",
+      "items": [
+        {
+          "text": "休息",
+          "color": "#cc0000"
+        }
+      ]
+    },
+    {
+      "date": "2026-06-10",
+      "items": [
+        {
+          "text": "切片優惠組合",
+          "color": "#e67700"
+        }
+      ]
+    },
+    {
+      "date": "2026-06-13",
+      "items": [
+        {
+          "text": "10am -2pm",
+          "color": "#1a8a1a"
+        }
+      ]
+    },
+    {
+      "date": "2026-06-14",
+      "items": [
+        {
+          "text": "10am -2pm",
+          "color": "#1a8a1a"
+        }
+      ]
+    },
+    {
+      "date": "2026-06-15",
+      "items": [
+        {
+          "text": "休息",
+          "color": "#cc0000"
+        }
+      ]
+    },
+    {
+      "date": "2026-06-17",
+      "items": [
+        {
+          "text": "切片優惠組合",
+          "color": "#e67700"
+        }
+      ]
+    },
+    {
+      "date": "2026-06-20",
+      "items": [
+        {
+          "text": "10am -2pm",
+          "color": "#1a8a1a"
+        }
+      ]
+    },
+    {
+      "date": "2026-06-21",
+      "items": [
+        {
+          "text": "10am -2pm",
+          "color": "#1a8a1a"
+        }
+      ]
+    },
+    {
+      "date": "2026-06-22",
+      "items": [
+        {
+          "text": "休息",
+          "color": "#cc0000"
+        }
+      ]
+    },
+    {
+      "date": "2026-06-24",
+      "items": [
+        {
+          "text": "切片優惠組合",
+          "color": "#e67700"
+        }
+      ]
+    },
+    {
+      "date": "2026-06-27",
+      "items": [
+        {
+          "text": "10am -2pm",
+          "color": "#1a8a1a"
+        }
+      ]
+    },
+    {
+      "date": "2026-06-28",
+      "items": [
+        {
+          "text": "10am -2pm",
+          "color": "#1a8a1a"
+        }
+      ]
+    },
+    {
+      "date": "2026-06-29",
+      "items": [
+        {
+          "text": "休息",
+          "color": "#cc0000"
         }
       ]
     }
