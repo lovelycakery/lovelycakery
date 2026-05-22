@@ -2,6 +2,46 @@
   "schema_version": 1,
   "items": [
     {
+      "image": "assets/images/products/未命名設計 - 2026-05-15T084548.578.jpg",
+      "name": "玫瑰荔枝千層",
+      "name_en": "Rose Lychee Mille-feuille",
+      "description": "大花農場食用玫瑰泥\n花山有機玫瑰花茶\n新鮮玉荷包荔枝(中間夾心和頂層裝飾)\n香烤堅果碎",
+      "description_en": "Delicate blend of edible rose puree from Dahua Farm, organic rose tea essence, fresh Yuheebao lychee with lychee curd filling and decoration, topped with toasted nutty crumble.",
+      "tags": [
+        "無酒精",
+        "無咖啡因",
+        "奶蛋素"
+      ],
+      "prices": {
+        "size6": "1880",
+        "size8": "3380",
+        "slice": "320"
+      },
+      "subImages": [
+        "assets/images/products/未命名設計 - 2026-05-15T084548.578-2.jpg"
+      ]
+    },
+    {
+      "image": "assets/images/products/玫瑰乳酪千層.jpg",
+      "name": "玫瑰乳酪千層",
+      "name_en": "Rosy Cheese Mille Crepes",
+      "prices": {
+        "size6": "1680",
+        "size8": "2980",
+        "slice": "280"
+      },
+      "description": "澳洲奶油乳酪\n大花農場食用玫瑰泥\n京都糖漬櫻花\n唐寧伯爵奶酥\n花山有機玫瑰花茶",
+      "description_en": "Australian cream cheese layered with rose puree from Big Flower Farm, candied Kyoto cherry blossoms, Twinings Earl Grey butter crumble, and organic rose petal tea from Huashan",
+      "tags": [
+        "奶蛋素",
+        "無咖啡因",
+        "無酒精"
+      ],
+      "subImages": [
+        "assets/images/products/玫瑰乳酪千層-2.jpg"
+      ]
+    },
+    {
       "image": "assets/images/products/微醺栗香千層.jpg",
       "name": "微醺栗香千層",
       "name_en": "Tipsy Chestnut Mille Crepes",
@@ -65,26 +105,6 @@
         "奶蛋素",
         "無咖啡因",
         "無酒精"
-      ]
-    },
-    {
-      "image": "assets/images/products/玫瑰乳酪千層.jpg",
-      "name": "玫瑰乳酪千層",
-      "name_en": "Rosy Cheese Mille Crepes",
-      "prices": {
-        "size6": "1680",
-        "size8": "2980",
-        "slice": "280"
-      },
-      "description": "澳洲奶油乳酪\n大花農場食用玫瑰泥\n京都糖漬櫻花\n唐寧伯爵奶酥\n花山有機玫瑰花茶",
-      "description_en": "Australian cream cheese layered with rose puree from Big Flower Farm, candied Kyoto cherry blossoms, Twinings Earl Grey butter crumble, and organic rose petal tea from Huashan",
-      "tags": [
-        "奶蛋素",
-        "無咖啡因",
-        "無酒精"
-      ],
-      "subImages": [
-        "assets/images/products/玫瑰乳酪千層-2.jpg"
       ]
     },
     {
@@ -244,22 +264,6 @@
       },
       "subImages": [
         "assets/images/products/未命名設計 - 2026-04-16T080954.574-2.jpg"
-      ]
-    },
-    {
-      "image": "assets/images/products/未命名設計 - 2026-05-15T084548.578.jpg",
-      "name": "玫瑰荔枝千層",
-      "name_en": "Rose Lychee Mille-feuille",
-      "description": "大花農場食用玫瑰泥\n花山有機玫瑰花茶\n新鮮玉荷包荔枝(中間夾心和頂層裝飾)\n香烤堅果碎",
-      "description_en": "Delicate blend of edible rose puree from Dahua Farm, organic rose tea essence, fresh Yuheebao lychee with lychee curd filling and decoration, topped with toasted nutty crumble.",
-      "tags": [],
-      "prices": {
-        "size6": "1880",
-        "size8": "3380",
-        "slice": "320"
-      },
-      "subImages": [
-        "assets/images/products/未命名設計 - 2026-05-15T084548.578-2.jpg"
       ]
     }
   ]
