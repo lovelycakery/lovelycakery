@@ -179,6 +179,25 @@
       ]
     },
     {
+      "image": "assets/images/products/未命名設計 - 2026-05-22T214339.170.jpg",
+      "name": "石板路巧克力",
+      "name_en": "Cobblestone Chocolate",
+      "description": "比利時黑巧克力\n香烤杏仁\n法芙娜無糖可可粉\n棉花糖",
+      "description_en": "Decadent Belgian dark chocolate layered with roasted almonds, Valrhona unsweetened cocoa powder, and fluffy marshmallow",
+      "tags": [
+        "奶蛋素",
+        "無酒精"
+      ],
+      "prices": {
+        "size6": "1780",
+        "size8": "3180",
+        "slice": "300"
+      },
+      "subImages": [
+        "assets/images/products/未命名設計 - 2026-05-22T214339.170-2.jpg"
+      ]
+    },
+    {
       "image": "assets/images/products/玫瑰乳酪千層.jpg",
       "name": "玫瑰乳酪千層",
       "name_en": "Rosy Cheese Mille Crepes",
@@ -322,23 +341,20 @@
       ]
     },
     {
-      "image": "assets/images/products/未命名設計 - 2026-05-22T214339.170.jpg",
-      "name": "石板路巧克力",
-      "name_en": "Cobblestone Chocolate",
-      "description": "比利時黑巧克力\n香烤杏仁\n法芙娜無糖可可粉\n棉花糖",
-      "description_en": "Decadent Belgian dark chocolate layered with roasted almonds, Valrhona unsweetened cocoa powder, and fluffy marshmallow",
+      "image": "assets/images/products/未命名設計 - 2026-05-22T215516.806.jpg",
+      "name": "珍珠奶茶千層 (建議當天食用完畢)",
+      "name_en": "Pearl Milk Tea Mille-feuille",
+      "description": "唐寧伯爵茶，鐵觀音，阿薩姆，紅玉\n(茶可自選)\n紅茶奶酥碎\n珍珠糖\n珍珠",
+      "description_en": "Choice of teas: Earl Grey, Tie Guan Yin, Assam, or Ruby Red. Topped with red tea buttery crumble, pearl sugar, and pearls.",
       "tags": [
         "奶蛋素",
         "無酒精"
       ],
       "prices": {
-        "size6": "1780",
-        "size8": "3180",
-        "slice": "300"
-      },
-      "subImages": [
-        "assets/images/products/未命名設計 - 2026-05-22T214339.170-2.jpg"
-      ]
+        "size6": "1680",
+        "size8": "2980",
+        "slice": "280"
+      }
     }
   ]
 }
