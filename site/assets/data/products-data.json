@@ -32,26 +32,6 @@
       ]
     },
     {
-      "image": "assets/images/products/芝麻花園千層.jpg",
-      "name": "芝麻花園千層",
-      "name_en": "Black Sesame Garden Mille Crepes",
-      "prices": {
-        "size6": "1480",
-        "size8": "2580",
-        "slice": "250"
-      },
-      "description": "100%黑芝麻粉 \n自製鮮奶麻糬夾心 \n鹿港黑芝麻酥 \n爆黑糖麥粒",
-      "description_en": "Pure black sesame powder with homemade fresh milk mochi filling, layered with Lugang black sesame brittle and bursting brown sugar grain clusters",
-      "tags": [
-        "奶蛋素",
-        "無咖啡因",
-        "無酒精"
-      ],
-      "subImages": [
-        "assets/images/products/芝麻花園千層-2.jpg"
-      ]
-    },
-    {
       "image": "assets/images/products/夏日繽紛水果茶千層.jpg",
       "name": "夏日繽紛水果茶千層",
       "name_en": "Summer Fruit Tea Medley Mille Crepes",
@@ -88,23 +68,6 @@
       ]
     },
     {
-      "image": "assets/images/products/杏仁茶千層.jpg",
-      "name": "杏仁茶千層",
-      "name_en": "Artisan Almond Cream Mille Crepes",
-      "prices": {
-        "size6": "1480",
-        "size8": "2580",
-        "slice": "250"
-      },
-      "description": "杏仁粉 \n黑糖蕨餅夾心 \n乾燥橙片 \n黑糖爆麥粒",
-      "description_en": "Almond flour base with black sugar warabi mochi filling, topped with candied orange slices and roasted black sugar popcorn brittle",
-      "tags": [
-        "奶蛋素",
-        "無咖啡因",
-        "無酒精"
-      ]
-    },
-    {
       "image": "assets/images/products/玫瑰乳酪千層.jpg",
       "name": "玫瑰乳酪千層",
       "name_en": "Rosy Cheese Mille Crepes",
@@ -122,22 +85,6 @@
       ],
       "subImages": [
         "assets/images/products/玫瑰乳酪千層-2.jpg"
-      ]
-    },
-    {
-      "image": "assets/images/products/老派巧克力千層.jpg",
-      "name": "老派巧克力千層",
-      "name_en": "Old School Chocolate Mille Crepes",
-      "prices": {
-        "size6": "1680",
-        "size8": "2980",
-        "slice": "280"
-      },
-      "description": "比利時70%黑巧克力\n奶油焦糖香蕉\n花生醬\n香烤榛果",
-      "description_en": "Belgian 70% dark chocolate paired with creamy caramel and banana, finished with smooth peanut butter and roasted hazelnut crunch.",
-      "tags": [
-        "奶蛋素",
-        "無酒精"
       ]
     },
     {
@@ -261,25 +208,6 @@
       ]
     },
     {
-      "image": "assets/images/products/早春千層.jpg",
-      "name": "早春千層",
-      "name_en": "Early Spring Mille Crepes",
-      "prices": {
-        "size6": "1580",
-        "size8": "2780",
-        "slice": "270"
-      },
-      "description": "黑糖 貝禮詩香甜酒 堅果碎\n奶油肉桂蘋果內餡 \n水嫩蘋果花",
-      "description_en": "Brown sugar and Baileys Irish Cream with nutty crumble, creamy cinnamon apple filling, and delicate apple blossom",
-      "tags": [
-        "奶蛋素",
-        "無咖啡因"
-      ],
-      "subImages": [
-        "assets/images/products/早春千層-2.jpg"
-      ]
-    },
-    {
       "image": "assets/images/products/法式蘋果塔千層.jpg",
       "name": "法式蘋果塔千層",
       "name_en": "French Apple Tart Mille Crepes",
@@ -300,22 +228,19 @@
       ]
     },
     {
-      "image": "assets/images/products/未命名 (Facebook 影片) (1).jpg",
-      "name": "花生OREO千層",
-      "name_en": "Peanut Oreo Mille Crepes",
+      "image": "assets/images/products/未命名設計 - 2026-04-16T080954.574.jpg",
+      "name": "琥珀焙香千層",
+      "name_en": "Amber Hojicha Mille Crêpes",
+      "description": "日本靜岡小柳津焙茶\n黑糖蕨餅夾心\n奶酥餅乾碎\n迷你西洋梨\n日曬橙片",
+      "description_en": "Delicate warabi mochi with brown sugar filling, layered with buttery cookie crumble, miniature pear, and sun-dried orange slices. A sophisticated blend of Japanese roasted tea elegance and citrus brightness.",
+      "tags": [],
       "prices": {
-        "size6": "1480",
-        "size8": "2580",
-        "slice": "250"
+        "size6": "1680",
+        "size8": "2980",
+        "slice": "280"
       },
-      "description": "OREO\n花生醬 \nMINI OREO",
-      "description_en": "A delightful combination of creamy peanut butter and iconic OREO cookies in petite form, delivering classic cookies-and-cream satisfaction in every bite.",
-      "tags": [
-        "奶蛋素",
-        "無酒精"
-      ],
       "subImages": [
-        "assets/images/products/花生OREO千層-2.jpg"
+        "assets/images/products/未命名設計 - 2026-04-16T080954.574-2.jpg"
       ]
     }
   ]
