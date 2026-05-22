@@ -42,62 +42,6 @@
       ]
     },
     {
-      "image": "assets/images/products/玫瑰乳酪千層.jpg",
-      "name": "玫瑰乳酪千層",
-      "name_en": "Rosy Cheese Mille Crepes",
-      "prices": {
-        "size6": "1680",
-        "size8": "2980",
-        "slice": "280"
-      },
-      "description": "澳洲奶油乳酪\n大花農場食用玫瑰泥\n京都糖漬櫻花\n唐寧伯爵奶酥\n花山有機玫瑰花茶",
-      "description_en": "Australian cream cheese layered with rose puree from Big Flower Farm, candied Kyoto cherry blossoms, Twinings Earl Grey butter crumble, and organic rose petal tea from Huashan",
-      "tags": [
-        "奶蛋素",
-        "無咖啡因",
-        "無酒精"
-      ],
-      "subImages": [
-        "assets/images/products/玫瑰乳酪千層-2.jpg"
-      ]
-    },
-    {
-      "image": "assets/images/products/夏日繽紛水果茶千層.jpg",
-      "name": "夏日繽紛水果茶千層",
-      "name_en": "Summer Fruit Tea Medley Mille Crepes",
-      "prices": {
-        "size6": "1780",
-        "size8": "3180",
-        "slice": "300"
-      },
-      "description": "茶葉選擇:伯爵/鐵觀音/紅烏龍/阿薩姆/紅玉\n\n新鮮綠葡萄夾心\n柑橘 鳳梨 綠葡萄 藍莓",
-      "description_en": "Artisan tea selection including Earl Grey, Tie Guan Yin, Red Oolong, Assam, and Ruby Black Tea layered with fresh green grape filling. Delicate notes of citrus, pineapple, green grape, and blueberry create a bright, refreshing flavor profile.",
-      "tags": [
-        "奶蛋素",
-        "無酒精"
-      ],
-      "subImages": [
-        "assets/images/products/夏日繽紛水果茶千層-2.jpg"
-      ]
-    },
-    {
-      "image": "assets/images/products/一根香草莢千層.jpg",
-      "name": "一根香草莢千層",
-      "name_en": "Whole Vanilla Bean Mille Crepes",
-      "prices": {
-        "size6": "1680",
-        "size8": "2980",
-        "slice": "280"
-      },
-      "description": "一根完整的馬達加斯加香草莢 \n小蜜柑  \n新鮮綠葡萄 \n香烤堅果碎",
-      "description_en": "A whole Madagascar vanilla bean paired with sweet mandarins, fresh green grapes, and toasted nut crumble",
-      "tags": [
-        "奶蛋素",
-        "無咖啡因",
-        "無酒精"
-      ]
-    },
-    {
       "image": "assets/images/products/比利時黑巧克力千層.jpg",
       "name": "比利時黑巧克力千層",
       "name_en": "Belgian Dark Chocolate Mille Crepes",
@@ -218,6 +162,26 @@
       ]
     },
     {
+      "image": "assets/images/products/玫瑰乳酪千層.jpg",
+      "name": "玫瑰乳酪千層",
+      "name_en": "Rosy Cheese Mille Crepes",
+      "prices": {
+        "size6": "1680",
+        "size8": "2980",
+        "slice": "280"
+      },
+      "description": "澳洲奶油乳酪\n大花農場食用玫瑰泥\n京都糖漬櫻花\n唐寧伯爵奶酥\n花山有機玫瑰花茶",
+      "description_en": "Australian cream cheese layered with rose puree from Big Flower Farm, candied Kyoto cherry blossoms, Twinings Earl Grey butter crumble, and organic rose petal tea from Huashan",
+      "tags": [
+        "奶蛋素",
+        "無咖啡因",
+        "無酒精"
+      ],
+      "subImages": [
+        "assets/images/products/玫瑰乳酪千層-2.jpg"
+      ]
+    },
+    {
       "image": "assets/images/products/法式蘋果塔千層.jpg",
       "name": "法式蘋果塔千層",
       "name_en": "French Apple Tart Mille Crepes",
@@ -238,6 +202,23 @@
       ]
     },
     {
+      "image": "assets/images/products/一根香草莢千層.jpg",
+      "name": "一根香草莢千層",
+      "name_en": "Whole Vanilla Bean Mille Crepes",
+      "prices": {
+        "size6": "1680",
+        "size8": "2980",
+        "slice": "280"
+      },
+      "description": "一根完整的馬達加斯加香草莢 \n小蜜柑  \n新鮮綠葡萄 \n香烤堅果碎",
+      "description_en": "A whole Madagascar vanilla bean paired with sweet mandarins, fresh green grapes, and toasted nut crumble",
+      "tags": [
+        "奶蛋素",
+        "無咖啡因",
+        "無酒精"
+      ]
+    },
+    {
       "image": "assets/images/products/未命名設計 - 2026-04-16T080954.574.jpg",
       "name": "琥珀焙香千層",
       "name_en": "Amber Hojicha Mille Crêpes",
@@ -254,6 +235,25 @@
       },
       "subImages": [
         "assets/images/products/未命名設計 - 2026-04-16T080954.574-2.jpg"
+      ]
+    },
+    {
+      "image": "assets/images/products/夏日繽紛水果茶千層.jpg",
+      "name": "夏日繽紛水果茶千層",
+      "name_en": "Summer Fruit Tea Medley Mille Crepes",
+      "prices": {
+        "size6": "1780",
+        "size8": "3180",
+        "slice": "300"
+      },
+      "description": "茶葉選擇:伯爵/鐵觀音/紅烏龍/阿薩姆/紅玉\n\n新鮮綠葡萄夾心\n柑橘 鳳梨 綠葡萄 藍莓",
+      "description_en": "Artisan tea selection including Earl Grey, Tie Guan Yin, Red Oolong, Assam, and Ruby Black Tea layered with fresh green grape filling. Delicate notes of citrus, pineapple, green grape, and blueberry create a bright, refreshing flavor profile.",
+      "tags": [
+        "奶蛋素",
+        "無酒精"
+      ],
+      "subImages": [
+        "assets/images/products/夏日繽紛水果茶千層-2.jpg"
       ]
     },
     {
