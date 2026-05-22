@@ -22,6 +22,23 @@
       ]
     },
     {
+      "image": "assets/images/products/未命名設計 - 2026-05-22T213610.199.jpg",
+      "name": "雲朵千層",
+      "name_en": "Cloud Mille-feuille",
+      "description": "新鮮檸檬\n可爾必思 棉花糖 \n奶酥餅乾碎\n綠葡萄 藍莓",
+      "description_en": "Layers of fresh lemon and Calpis cream with fluffy marshmallow, topped with buttery almond crumble, green grapes, and blueberries",
+      "tags": [
+        "奶蛋素",
+        "無咖啡因",
+        "無酒精"
+      ],
+      "prices": {
+        "size6": "1680",
+        "size8": "2980",
+        "slice": "280"
+      }
+    },
+    {
       "image": "assets/images/products/未命名設計 - 2026-05-13T132922.097.jpg",
       "name": "蜂蜜柚香千層",
       "name_en": "Honey Yuzu Mille-Feuille",
@@ -39,22 +56,6 @@
       },
       "subImages": [
         "assets/images/products/未命名設計 - 2026-05-13T132922.097-2.jpg"
-      ]
-    },
-    {
-      "image": "assets/images/products/比利時黑巧克力千層.jpg",
-      "name": "比利時黑巧克力千層",
-      "name_en": "Belgian Dark Chocolate Mille Crepes",
-      "prices": {
-        "size6": "1680",
-        "size8": "2980",
-        "slice": "280"
-      },
-      "description": "比利時70%黑巧克力\n綜合堅果碎\n草莓乾",
-      "description_en": "Decadent 70% Belgian dark chocolate with crunchy mixed nuts and tart strawberry bits",
-      "tags": [
-        "奶蛋素",
-        "無酒精"
       ]
     },
     {
@@ -156,6 +157,22 @@
       },
       "description": "靜岡小柳津抹茶粉\n香烤堅果\n法國珍珠糖",
       "description_en": "Shizuoka Koyanagi matcha powder with roasted nuts and French pearl sugar",
+      "tags": [
+        "奶蛋素",
+        "無酒精"
+      ]
+    },
+    {
+      "image": "assets/images/products/比利時黑巧克力千層.jpg",
+      "name": "比利時黑巧克力千層",
+      "name_en": "Belgian Dark Chocolate Mille Crepes",
+      "prices": {
+        "size6": "1680",
+        "size8": "2980",
+        "slice": "280"
+      },
+      "description": "比利時70%黑巧克力\n綜合堅果碎\n草莓乾",
+      "description_en": "Decadent 70% Belgian dark chocolate with crunchy mixed nuts and tart strawberry bits",
       "tags": [
         "奶蛋素",
         "無酒精"
@@ -302,6 +319,25 @@
       },
       "subImages": [
         "assets/images/products/未命名設計 - 2026-04-16T080659.889-2.jpg"
+      ]
+    },
+    {
+      "image": "assets/images/products/未命名設計 - 2026-05-22T214339.170.jpg",
+      "name": "石板路巧克力",
+      "name_en": "Cobblestone Chocolate",
+      "description": "比利時黑巧克力\n香烤杏仁\n法芙娜無糖可可粉\n棉花糖",
+      "description_en": "Decadent Belgian dark chocolate layered with roasted almonds, Valrhona unsweetened cocoa powder, and fluffy marshmallow",
+      "tags": [
+        "奶蛋素",
+        "無酒精"
+      ],
+      "prices": {
+        "size6": "1780",
+        "size8": "3180",
+        "slice": "300"
+      },
+      "subImages": [
+        "assets/images/products/未命名設計 - 2026-05-22T214339.170-2.jpg"
       ]
     }
   ]
