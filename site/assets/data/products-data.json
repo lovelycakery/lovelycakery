@@ -265,6 +265,26 @@
       "subImages": [
         "assets/images/products/未命名設計 - 2026-04-16T080954.574-2.jpg"
       ]
+    },
+    {
+      "image": "assets/images/products/未命名設計 - 2026-05-13T132922.097.jpg",
+      "name": "蜂蜜柚香千層",
+      "name_en": "Honey Yuzu Mille-Feuille",
+      "description": "蜂蜜柚子醬\n奶油乳酪\n黃桃  小柑橘 綠葡萄\n綜合堅果碎",
+      "description_en": "Creamy cheese frosting layered with honey yuzu sauce, topped with yellow peach, mandarin, green grapes, and mixed nut crumble",
+      "tags": [
+        "奶蛋素",
+        "無咖啡因",
+        "無酒精"
+      ],
+      "prices": {
+        "size6": "1680",
+        "size8": "2980",
+        "slice": "280"
+      },
+      "subImages": [
+        "assets/images/products/未命名設計 - 2026-05-13T132922.097-2.jpg"
+      ]
     }
   ]
 }
