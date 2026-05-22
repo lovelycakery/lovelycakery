@@ -233,7 +233,10 @@
       "name_en": "Amber Hojicha Mille Crêpes",
       "description": "日本靜岡小柳津焙茶\n黑糖蕨餅夾心\n奶酥餅乾碎\n迷你西洋梨\n日曬橙片",
       "description_en": "Delicate warabi mochi with brown sugar filling, layered with buttery cookie crumble, miniature pear, and sun-dried orange slices. A sophisticated blend of Japanese roasted tea elegance and citrus brightness.",
-      "tags": [],
+      "tags": [
+        "奶蛋素",
+        "無酒精"
+      ],
       "prices": {
         "size6": "1680",
         "size8": "2980",
