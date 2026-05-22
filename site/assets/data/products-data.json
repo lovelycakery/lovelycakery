@@ -22,6 +22,26 @@
       ]
     },
     {
+      "image": "assets/images/products/未命名設計 - 2026-05-13T132922.097.jpg",
+      "name": "蜂蜜柚香千層",
+      "name_en": "Honey Yuzu Mille-Feuille",
+      "description": "蜂蜜柚子醬\n奶油乳酪\n黃桃  小柑橘 綠葡萄\n綜合堅果碎",
+      "description_en": "Creamy cheese frosting layered with honey yuzu sauce, topped with yellow peach, mandarin, green grapes, and mixed nut crumble",
+      "tags": [
+        "奶蛋素",
+        "無咖啡因",
+        "無酒精"
+      ],
+      "prices": {
+        "size6": "1680",
+        "size8": "2980",
+        "slice": "280"
+      },
+      "subImages": [
+        "assets/images/products/未命名設計 - 2026-05-13T132922.097-2.jpg"
+      ]
+    },
+    {
       "image": "assets/images/products/玫瑰乳酪千層.jpg",
       "name": "玫瑰乳酪千層",
       "name_en": "Rosy Cheese Mille Crepes",
@@ -39,36 +59,6 @@
       ],
       "subImages": [
         "assets/images/products/玫瑰乳酪千層-2.jpg"
-      ]
-    },
-    {
-      "image": "assets/images/products/微醺栗香千層.jpg",
-      "name": "微醺栗香千層",
-      "name_en": "Tipsy Chestnut Mille Crepes",
-      "prices": {
-        "size6": "1680",
-        "size8": "2980",
-        "slice": "280"
-      },
-      "description": "法國沙巴東栗子泥\n貝禮詩香甜酒\n糖漬橙片 榛果\n綜合堅果碎",
-      "description_en": "Layers of velvety chestnut purée, silky Baileys cream, candied orange slices, hazelnuts, and a medley of crushed nuts for textural delight",
-      "tags": [
-        "奶蛋素"
-      ]
-    },
-    {
-      "image": "assets/images/products/提拉米蘇千層.jpg",
-      "name": "提拉米蘇千層",
-      "name_en": "Classic Tiramisu Mille Crepes",
-      "prices": {
-        "size6": "1580",
-        "size8": "2780",
-        "slice": "270"
-      },
-      "description": "手工熬煮咖啡醬\n義大利白朗峰拇指餅\n貝禮詩香甜酒\n綜合堅果碎\n法國法芙娜可可粉",
-      "description_en": "Crafted with hand-brewed coffee sauce, delicate Italian Amaretti fingers, Baileys Irish cream liqueur, mixed toasted nuts, and dusted with premium Valrhona cocoa powder.",
-      "tags": [
-        "奶蛋素"
       ]
     },
     {
@@ -124,6 +114,23 @@
       ]
     },
     {
+      "image": "assets/images/products/法式檸檬塔千層.jpg",
+      "name": "法式檸檬塔千層",
+      "name_en": "French Lemon Tart Mille Crepes",
+      "prices": {
+        "size6": "1680",
+        "size8": "2980",
+        "slice": "280"
+      },
+      "description": "手作新鮮檸檬醬\n義式蛋白霜\n奶酥餅乾屑\n綜合堅果碎",
+      "description_en": "Handcrafted fresh lemon curd, Italian meringue, buttery crumble, and mixed nuts",
+      "tags": [
+        "奶蛋素",
+        "無咖啡因",
+        "無酒精"
+      ]
+    },
+    {
       "image": "assets/images/products/檸檬藍莓千層.jpg",
       "name": "檸檬藍莓千層",
       "name_en": "Lemon Blueberry Mille Crepes",
@@ -158,20 +165,21 @@
       ]
     },
     {
-      "image": "assets/images/products/法式檸檬塔千層.jpg",
-      "name": "法式檸檬塔千層",
-      "name_en": "French Lemon Tart Mille Crepes",
+      "image": "assets/images/products/抹茶提拉米蘇千層.jpg",
+      "name": "抹茶提拉米蘇千層",
+      "name_en": "Matcha Tiramisu Mille Crepes",
       "prices": {
         "size6": "1680",
         "size8": "2980",
         "slice": "280"
       },
-      "description": "手作新鮮檸檬醬\n義式蛋白霜\n奶酥餅乾屑\n綜合堅果碎",
-      "description_en": "Handcrafted fresh lemon curd, Italian meringue, buttery crumble, and mixed nuts",
+      "description": "靜岡小柳津抹茶粉\n義大利白朗峰拇指餅\n貝禮詩香甜酒\n香烤杏仁",
+      "description_en": "Shizuoka Kouyagitsu matcha powder layered with Italian Mont Blanc-inspired hazelnut meringue, infused with Baileys sweet cream, and finished with roasted almond crunch.",
       "tags": [
-        "奶蛋素",
-        "無咖啡因",
-        "無酒精"
+        "奶蛋素"
+      ],
+      "subImages": [
+        "assets/images/products/抹茶提拉米蘇千層-2.jpg"
       ]
     },
     {
@@ -207,24 +215,6 @@
       "tags": [
         "奶蛋素",
         "無酒精"
-      ]
-    },
-    {
-      "image": "assets/images/products/抹茶提拉米蘇千層.jpg",
-      "name": "抹茶提拉米蘇千層",
-      "name_en": "Matcha Tiramisu Mille Crepes",
-      "prices": {
-        "size6": "1680",
-        "size8": "2980",
-        "slice": "280"
-      },
-      "description": "靜岡小柳津抹茶粉\n義大利白朗峰拇指餅\n貝禮詩香甜酒\n香烤杏仁",
-      "description_en": "Shizuoka Kouyagitsu matcha powder layered with Italian Mont Blanc-inspired hazelnut meringue, infused with Baileys sweet cream, and finished with roasted almond crunch.",
-      "tags": [
-        "奶蛋素"
-      ],
-      "subImages": [
-        "assets/images/products/抹茶提拉米蘇千層-2.jpg"
       ]
     },
     {
@@ -267,23 +257,51 @@
       ]
     },
     {
-      "image": "assets/images/products/未命名設計 - 2026-05-13T132922.097.jpg",
-      "name": "蜂蜜柚香千層",
-      "name_en": "Honey Yuzu Mille-Feuille",
-      "description": "蜂蜜柚子醬\n奶油乳酪\n黃桃  小柑橘 綠葡萄\n綜合堅果碎",
-      "description_en": "Creamy cheese frosting layered with honey yuzu sauce, topped with yellow peach, mandarin, green grapes, and mixed nut crumble",
-      "tags": [
-        "奶蛋素",
-        "無咖啡因",
-        "無酒精"
-      ],
+      "image": "assets/images/products/微醺栗香千層.jpg",
+      "name": "微醺栗香千層",
+      "name_en": "Tipsy Chestnut Mille Crepes",
       "prices": {
         "size6": "1680",
         "size8": "2980",
         "slice": "280"
       },
+      "description": "法國沙巴東栗子泥\n貝禮詩香甜酒\n糖漬橙片 榛果\n綜合堅果碎",
+      "description_en": "Layers of velvety chestnut purée, silky Baileys cream, candied orange slices, hazelnuts, and a medley of crushed nuts for textural delight",
+      "tags": [
+        "奶蛋素"
+      ]
+    },
+    {
+      "image": "assets/images/products/提拉米蘇千層.jpg",
+      "name": "提拉米蘇千層",
+      "name_en": "Classic Tiramisu Mille Crepes",
+      "prices": {
+        "size6": "1580",
+        "size8": "2780",
+        "slice": "270"
+      },
+      "description": "手工熬煮咖啡醬\n義大利白朗峰拇指餅\n貝禮詩香甜酒\n綜合堅果碎\n法國法芙娜可可粉",
+      "description_en": "Crafted with hand-brewed coffee sauce, delicate Italian Amaretti fingers, Baileys Irish cream liqueur, mixed toasted nuts, and dusted with premium Valrhona cocoa powder.",
+      "tags": [
+        "奶蛋素"
+      ]
+    },
+    {
+      "image": "assets/images/products/未命名設計 - 2026-04-16T080659.889.jpg",
+      "name": "微醺栗香提拉米蘇千層",
+      "name_en": "Tipsy Chestnut Tiramisu Mille-feuille",
+      "description": "法國沙巴東栗子泥\n貝禮詩香甜酒 \n義大利白朗尼手指餅\n手工熬煮咖啡醬 \n香烤杏仁",
+      "description_en": "French Sabayonne chestnut purée, Baileys Irish Cream, Italian Savoiardi ladyfingers, hand-crafted coffee sauce, and roasted almonds",
+      "tags": [
+        "奶蛋素"
+      ],
+      "prices": {
+        "size6": "1780",
+        "size8": "3180",
+        "slice": "300"
+      },
       "subImages": [
-        "assets/images/products/未命名設計 - 2026-05-13T132922.097-2.jpg"
+        "assets/images/products/未命名設計 - 2026-04-16T080659.889-2.jpg"
       ]
     }
   ]
