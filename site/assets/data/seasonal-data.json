@@ -23,15 +23,19 @@
     },
     {
       "image": "assets/images/seasonal/未命名設計 - 2026-05-22T212901.909.jpg",
-      "name": "未命名設計 - 2026-05-22T212901.909",
-      "name_en": "",
-      "description": "",
+      "name": "芒果星星千層",
+      "name_en": "Mango Star Mille-feuille",
+      "description": "香草千層\n愛文芒果(中間夾心&頂層裝飾)\n香烤堅果碎",
       "description_en": "",
-      "tags": [],
+      "tags": [
+        "奶蛋素",
+        "無咖啡因",
+        "無酒精"
+      ],
       "prices": {
-        "size6": "",
-        "size8": "",
-        "slice": ""
+        "size6": "1780",
+        "size8": "3180",
+        "slice": "300"
       }
     }
   ]
