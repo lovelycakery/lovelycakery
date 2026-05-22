@@ -7,7 +7,11 @@
       "name_en": "Summer Mountain Mille-feuille",
       "description": "比利時lotus焦糖脆餅\n愛文芒果\n綠葡萄\n玉荷包荔枝",
       "description_en": "A delightful fusion featuring Belgian Lotus caramel wafer crispness, paired with the creamy sweetness of Ataulfo mango, refreshing green grapes, and the floral notes of Yuhe lychee.",
-      "tags": [],
+      "tags": [
+        "奶蛋素",
+        "無咖啡因",
+        "無酒精"
+      ],
       "prices": {
         "size6": "1780",
         "size8": "3180",
