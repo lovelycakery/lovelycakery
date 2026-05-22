@@ -198,6 +198,21 @@
       ]
     },
     {
+      "image": "assets/images/products/未命名設計 - 2026-05-22T215837.852.jpg",
+      "name": "淑女巧克力千層",
+      "name_en": "Elegant Lady Chocolate Mille-feuille",
+      "description": "藍莓 \n草莓乾 \n比利時紅寶石巧克力\n比利時黑巧克力\n貝禮詩奶酒",
+      "description_en": "A luxurious blend of Belgian ruby and dark chocolate layered with fresh blueberries, dried strawberries, and smooth Baileys Irish Cream liqueur",
+      "tags": [
+        "奶蛋素"
+      ],
+      "prices": {
+        "size6": "1880",
+        "size8": "3380",
+        "slice": "320"
+      }
+    },
+    {
       "image": "assets/images/products/玫瑰乳酪千層.jpg",
       "name": "玫瑰乳酪千層",
       "name_en": "Rosy Cheese Mille Crepes",
@@ -355,21 +370,6 @@
       "subImages": [
         "assets/images/products/未命名設計 - 2026-04-16T080659.889-2.jpg"
       ]
-    },
-    {
-      "image": "assets/images/products/未命名設計 - 2026-05-22T215837.852.jpg",
-      "name": "淑女巧克力千層",
-      "name_en": "Elegant Lady Chocolate Mille-feuille",
-      "description": "藍莓 \n草莓乾 \n比利時紅寶石巧克力\n比利時黑巧克力\n貝禮詩奶酒",
-      "description_en": "A luxurious blend of Belgian ruby and dark chocolate layered with fresh blueberries, dried strawberries, and smooth Baileys Irish Cream liqueur",
-      "tags": [
-        "奶蛋素"
-      ],
-      "prices": {
-        "size6": "1880",
-        "size8": "3380",
-        "slice": "320"
-      }
     }
   ]
 }
