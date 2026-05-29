@@ -49,7 +49,10 @@
         "size6": "1680",
         "size8": "2980",
         "slice": "280"
-      }
+      },
+      "subImages": [
+        "assets/images/seasonal/椰香拿鐵-2.jpg"
+      ]
     }
   ]
 }
