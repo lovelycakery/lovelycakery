@@ -22,6 +22,25 @@
       ]
     },
     {
+      "image": "assets/images/seasonal/未命名設計 - 2026-06-01T083436.043.jpg",
+      "name": "伯爵芒果千層",
+      "name_en": "Earl Grey Mango Mille-feuille",
+      "description": "英國唐寧伯爵茶\n唐寧伯爵奶酥\n新鮮愛文芒果(中間夾心&頂層裝飾)",
+      "description_en": "Delicate Earl Grey tea-infused layers with crispy caramelized topping, crowned with fresh Ataulfo mango as the filling and elegant garnish.",
+      "tags": [
+        "奶蛋素",
+        "無酒精"
+      ],
+      "prices": {
+        "size6": "300",
+        "size8": "1780",
+        "slice": "3180"
+      },
+      "subImages": [
+        "assets/images/seasonal/未命名設計 - 2026-06-01T083436.043-2.jpg"
+      ]
+    },
+    {
       "image": "assets/images/seasonal/未命名設計 - 2026-05-22T212901.909.jpg",
       "name": "芒果星星千層",
       "name_en": "Mango Star Mille-feuille",
@@ -40,14 +59,11 @@
     },
     {
       "image": "assets/images/seasonal/未命名設計 - 2026-05-29T105505.976.jpg",
-      "name": "椰香拿鐵千層",
-      "name_en": "Coconut Latte Mille-feuille",
+      "name": "椰香拿鐵",
+      "name_en": "Coconut Latte",
       "description": "咖啡千層 X 椰奶 X 香烤椰蓉 X 咖啡威化餅",
       "description_en": "Delicate layers of coffee mille-feuille paired with silky coconut cream, topped with toasted coconut flakes and crispy coffee wafers for a harmonious blend of flavors and textures.",
-      "tags": [
-        "奶蛋素",
-        "無酒精"
-      ],
+      "tags": [],
       "prices": {
         "size6": "1680",
         "size8": "2980",
@@ -58,22 +74,23 @@
       ]
     },
     {
-      "image": "assets/images/seasonal/未命名設計 - 2026-06-01T083436.043.jpg",
-      "name": "伯爵芒果千層",
-      "name_en": "Earl Grey Mango Mille-feuille",
-      "description": "英國唐寧伯爵茶\n唐寧伯爵奶酥\n新鮮愛文芒果(中間夾心&頂層裝飾)",
-      "description_en": "Delicate Earl Grey tea-infused layers with crispy caramelized topping, crowned with fresh Ataulfo mango as the filling and elegant garnish.",
+      "image": "assets/images/seasonal/未命名設計 - 2026-06-01T094500.334.jpg",
+      "name": "蜜桃玫瑰千層",
+      "name_en": "Peach Rose Mille-feuille",
+      "description": "整顆拉拉山水蜜桃\n大花農場食用玫瑰泥\n比利時焦糖餅乾碎",
+      "description_en": "Whole Lala Mountain peach, premium edible rose from Dahuang Farm, and Belgian caramel cookie crumble",
       "tags": [
         "奶蛋素",
+        "無咖啡因",
         "無酒精"
       ],
       "prices": {
-        "size6": "300",
-        "size8": "1780",
-        "slice": "3180"
+        "size6": "320",
+        "size8": "1880",
+        "slice": "3380"
       },
       "subImages": [
-        "assets/images/seasonal/未命名設計 - 2026-06-01T083436.043-2.jpg"
+        "assets/images/seasonal/未命名設計 - 2026-06-01T094500.334-2.jpg"
       ]
     }
   ]
