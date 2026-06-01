@@ -40,11 +40,14 @@
     },
     {
       "image": "assets/images/seasonal/未命名設計 - 2026-05-29T105505.976.jpg",
-      "name": "椰香拿鐵",
-      "name_en": "Coconut Latte",
+      "name": "椰香拿鐵千層",
+      "name_en": "Coconut Latte Mille-feuille",
       "description": "咖啡千層 X 椰奶 X 香烤椰蓉 X 咖啡威化餅",
       "description_en": "Delicate layers of coffee mille-feuille paired with silky coconut cream, topped with toasted coconut flakes and crispy coffee wafers for a harmonious blend of flavors and textures.",
-      "tags": [],
+      "tags": [
+        "奶蛋素",
+        "無酒精"
+      ],
       "prices": {
         "size6": "1680",
         "size8": "2980",
