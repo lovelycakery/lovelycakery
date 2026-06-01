@@ -53,6 +53,25 @@
       "subImages": [
         "assets/images/seasonal/椰香拿鐵-2.jpg"
       ]
+    },
+    {
+      "image": "assets/images/seasonal/未命名設計 - 2026-06-01T083436.043.jpg",
+      "name": "伯爵芒果千層",
+      "name_en": "Earl Grey Mango Mille-feuille",
+      "description": "英國唐寧伯爵茶\n唐寧伯爵奶酥\n新鮮愛文芒果(中間夾心&頂層裝飾)",
+      "description_en": "Delicate Earl Grey tea-infused layers with crispy caramelized topping, crowned with fresh Ataulfo mango as the filling and elegant garnish.",
+      "tags": [
+        "奶蛋素",
+        "無酒精"
+      ],
+      "prices": {
+        "size6": "300",
+        "size8": "1780",
+        "slice": "3180"
+      },
+      "subImages": [
+        "assets/images/seasonal/未命名設計 - 2026-06-01T083436.043-2.jpg"
+      ]
     }
   ]
 }
