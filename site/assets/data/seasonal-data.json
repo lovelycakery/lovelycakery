@@ -55,7 +55,10 @@
         "size6": "1780",
         "size8": "3180",
         "slice": "300"
-      }
+      },
+      "subImages": [
+        "assets/images/seasonal/芒果星星千層-2.jpg"
+      ]
     },
     {
       "image": "assets/images/seasonal/未命名設計 - 2026-05-29T105505.976.jpg",
