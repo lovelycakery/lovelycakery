@@ -222,9 +222,11 @@
   }
 
   function reloadPreview() {
-    var pageMap = { calendar: 'calendar.html', seasonal: 'seasonal.html', sets: 'sets.html', products: 'all-items.html' };
+    var pageMap = { calendar: 'calendar.html', seasonal: 'seasonal.html', sets: 'sets.html', products: 'all-items.html', 'weekly-slices': 'sets.html' };
     var page = pageMap[state.currentTab] || 'calendar.html';
-    var mode = state.currentMode || 'edit';
+    // 本週切片 tab 的編輯入口是右側勾選清單，預覽頁本身不需可編輯，
+    // 強制用 preview 模式避免 sets 圖片出現拖曳/編輯互動造成混淆。
+    var mode = state.currentTab === 'weekly-slices' ? 'preview' : (state.currentMode || 'edit');
     var iframe = $('previewFrame');
     iframe.src = getPreviewBaseUrl() + '/' + page + '?adminPreview=1&mode=' + mode + '&ts=' + Date.now();
     state.clickHookInstalled = false;
@@ -347,7 +349,7 @@
     }
     if (!Array.isArray(state.imageData.sets.weeklySlices)) state.imageData.sets.weeklySlices = [];
     // 切回別的 tab 後再回來時才 render（避免 await 期間使用者已切走）
-    if (state.currentTab === 'sets') renderWeeklySlicesPicker();
+    if (state.currentTab === 'weekly-slices') renderWeeklySlicesPicker();
   }
 
   // ── Calendar click hook ───────────────────────────────────────────
@@ -1737,12 +1739,14 @@
     if (tabName !== 'calendar' && state.hookTimer) { clearInterval(state.hookTimer); state.hookTimer = 0; state.clickHookInstalled = false; }
     document.querySelectorAll('.tab-btn').forEach(function (btn) { btn.classList.toggle('active', btn.dataset.tab === tabName); });
     clearError(); clearSuccess();
-    if (tabName === 'calendar') {
-      $('calendarPanel').style.display = 'block';
-      $('imagePanel').style.display = 'none';
-    } else {
-      $('calendarPanel').style.display = 'none';
-      $('imagePanel').style.display = 'block';
+    // 三種面板：日曆 / 本週切片（獨立分頁）/ 圖片型（seasonal/products/sets）
+    $('calendarPanel').style.display = (tabName === 'calendar') ? 'block' : 'none';
+    $('weeklySlicesPanel').style.display = (tabName === 'weekly-slices') ? 'block' : 'none';
+    $('imagePanel').style.display = isImageTab(tabName) ? 'block' : 'none';
+
+    if (tabName === 'weekly-slices') {
+      setupWeeklySlicesPicker();
+    } else if (isImageTab(tabName)) {
       // 在沒有價格的 tab（如 sets）隱藏價格區塊
       var priceSection = $('priceSection');
       if (priceSection) priceSection.style.display = tabTypeHasPrice(tabName) ? '' : 'none';
@@ -1757,10 +1761,6 @@
         loadImageData(tabName);
       }
       clearImageEditPanel();
-      // 本週切片勾選區塊只在 sets tab 顯示
-      var wsPickerSection = $('weeklySlicesPickerSection');
-      if (wsPickerSection) wsPickerSection.style.display = (tabName === 'sets') ? '' : 'none';
-      if (tabName === 'sets') setupWeeklySlicesPicker();
     }
     reloadPreview();
   }
@@ -2116,8 +2116,8 @@
       if (isImageTab(state.currentTab) && dirty[state.currentTab]) {
         setTimeout(function () { sendImageDataToPreview(state.currentTab); }, 500);
       }
-      // sets 預覽：若有未發布的本週切片變更，重送以反映勾選狀態
-      if (state.currentTab === 'sets' && dirty.sets) {
+      // sets / 本週切片 預覽：若有未發布的本週切片變更，重送以反映勾選狀態
+      if ((state.currentTab === 'sets' || state.currentTab === 'weekly-slices') && dirty.sets) {
         setTimeout(function () { sendWeeklySlicesToPreview(); }, 500);
       }
       if (state.editingImageIndex >= 0 && state.currentMode === 'edit' && previewFrame.contentWindow) {
