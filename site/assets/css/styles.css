@@ -672,6 +672,18 @@ img {
     padding-bottom: 60px;
 }
 
+/* 本週切片區塊（優惠組合頁，圖片參照自全部品項） */
+.weekly-slices-section {
+    margin-top: 20px;
+    padding-top: 40px;
+    border-top: 1px solid var(--skin-border, rgba(61, 40, 23, 0.08));
+}
+
+.weekly-slices-header {
+    margin-bottom: 40px;
+    padding-top: 0;
+}
+
 .gallery-item {
     width: 100%;
 }

@@ -955,3 +955,58 @@ body {
     justify-content: flex-start;
   }
 }
+
+/* 本週切片勾選清單（優惠組合 tab，從全部品項勾選） */
+.weekly-slices-hint {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 0 0 10px;
+  line-height: 1.5;
+}
+
+.weekly-slices-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+.weekly-slice-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.weekly-slice-row:hover {
+  background: var(--panel-2);
+}
+
+.weekly-slice-checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+  flex: 0 0 auto;
+  cursor: pointer;
+}
+
+.weekly-slice-thumb {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border-radius: 6px;
+  flex: 0 0 auto;
+  background: var(--panel-2);
+}
+
+.weekly-slice-name {
+  font-size: 13px;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

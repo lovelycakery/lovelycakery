@@ -29,13 +29,15 @@ https://github.com/settings/tokens/new?scopes=repo&description=Lovely+Admin
 ### 操作流程
 
 ```
-選擇分頁（日曆/季節限定/全部品項）
-  → 編輯內容
+選擇分頁（日曆/新品上市/全部品項/優惠組合）
+  → 編輯內容（可用 Claude API 一鍵翻譯中→英）
   → 點「儲存」（只存瀏覽器記憶體，預覽即時更新）
   → 全部改完後，點「一鍵發布」
   → 所有變更打包成一次 commit 推到 GitHub
-  → CI 自動部署
+  → Cloudflare Pages + GitHub Pages 自動部署（兩站同步）
 ```
+
+> 分頁對應：`seasonal` = 新品上市、`products` = 全部品項、`sets` = 優惠組合、`calendar` = 日曆。
 
 ---
 
@@ -48,12 +50,14 @@ site/
 │   ├── css/
 │   │   └── admin.css                   # 暗色主題樣式
 │   └── js/
+│       ├── jszip.min.js                # 第三方 ZIP 函式庫
 │       ├── admin-github-api.js         # GitHub API 封裝
 │       ├── admin-image-compress.js     # 瀏覽器端圖片壓縮
+│       ├── admin-translate.js          # Claude API 中→英翻譯
 │       └── admin-app.js               # 主要 UI 邏輯
 ```
 
-載入順序：`admin-github-api.js` → `admin-image-compress.js` → `admin-app.js`
+載入順序：`jszip.min.js` → `admin-github-api.js` → `admin-image-compress.js` → `admin-translate.js` → `admin-app.js`
 
 ---
 
@@ -112,11 +116,12 @@ const state = {
   calendarData: null,       // 日曆 JSON
   eventsByDate: new Map(),  // date → event 快速查詢
   selectedDate: '',
-  currentTab: 'calendar',   // 'calendar' | 'seasonal' | 'products'
+  currentTab: 'calendar',   // 'calendar' | 'seasonal' | 'products' | 'sets'
   currentMode: 'edit',      // 'edit' | 'preview'
   imageData: {
     seasonal: { items: [] },
     products: { items: [] },
+    sets: { items: [] },
   },
   editingImageIndex: -1,
 };
@@ -125,9 +130,14 @@ const dirty = {
   calendar: false,
   seasonal: false,
   products: false,
+  sets: false,
   pendingImages: [],     // 待上傳 [{repoPath, base64}]
   pendingDeletes: [],    // 待刪除 [repoPath]
 };
+
+// 圖片型分頁常數（admin-app.js 頂部）
+const IMAGE_TYPES = ['seasonal', 'products', 'sets'];
+// sets 沒有價格與標籤欄位，編輯面板會隱藏對應區塊
 ```
 
 ---
@@ -147,9 +157,11 @@ const dirty = {
 
 **清除事件**（`clearCalendarEvent`）：confirm → 過濾掉該日期 → 更新 state + dirty → postMessage
 
-### 2. 季節限定 / 全部品項分頁
+### 2. 圖片型分頁（新品上市 / 全部品項 / 優惠組合）
 
-**預覽**：iframe 載入 `seasonal.html` 或 `all-items.html`，帶 `?adminPreview=1&mode=edit`
+三個分頁（`seasonal` / `products` / `sets`）共用同一套圖片編輯邏輯（見 `IMAGE_TYPES`）。差異：`sets`（優惠組合）沒有價格與標籤欄位，編輯面板會自動隱藏這兩個區塊。
+
+**預覽**：iframe 載入對應頁面（`seasonal.html` / `all-items.html` / `sets.html`），帶 `?adminPreview=1&mode=edit`
 
 **圖片選取**：`gallery-loader.js` 在編輯模式下為每個圖片綁定 click → `postMessage({type: 'gallery-edit', index})` → admin 打開編輯面板
 
@@ -182,7 +194,16 @@ confirm() → 收集 dirty 變更 → commitMultipleFiles() 原子 commit
   → watchDeployment() 監控部署狀態
 ```
 
-commit 內容：calendar-data.json → cache version bump → seasonal-data.json → products-data.json → 圖片二進位 → 刪除檔案
+commit 內容：calendar-data.json → cache version bump → seasonal-data.json → products-data.json → sets-data.json → 圖片二進位 → 刪除檔案
+
+### 自動翻譯（`admin-translate.js`）
+
+編輯面板提供「翻譯」按鈕，把中文品名/描述（或日曆標籤）送 Claude API 產生英文，填入 `name_en` / `description_en`（日曆為 `text_en` / `detail_en`）。
+
+- 暴露為 `window.AdminTranslate`：`translate(zhName, zhDesc)`、`translateCalendar(zhText, zhDetail)`、`get/set/clear/hasApiKey()`
+- 模型：`claude-haiku-4-5-20251001`，端點 `https://api.anthropic.com/v1/messages`（瀏覽器直連，帶 `anthropic-dangerous-direct-browser-access: true`）
+- API Key 存 `localStorage`，key 為 `lovely-admin-claude-api-key`（與 GitHub token 分開）
+- 系統提示要求只回傳 JSON；錯誤碼（401/403/429/5xx）各有對應中文提示
 
 ---
 
@@ -270,6 +291,8 @@ SIZE_THRESHOLD = 500 * 1024 // 500 KB
 ## 部署狀態監控
 
 `watchDeployment()` 發布後每 5 秒查詢 GitHub Actions API，顯示進度直到成功/失敗/超時（3 分鐘）。成功後 2 秒自動重新整理預覽。
+
+> 監控的是 **GitHub Pages** 那條管線（`.github/workflows/pages.yml`）。Cloudflare Pages 走自己的 Git 整合並行部署，不在此監控範圍，但同一個 commit 兩站都會更新。
 
 ---
 

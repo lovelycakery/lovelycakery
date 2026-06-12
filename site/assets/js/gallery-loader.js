@@ -3,23 +3,50 @@
 (function () {
   if (window.LovelyGalleryLoader) return;
 
-  async function loadGalleryData(type) {
-    // file:// 協議下 fetch 本地檔案會被瀏覽器阻擋，改用 GitHub raw URL
-    const isLocalFile = window.location.protocol === 'file:';
-    let dataFile = isLocalFile
-      ? `https://raw.githubusercontent.com/lovelycakery/lovelycakery/main/site/assets/data/${type}-data.json`
-      : `assets/data/${type}-data.json`;
+  // 「本週切片」不是直接顯示某個資料檔，而是從 sets-data.json 的 weeklySlices
+  // 取出 product 圖片路徑，再到 products-data.json 比對出對應商品。
+  // 用統一判斷取代散落的字串比對：本週切片不顯示標籤 UI、只顯示切片價。
+  function showsTagUI(type) { return type !== 'sets' && type !== 'weekly-slices'; }
+  function sliceOnlyPrice(type) { return type === 'weekly-slices'; }
 
-    // Admin 預覽模式：加上時間戳避免瀏覽器快取舊 JSON
+  // 組出某個 data 檔的 fetch URL（沿用 file:// fallback 與 adminPreview 時間戳）
+  function dataFileUrl(name) {
+    const isLocalFile = window.location.protocol === 'file:';
+    let url = isLocalFile
+      ? `https://raw.githubusercontent.com/lovelycakery/lovelycakery/main/site/assets/data/${name}`
+      : `assets/data/${name}`;
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('adminPreview') === '1') {
-      dataFile += (dataFile.includes('?') ? '&' : '?') + 'ts=' + Date.now();
+      url += (url.includes('?') ? '&' : '?') + 'ts=' + Date.now();
     }
+    return url;
+  }
 
+  async function fetchData(name) {
+    const response = await fetch(dataFileUrl(name));
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return await response.json();
+  }
+
+  // 依 weeklySlices 路徑陣列，從 products items 取出對應商品（保持選取順序，略過找不到的）
+  function resolveWeeklySlices(slicePaths, productItems) {
+    if (!Array.isArray(slicePaths) || !Array.isArray(productItems)) return [];
+    const byImage = new Map(productItems.map(it => [it.image, it]));
+    return slicePaths.map(p => byImage.get(p)).filter(Boolean);
+  }
+
+  async function loadGalleryData(type) {
     try {
-      const response = await fetch(dataFile);
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const data = await response.json();
+      if (type === 'weekly-slices') {
+        const [setsData, productsData] = await Promise.all([
+          fetchData('sets-data.json'),
+          fetchData('products-data.json'),
+        ]);
+        const slicePaths = setsData && Array.isArray(setsData.weeklySlices) ? setsData.weeklySlices : [];
+        const productItems = productsData && Array.isArray(productsData.items) ? productsData.items : [];
+        return resolveWeeklySlices(slicePaths, productItems);
+      }
+      const data = await fetchData(`${type}-data.json`);
       return data && Array.isArray(data.items) ? data.items : [];
     } catch (e) {
       console.warn(`Failed to load ${type} data:`, e);
@@ -49,9 +76,9 @@
     const itemDescriptionEn = item.description_en || item.description || '';
     const itemDescription = currentLang === 'en' ? itemDescriptionEn : itemDescriptionZh;
 
-    // 生成標籤 HTML，支持國際化（sets 不需要標籤）
+    // 生成標籤 HTML，支持國際化（sets / 本週切片 不顯示標籤）
     let tagsHTML = '';
-    if (type !== 'sets' && item.tags && item.tags.length > 0) {
+    if (showsTagUI(type) && item.tags && item.tags.length > 0) {
       const tags = item.tags.map(tag => {
         const tagText = getTagText(tag, currentLang);
         const tagTextZh = TAG_I18N[tag] ? TAG_I18N[tag].zh : tag;
@@ -67,8 +94,10 @@
     let priceHTML = '';
     if (item.prices && typeof item.prices === 'object') {
       const prices = item.prices;
-      const size6 = prices.size6 || '';
-      const size8 = prices.size8 || '';
+      // 本週切片是「切片」組合，只顯示切片價
+      const sliceOnly = sliceOnlyPrice(type);
+      const size6 = sliceOnly ? '' : (prices.size6 || '');
+      const size8 = sliceOnly ? '' : (prices.size8 || '');
       const slice = prices.slice || '';
 
       if (size6 || size8 || slice) {
@@ -495,11 +524,14 @@
     const urlParams = new URLSearchParams(window.location.search);
     const isAdminMode = urlParams.get('adminPreview') === '1';
     const adminMode = urlParams.get('mode'); // 'edit' 或 'preview'
-    const isEditMode = isAdminMode && adminMode === 'edit'; // 只有在編輯模式下才啟用拖曳和點擊編輯
+    // 只有在編輯模式下才啟用拖曳和點擊編輯。
+    // 本週切片（weekly-slices）由 admin 的勾選清單控制，不可在預覽 iframe 內拖曳/點擊編輯，
+    // 否則送出的索引會被誤認為 sets 清單的索引。
+    const isEditMode = isAdminMode && adminMode === 'edit' && type !== 'weekly-slices';
 
-    // 渲染圖例（在頁面上方；sets 類型不需要標籤圖例）
+    // 渲染圖例（在頁面上方；sets / 本週切片 不需要標籤圖例）
     // 合併版（autoInit 已 render 共享 legend）會傳 skipLegend，避免重複
-    if (type !== 'sets' && !options.skipLegend) {
+    if (showsTagUI(type) && !options.skipLegend) {
       renderTagLegend(container);
     }
     
@@ -517,8 +549,8 @@
       const imageName = currentLang === 'en' ? imageNameEn : imageNameZh;
       const imageAlt = imageName + (currentLang === 'en' ? ' - Lovely Cakery' : ' - Lovely Cakery 手工千層');
       
-      // 將標籤儲存到 data 屬性中，用於篩選（sets 不需要）
-      if (type !== 'sets' && item.tags && Array.isArray(item.tags) && item.tags.length > 0) {
+      // 將標籤儲存到 data 屬性中，用於篩選（sets / 本週切片 不需要）
+      if (showsTagUI(type) && item.tags && Array.isArray(item.tags) && item.tags.length > 0) {
         itemEl.dataset.tags = item.tags.join(',');
       }
       
@@ -540,8 +572,8 @@
       img.onload = () => imageWrapper.classList.add('loaded');
       imageWrapper.appendChild(img);
 
-      // 如果有標籤，在圖片上顯示標籤（sets 不需要）
-      if (type !== 'sets' && item.tags && Array.isArray(item.tags) && item.tags.length > 0) {
+      // 如果有標籤，在圖片上顯示標籤（sets / 本週切片 不需要）
+      if (showsTagUI(type) && item.tags && Array.isArray(item.tags) && item.tags.length > 0) {
         renderImageTags(imageWrapper, item.tags);
       }
 
@@ -821,6 +853,22 @@
     if (!container) return;
 
     const items = await loadGalleryData(type);
+
+    // 「本週切片」特例：沒有任何切片（空陣列）或載入失敗時，整段隱藏，不顯示「籌備中」
+    if (type === 'weekly-slices') {
+      var section = document.getElementById('weeklySlicesSection');
+      if (!items || items.length === 0) {
+        if (section) section.style.display = 'none';
+        container.innerHTML = '';
+        return;
+      }
+      if (section) section.style.display = '';
+      renderGallery(items, container, type, options);
+      setupLazyImages(container);
+      if (window.LovelyI18n) window.LovelyI18n.applyLanguage(localStorage.getItem('language') || 'zh', section);
+      return;
+    }
+
     if (items === null) {
       const lang = localStorage.getItem('language') || 'zh';
       container.innerHTML = '<p style="text-align:center;padding:40px;color:#6b5d4f;font-size:16px;" data-en="Unable to load content. Please try again later." data-zh="無法載入內容，請稍後再試。">' +
@@ -1044,6 +1092,25 @@
       return;
     }
 
+    // Admin: 本週切片即時更新（admin 已解析好對應的 product items）
+    if (e.data && e.data.type === 'admin-weekly-slices-update' && Array.isArray(e.data.items)) {
+      var wsSection = document.getElementById('weeklySlicesSection');
+      var wsContainer = document.querySelector('.gallery-grid[data-gallery-type="weekly-slices"]');
+      if (!wsContainer) return;
+      if (e.data.items.length === 0) {
+        if (wsSection) wsSection.style.display = 'none';
+        wsContainer.innerHTML = '';
+        return;
+      }
+      if (wsSection) wsSection.style.display = '';
+      renderGallery(e.data.items, wsContainer, 'weekly-slices', {});
+      setupLazyImages(wsContainer);
+      if (window.LovelyI18n) {
+        window.LovelyI18n.applyLanguage(localStorage.getItem('language') || 'zh', wsSection || document);
+      }
+      return;
+    }
+
     // 處理滾動到指定索引的消息
     if (e.data && e.data.type === 'gallery-scroll-to') {
       const { index } = e.data;
@@ -1190,12 +1257,14 @@
   // 支援同頁多個 grid（例如 all-items.html admin 預覽合併版）
   function autoInit() {
     var containers = Array.from(document.querySelectorAll('.gallery-grid[data-gallery-type]'));
-    var isMergedView = containers.length > 1;
+    // 只有「會顯示標籤圖例」的 grid 才算合併版（sets / weekly-slices 不算）。
+    // 否則 sets.html 有 sets + weekly-slices 兩個 grid 會被誤判成合併版而塞共享圖例。
+    var tagGrids = containers.filter(function (c) { return showsTagUI(c.getAttribute('data-gallery-type')); });
+    var isMergedView = tagGrids.length > 1;
 
     // 合併版：先 render 共享 legend（內容 hard-coded，不需等 fetch），各 grid 再 init 時 skip 自己的 legend
     if (isMergedView) {
-      var grids = containers.filter(function (c) { return c.getAttribute('data-gallery-type') !== 'sets'; });
-      if (grids.length > 0) renderSharedLegend(grids);
+      renderSharedLegend(tagGrids);
     }
 
     containers.forEach(function (container) {

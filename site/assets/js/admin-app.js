@@ -258,6 +258,98 @@
     }, '*');
   }
 
+  // ── Weekly slices（本週切片）：從 products 勾選參照 ──────────────────
+
+  // 依 weeklySlices 路徑陣列，從 products items 取出對應商品（保持順序，略過找不到的）
+  function resolveWeeklySliceItems() {
+    var paths = state.imageData.sets.weeklySlices || [];
+    var products = (state.imageData.products && state.imageData.products.items) || [];
+    var byImage = {};
+    products.forEach(function (it) { byImage[it.image] = it; });
+    return paths.map(function (p) { return byImage[p]; }).filter(Boolean);
+  }
+
+  function sendWeeklySlicesToPreview() {
+    var iframe = $('previewFrame');
+    if (!iframe || !iframe.contentWindow) return;
+    iframe.contentWindow.postMessage({
+      type: 'admin-weekly-slices-update',
+      items: resolveWeeklySliceItems(),
+    }, '*');
+  }
+
+  function renderWeeklySlicesPicker() {
+    var picker = $('weeklySlicesPicker');
+    if (!picker) return;
+    picker.innerHTML = '';
+    var products = (state.imageData.products && state.imageData.products.items) || [];
+    var selected = state.imageData.sets.weeklySlices || [];
+    if (products.length === 0) {
+      picker.innerHTML = '<p class="weekly-slices-hint">全部品項尚無資料。</p>';
+      return;
+    }
+    products.forEach(function (item) {
+      var row = document.createElement('label');
+      row.className = 'weekly-slice-row';
+
+      var cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.className = 'weekly-slice-checkbox';
+      cb.value = item.image;
+      cb.checked = selected.indexOf(item.image) !== -1;
+      cb.addEventListener('change', function () { toggleWeeklySlice(item.image, cb.checked); });
+
+      var thumb = document.createElement('img');
+      thumb.className = 'weekly-slice-thumb';
+      thumb.src = previewImageSrc(item, 'products');
+      thumb.alt = item.name || '';
+      thumb.loading = 'lazy';
+
+      var name = document.createElement('span');
+      name.className = 'weekly-slice-name';
+      name.textContent = item.name || '(未命名)';
+
+      row.appendChild(cb);
+      row.appendChild(thumb);
+      row.appendChild(name);
+      picker.appendChild(row);
+    });
+  }
+
+  // 取得 products 圖片的預覽 URL（未發布的用 blob，已發布的用實際路徑）
+  // admin.html 位於 site/，圖片在 site/assets/...，故相對路徑即 item.image；
+  // file:// 下無法直接讀本地檔，改用 GitHub raw URL。
+  function previewImageSrc(item, type) {
+    if (item._previewUrl) return item._previewUrl;
+    if (location.protocol === 'file:') {
+      return 'https://raw.githubusercontent.com/lovelycakery/lovelycakery/main/' + SITE + '/' + item.image;
+    }
+    return item.image;
+  }
+
+  function toggleWeeklySlice(imagePath, on) {
+    var list = state.imageData.sets.weeklySlices || (state.imageData.sets.weeklySlices = []);
+    var idx = list.indexOf(imagePath);
+    if (on && idx === -1) list.push(imagePath);
+    else if (!on && idx !== -1) list.splice(idx, 1);
+    dirty.sets = true;
+    updatePublishButton();
+    sendWeeklySlicesToPreview();
+  }
+
+  // 確保 sets 與 products 資料都已載入，再 render 勾選清單
+  async function setupWeeklySlicesPicker() {
+    if (!dirty.sets && (!state.imageData.sets.weeklySlices)) {
+      await loadImageData('sets');
+    }
+    if (!dirty.products && (!state.imageData.products.items || state.imageData.products.items.length === 0)) {
+      await loadImageData('products');
+    }
+    if (!Array.isArray(state.imageData.sets.weeklySlices)) state.imageData.sets.weeklySlices = [];
+    // 切回別的 tab 後再回來時才 render（避免 await 期間使用者已切走）
+    if (state.currentTab === 'sets') renderWeeklySlicesPicker();
+  }
+
   // ── Calendar click hook ───────────────────────────────────────────
 
   function tryInstallCalendarClickHook() {
@@ -625,6 +717,10 @@
       var filename = TYPE_DATAFILE[type] || (type + '-data.json');
       var res = await GitHubAPI.getJSON(SITE + '/assets/data/' + filename);
       state.imageData[type] = res.data;
+      // sets 額外帶 weeklySlices（本週切片參照）；舊資料沒有就補空陣列
+      if (type === 'sets' && !Array.isArray(state.imageData.sets.weeklySlices)) {
+        state.imageData.sets.weeklySlices = [];
+      }
     } catch (e) {
       logStatus('❌ 載入 ' + type + ' 資料失敗：' + (e.message || String(e)));
     }
@@ -1341,6 +1437,7 @@
       IMAGE_TYPES.forEach(function (t) {
         if (!dirty[t]) return;
         var data = { schema_version: 1, items: cleanItemsForCommit(state.imageData[t].items) };
+        if (t === 'sets') data.weeklySlices = state.imageData.sets.weeklySlices || [];
         validateImageData(data);
         changes.push({ path: SITE + '/assets/data/' + TYPE_DATAFILE[t], content: JSON.stringify(data, null, 2) + '\n' });
         parts.push(TYPE_LABEL[t]);
@@ -1660,6 +1757,10 @@
         loadImageData(tabName);
       }
       clearImageEditPanel();
+      // 本週切片勾選區塊只在 sets tab 顯示
+      var wsPickerSection = $('weeklySlicesPickerSection');
+      if (wsPickerSection) wsPickerSection.style.display = (tabName === 'sets') ? '' : 'none';
+      if (tabName === 'sets') setupWeeklySlicesPicker();
     }
     reloadPreview();
   }
@@ -2014,6 +2115,10 @@
       }
       if (isImageTab(state.currentTab) && dirty[state.currentTab]) {
         setTimeout(function () { sendImageDataToPreview(state.currentTab); }, 500);
+      }
+      // sets 預覽：若有未發布的本週切片變更，重送以反映勾選狀態
+      if (state.currentTab === 'sets' && dirty.sets) {
+        setTimeout(function () { sendWeeklySlicesToPreview(); }, 500);
       }
       if (state.editingImageIndex >= 0 && state.currentMode === 'edit' && previewFrame.contentWindow) {
         setTimeout(function () { previewFrame.contentWindow.postMessage({ type: 'gallery-select', index: state.editingImageIndex }, '*'); }, 300);

@@ -5,13 +5,24 @@
 
 ## 重要：專案資料夾結構
 
-- `site/`：**網站本體**（GitHub Pages 部署目錄）
+- `site/`：**網站本體**（部署目錄）
 - 本文件提到的路徑若未特別註明，一律以 `site/` 內為準（例如 `assets/js/i18n.js` 實際位置是 `site/assets/js/i18n.js`）
+
+### 部署平台（雙重部署）
+
+`push` 到 `main` 會**同時觸發兩條部署管線**，兩站內容一致：
+
+| 平台 | 網址 | 機制 | 特點 |
+|------|------|------|------|
+| **Cloudflare Pages** | `lovelycakery.pages.dev` | Git 整合自動部署 | 讀 `site/_headers`（cache 策略） |
+| **GitHub Pages** | `lovelycakery.github.io/lovelycakery/` | `.github/workflows/pages.yml`（含 `check.sh` 預檢） | 不讀 `_headers`，用 GitHub 預設 cache |
+
+> `site/_headers` 是 Cloudflare 專用格式（GitHub Pages 會忽略它），設定 HTML `max-age=0, must-revalidate` 解決舊 HTML 引用舊版 `?v=` 的 cache 死角。
 
 ## 架構總覽
 
-1. **主站頁面**：`index.html`, `calendar.html`, `seasonal.html`, `all-items.html`, `order.html`, `contact.html`（另有 `404.html` 為 GitHub Pages 錯誤頁）
-2. **共用導覽列/header**：`assets/js/site-header.js`（主站 6 頁共用，由 JS 動態生成）
+1. **主站頁面**：`index.html`, `calendar.html`, `seasonal.html`, `all-items.html`, `sets.html`, `order.html`, `contact.html`（另有 `404.html` 為自訂錯誤頁）
+2. **共用導覽列/header**：`assets/js/site-header.js`（主站各頁共用，由 JS 動態生成）
 3. **共用語言切換**：`assets/js/i18n.js`（唯一語言模組；頁面有 `.lang-btn` 時自動初始化）
 4. **日曆採 iframe 隔離**：`calendar.html` 內嵌 `calendar-widget-readonly.html`
 5. **商品/季節圖片動態載入**：`assets/js/gallery-loader.js` 從 JSON 資料檔動態產生相簿（透過 `.gallery-grid[data-gallery-type]` 自動初始化，不需 inline script）
@@ -25,13 +36,15 @@
 site/
 ├── index.html                         # 首頁
 ├── calendar.html                      # 日曆頁（嵌入只讀 widget）
-├── seasonal.html                      # 季節限定（gallery-loader.js 動態載入）
+├── seasonal.html                      # 季節限定 / 新品上市（gallery-loader.js 動態載入）
 ├── all-items.html                     # 全部品項（gallery-loader.js 動態載入）
+├── sets.html                          # 優惠組合（gallery-loader.js 動態載入）
 ├── order.html                         # 訂購方式
 ├── contact.html                       # 聯絡/地圖
 ├── calendar-widget-readonly.html      # 只讀日曆 widget（iframe 內）
 ├── admin.html                         # Web Admin 管理頁面
-├── 404.html                           # GitHub Pages 自訂 404 錯誤頁
+├── 404.html                           # 自訂 404 錯誤頁
+├── _headers                           # Cloudflare Pages cache 策略（GitHub Pages 忽略）
 └── assets/
     ├── css/
     │   ├── styles.css                 # 主站共用樣式
@@ -45,24 +58,28 @@ site/
     │   ├── calendar-embed.js          # 日曆 iframe 高度同步
     │   ├── calendar-shared.js         # 日曆共用工具
     │   ├── calendar-widget-readonly.js# 只讀日曆 widget
-    │   ├── gallery-loader.js          # 相簿動態載入（seasonal / all-items 共用）
+    │   ├── gallery-loader.js          # 相簿動態載入（seasonal / all-items / sets 共用）
     │   ├── image-protection.js        # 圖片防護（禁右鍵/拖曳）
+    │   ├── jszip.min.js               # Web Admin: ZIP 函式庫（第三方）
     │   ├── admin-github-api.js        # Web Admin: GitHub API 封裝
     │   ├── admin-image-compress.js    # Web Admin: 圖片壓縮
+    │   ├── admin-translate.js         # Web Admin: Claude API 中→英翻譯
     │   └── admin-app.js              # Web Admin: UI 邏輯
     ├── data/
     │   ├── calendar-data.json         # 日曆事件資料
     │   ├── products-data.json         # 全部品項資料
-    │   └── seasonal-data.json         # 季節限定資料
+    │   ├── seasonal-data.json         # 季節限定 / 新品上市資料
+    │   └── sets-data.json             # 優惠組合資料
     └── images/
         ├── logo/                      # Logo 圖片
         ├── calendar/                  # 日曆頁面圖片
         │   └── frames/                # 日曆外框圖片
         ├── seasonal/                  # 季節限定頁面圖片
         ├── products/                  # 全部品項頁面圖片
+        ├── sets/                      # 優惠組合頁面圖片
         ├── order/                     # 訂購方式頁面圖片
         ├── contact/                   # 地圖頁面圖片
-        └── _originals/                # 原始圖片備份
+        └── _originals/                # 原始圖片備份（不部署）
 ```
 
 ---
@@ -73,13 +90,14 @@ site/
 
 - `index.html`：首頁
 - `calendar.html`：日曆頁（iframe 嵌入只讀日曆）
-- `seasonal.html`：季節限定頁（由 gallery-loader.js 動態載入圖片）
+- `seasonal.html`：季節限定 / 新品上市頁（由 gallery-loader.js 動態載入圖片）
 - `all-items.html`：全部品項頁（由 gallery-loader.js 動態載入圖片）
+- `sets.html`：優惠組合頁（由 gallery-loader.js 動態載入圖片）
 - `order.html`：訂購方式頁
 - `contact.html`：聯絡/地圖頁
 - `calendar-widget-readonly.html`：只讀日曆 widget 頁（iframe 內）
 - `admin.html`：Web Admin 管理頁面（詳見 `ADMIN_GUIDE.md`）
-- `404.html`：GitHub Pages 自訂 404 錯誤頁
+- `404.html`：自訂 404 錯誤頁
 
 ### CSS
 
@@ -113,9 +131,9 @@ site/
   - render 後 `postMessage({type:'calendar-resize', height})` 讓父頁調整 iframe 高度
   - 每個日期格帶 `data-date="YYYY-MM-DD"`
 - `assets/js/gallery-loader.js`
-  - 相簿動態載入器（`seasonal.html` 和 `all-items.html` 共用）
-  - 從 JSON 資料檔（`products-data.json` / `seasonal-data.json`）動態載入商品圖片
-  - 自動初始化：偵測 `.gallery-grid[data-gallery-type="seasonal|products"]`，不需 inline script
+  - 相簿動態載入器（`seasonal.html`、`all-items.html`、`sets.html` 共用）
+  - 從 JSON 資料檔（`products-data.json` / `seasonal-data.json` / `sets-data.json`）動態載入商品圖片
+  - 自動初始化：偵測 `.gallery-grid[data-gallery-type="seasonal|products|sets"]`，不需 inline script
   - 提供圖片彈窗（modal）、標籤篩選、標籤圖例
   - 在 Admin 編輯模式下另有拖曳排序與點擊編輯功能（詳見 `ADMIN_GUIDE.md`）
 - `assets/js/image-protection.js`
@@ -125,8 +143,10 @@ site/
 ### JS（Admin 端）
 
 Admin 相關 JS 的詳細說明見 `ADMIN_GUIDE.md`：
+- `assets/js/jszip.min.js`：第三方 ZIP 函式庫
 - `assets/js/admin-github-api.js`：GitHub API 封裝（token 管理、Contents API、Git Data API 多檔原子 commit）
 - `assets/js/admin-image-compress.js`：瀏覽器端圖片壓縮（Canvas API）
+- `assets/js/admin-translate.js`：Claude API 中→英自動翻譯（品名/描述/日曆標籤）
 - `assets/js/admin-app.js`：主要 UI 邏輯（本地編輯 + 即時預覽 + 一鍵發布）
 
 ---

@@ -2,19 +2,19 @@
 
 > **開始工作前，請先讀完 [WEB_GUIDE.md](WEB_GUIDE.md) 和 [ADMIN_GUIDE.md](ADMIN_GUIDE.md)**，了解網站架構、模組職責與修改指引。
 
-純靜態網站（HTML/CSS/JS），部署在 GitHub Pages。沒有 build system、沒有框架。
+純靜態網站（HTML/CSS/JS），沒有 build system、沒有框架。push 到 `main` 會**同時部署到 Cloudflare Pages（`lovelycakery.pages.dev`）與 GitHub Pages（`lovelycakery.github.io/lovelycakery/`）**，兩站內容一致（詳見 WEB_GUIDE.md 部署平台章節）。
 
 ## 專案結構
 
-- `site/` — 網站本體（GitHub Pages 部署目錄）
+- `site/` — 網站本體（部署目錄）
 - `scripts/` — 圖片優化/驗證腳本
 - `check.sh` — 部署前檢查（引用完整性、schema 驗證、圖片大小等）
 - `deploy.sh` — 部署腳本（push 前自動跑 check.sh）
 - `bump-calendar-cache.sh` — 更新日曆 cache-busting 版本號
 
-## 主站 6 頁
+## 主站 7 頁
 
-index.html / calendar.html / seasonal.html / all-items.html / order.html / contact.html
+index.html / calendar.html / seasonal.html / all-items.html / sets.html / order.html / contact.html
 
 共用 header 由 `site-header.js` 動態生成，語言切換由 `i18n.js` 統一處理（zh/en 雙語）。
 
