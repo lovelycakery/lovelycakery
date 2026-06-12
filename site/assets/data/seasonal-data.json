@@ -32,9 +32,9 @@
         "無酒精"
       ],
       "prices": {
-        "size6": "300",
-        "size8": "1780",
-        "slice": "3180"
+        "size6": "1780",
+        "size8": "3180",
+        "slice": "300"
       },
       "subImages": [
         "assets/images/seasonal/未命名設計 - 2026-06-01T083436.043-2.jpg"
@@ -88,9 +88,9 @@
         "無酒精"
       ],
       "prices": {
-        "size6": "320",
-        "size8": "1880",
-        "slice": "3380"
+        "size6": "1880",
+        "size8": "3380",
+        "slice": "320"
       },
       "subImages": [
         "assets/images/seasonal/未命名設計 - 2026-06-01T094500.334-2.jpg"
