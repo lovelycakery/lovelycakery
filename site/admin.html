@@ -92,6 +92,15 @@
                     </div>
 
                     <div id="imageEditForm" style="display: none;">
+                        <div class="panel__section" id="mainImageSection">
+                            <label class="label">主照片</label>
+                            <div class="main-image-row">
+                                <img id="mainImageThumb" class="main-image-thumb" alt="">
+                                <button id="replaceMainImageBtn" class="btn btn-secondary btn-sm" type="button">更換主照片</button>
+                            </div>
+                            <input type="file" id="mainImageFileInput" accept="image/jpeg,image/png,image/webp" style="display: none;">
+                        </div>
+
                         <div class="panel__section">
                             <label class="label" for="imageNameInput">名稱</label>
                             <input type="text" id="imageNameInput" class="input" placeholder="例如：草莓千層">

@@ -827,10 +827,23 @@
       label.className = 'sub-image-label';
       label.textContent = '子圖 ' + (idx + 1);
 
+      var setMainBtn = document.createElement('button');
+      setMainBtn.type = 'button';
+      setMainBtn.className = 'btn btn-secondary btn-sm sub-image-setmain';
+      setMainBtn.textContent = '設為主圖';
+      (function (i) {
+        setMainBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          setSubImageAsMain(i);
+        });
+      })(idx);
+
       row.appendChild(handle);
       row.appendChild(checkbox);
       row.appendChild(thumb);
       row.appendChild(label);
+      row.appendChild(setMainBtn);
 
       // 拖曳排序
       row.addEventListener('dragstart', function (e) {
@@ -934,6 +947,76 @@
     renderSubImagesList();
     sendImageDataToPreview(type);
     showSuccess('已新增 ' + files.length + ' 張子圖（本地）');
+  }
+
+  // 移除 pendingImages 中指向某 repoPath 的待上傳項（避免同一檔重複上傳時殘留舊的）
+  function dropPendingImage(repoPath) {
+    for (var i = dirty.pendingImages.length - 1; i >= 0; i--) {
+      if (dirty.pendingImages[i].repoPath === repoPath) dirty.pendingImages.splice(i, 1);
+    }
+  }
+
+  // 主圖的 mobile（sm/）路徑：assets/images/<type>/<file> → assets/images/<type>/sm/<file>
+  function smPathOf(imagePath) {
+    var slash = imagePath.lastIndexOf('/');
+    if (slash < 0) return 'sm/' + imagePath;
+    return imagePath.slice(0, slash) + '/sm/' + imagePath.slice(slash + 1);
+  }
+
+  // 方案 A：上傳新檔替換主圖，沿用舊檔名覆寫（desktop + sm 一起）
+  async function replaceMainImage(files) {
+    var item = getEditingItem();
+    if (!item) { alert('請先選取一個商品'); return; }
+    if (!files || files.length === 0) return;
+    var type = isImageTab(state.currentTab) ? state.currentTab : 'products';
+    var file = files[0];
+    logStatus('⏳ 壓縮主圖：' + file.name + '…');
+    try {
+      var compressed = await ImageCompress.compress(file);
+      // 沿用舊主圖路徑覆寫；desktop 與 sm 各一份
+      var desktopRepo = SITE + '/' + item.image;
+      var smRepo = SITE + '/' + smPathOf(item.image);
+      dropPendingImage(desktopRepo);
+      dropPendingImage(smRepo);
+      dirty.pendingImages.push({ repoPath: desktopRepo, base64: compressed.desktop.base64 });
+      dirty.pendingImages.push({ repoPath: smRepo, base64: compressed.mobile.base64 });
+      // 即時預覽用 blob（image 路徑不變，所以發布後 CDN 才會換成新圖）
+      item._previewUrl = URL.createObjectURL(compressed.desktop.blob);
+      dirty[type] = true;
+      updatePublishButton();
+      var mainThumb = $('mainImageThumb');
+      if (mainThumb) mainThumb.src = item._previewUrl;
+      sendImageDataToPreview(type);
+      showSuccess('已更換主照片（本地）：' + (item.name || ''));
+      logStatus('✅ 主圖已替換：' + item.image);
+    } catch (e) {
+      showError('壓縮失敗：' + (e.message || String(e)));
+    }
+  }
+
+  // 方案 B：把某張子圖設為主圖，原主圖移到該子圖原位置（檔案都已存在，純資料對調）
+  function setSubImageAsMain(subIdx) {
+    var item = getEditingItem();
+    if (!item || !Array.isArray(item.subImages) || subIdx < 0 || subIdx >= item.subImages.length) return;
+    var type = isImageTab(state.currentTab) ? state.currentTab : 'products';
+    if (!Array.isArray(item._subImagesPreview)) item._subImagesPreview = [];
+
+    var oldMain = item.image;
+    var oldMainPreview = item._previewUrl;
+    // 子圖 → 主圖
+    item.image = item.subImages[subIdx];
+    item._previewUrl = item._subImagesPreview[subIdx] || undefined;
+    // 原主圖 → 放回剛空出的子圖位置
+    item.subImages[subIdx] = oldMain;
+    item._subImagesPreview[subIdx] = oldMainPreview || undefined;
+
+    dirty[type] = true;
+    updatePublishButton();
+    var mainThumb = $('mainImageThumb');
+    if (mainThumb) mainThumb.src = previewImageSrc(item, type);
+    renderSubImagesList();
+    sendImageDataToPreview(type);
+    showSuccess('已設為主圖（本地）');
   }
 
   function deleteSelectedSubImages() {
@@ -1205,6 +1288,8 @@
     $('imageDescEnInput').value = item.description_en || '';
     state.editingTags = (item.tags && Array.isArray(item.tags)) ? item.tags.slice() : [];
     renderTagChips();
+    var mainThumb = $('mainImageThumb');
+    if (mainThumb) mainThumb.src = previewImageSrc(item, type);
     renderSubImagesList();
     $('imageEditForm').style.display = 'block';
     $('imageEditSaveBtn').disabled = false;
@@ -2105,6 +2190,20 @@
     $('publishBtn').addEventListener('click', publish);
 
     // Sub-images: 新增 / 刪除選取
+    if ($('replaceMainImageBtn')) {
+      $('replaceMainImageBtn').addEventListener('click', function () {
+        var fi = $('mainImageFileInput');
+        if (fi) fi.click();
+      });
+    }
+    if ($('mainImageFileInput')) {
+      $('mainImageFileInput').addEventListener('change', function () {
+        var fi = $('mainImageFileInput');
+        var files = Array.from(fi.files || []);
+        if (files.length > 0) replaceMainImage(files);
+        fi.value = '';
+      });
+    }
     if ($('subImagesAddBtn')) {
       $('subImagesAddBtn').addEventListener('click', function () {
         var fi = $('subImagesFileInput');

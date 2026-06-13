@@ -479,6 +479,35 @@ body {
 .sub-image-label {
   font-size: 13px;
   color: #5a4a35;
+  flex: 1 1 auto;
+}
+
+.sub-image-setmain {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  padding: 4px 10px;
+  font-size: 12px;
+}
+
+/* 主照片區（編輯面板頂部） */
+.main-image-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.main-image-thumb {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  flex: 0 0 auto;
+}
+
+#replaceMainImageBtn {
+  flex: 0 0 auto;
 }
 
 .sub-images-actions {
