@@ -1011,23 +1011,15 @@ img {
     font-weight: 700;
     color: #3d2817;
     letter-spacing: -0.5px;
-    margin-bottom: 32px;
+    /* 與「優惠組合 / 本週切片」一致的乾淨大標題（移除漸層底線） */
+    margin-bottom: 40px;
 }
 
-/* 漸層分隔線：兩端淡出、中間較深，視覺上有「中粗兩細」感 */
-.is-test-mode .all-items-section-title::after {
-    content: '';
-    display: block;
-    margin: 24px auto 0;
-    width: 80%;
-    max-width: 800px;
-    height: 1px;
-    background: linear-gradient(to right,
-        transparent 0%,
-        rgba(61, 40, 23, 0.4) 15%,
-        rgba(61, 40, 23, 0.9) 50%,
-        rgba(61, 40, 23, 0.4) 85%,
-        transparent 100%);
+/* 第二區（季節品項）上方用與 sets「本週切片」相同的乾淨分隔線 */
+.is-test-mode #products.all-items-section-title {
+    margin-top: 20px;
+    padding-top: 40px;
+    border-top: 1px solid var(--skin-border, rgba(61, 40, 23, 0.08));
 }
 
 @media (max-width: 968px) {

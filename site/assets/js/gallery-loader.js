@@ -28,11 +28,30 @@
     return await response.json();
   }
 
+  // 本週切片顯示用：若品項有子圖，把第一張子圖（通常是切片圖）當主圖，
+  // 原主圖移到子圖第一順位。回傳新物件，不動到原始資料。
+  function sliceFirstView(item) {
+    if (!item || !Array.isArray(item.subImages) || item.subImages.length === 0) return item;
+    const subs = item.subImages.slice();
+    const firstSub = subs.shift();
+    const swapped = Object.assign({}, item);
+    swapped.image = firstSub;
+    swapped.subImages = [item.image].concat(subs);
+    // 預覽 URL 陣列（admin 未發布圖）若存在，需同步對調，避免錯位
+    if (Array.isArray(item._subImagesPreview)) {
+      const prev = item._subImagesPreview.slice();
+      const firstPrev = prev.shift();
+      swapped._previewUrl = firstPrev || undefined;
+      swapped._subImagesPreview = [item._previewUrl].concat(prev);
+    }
+    return swapped;
+  }
+
   // 依 weeklySlices 路徑陣列，從來源品項取出對應商品（保持選取順序，略過找不到的）
   function resolveWeeklySlices(slicePaths, sourceItems) {
     if (!Array.isArray(slicePaths) || !Array.isArray(sourceItems)) return [];
     const byImage = new Map(sourceItems.map(it => [it.image, it]));
-    return slicePaths.map(p => byImage.get(p)).filter(Boolean);
+    return slicePaths.map(p => byImage.get(p)).filter(Boolean).map(sliceFirstView);
   }
 
   async function loadGalleryData(type) {

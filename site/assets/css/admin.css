@@ -975,7 +975,7 @@ body {
 .weekly-slice-row {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   padding: 12px 12px;
   border-radius: 10px;
   cursor: pointer;
@@ -995,16 +995,16 @@ body {
 }
 
 .weekly-slice-thumb {
-  width: 88px;
-  height: 88px;
+  width: 44px;
+  height: 44px;
   object-fit: cover;
-  border-radius: 8px;
+  border-radius: 6px;
   flex: 0 0 auto;
   background: var(--panel-2);
 }
 
 .weekly-slice-name {
-  font-size: 16px;
+  font-size: 18px;
   color: var(--text);
   overflow: hidden;
   text-overflow: ellipsis;

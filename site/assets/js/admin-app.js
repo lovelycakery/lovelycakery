@@ -276,12 +276,30 @@
     return all;
   }
 
+  // 本週切片顯示用：若品項有子圖，把第一張子圖（通常是切片圖）當主圖，
+  // 原主圖移到子圖第一順位。回傳新物件，不動到原始資料。
+  function sliceFirstView(item) {
+    if (!item || !Array.isArray(item.subImages) || item.subImages.length === 0) return item;
+    var subs = item.subImages.slice();
+    var firstSub = subs.shift();
+    var swapped = Object.assign({}, item);
+    swapped.image = firstSub;
+    swapped.subImages = [item.image].concat(subs);
+    if (Array.isArray(item._subImagesPreview)) {
+      var prev = item._subImagesPreview.slice();
+      var firstPrev = prev.shift();
+      swapped._previewUrl = firstPrev || undefined;
+      swapped._subImagesPreview = [item._previewUrl].concat(prev);
+    }
+    return swapped;
+  }
+
   // 依 weeklySlices 路徑陣列，從來源品項取出對應商品（保持順序，略過找不到的）
   function resolveWeeklySliceItems() {
     var paths = state.imageData.sets.weeklySlices || [];
     var byImage = {};
     weeklySliceSourceItems().forEach(function (it) { byImage[it.image] = it; });
-    return paths.map(function (p) { return byImage[p]; }).filter(Boolean);
+    return paths.map(function (p) { return byImage[p]; }).filter(Boolean).map(sliceFirstView);
   }
 
   function sendWeeklySlicesToPreview() {
@@ -316,7 +334,8 @@
 
       var thumb = document.createElement('img');
       thumb.className = 'weekly-slice-thumb';
-      thumb.src = previewImageSrc(item, 'products');
+      // 縮圖顯示實際會出現在本週切片的圖（有子圖時為第一張切片圖）
+      thumb.src = previewImageSrc(sliceFirstView(item), 'products');
       thumb.alt = item.name || '';
       thumb.loading = 'lazy';
 
