@@ -107,6 +107,9 @@
         "奶蛋素",
         "無咖啡因",
         "無酒精"
+      ],
+      "subImages": [
+        "assets/images/products/綠葡萄檸檬千層-2.jpg"
       ]
     },
     {
@@ -267,6 +270,9 @@
         "奶蛋素",
         "無咖啡因",
         "無酒精"
+      ],
+      "subImages": [
+        "assets/images/products/一根香草莢千層-2.jpg"
       ]
     },
     {
@@ -309,10 +315,10 @@
     },
     {
       "image": "assets/images/products/未命名設計 - 2026-05-22T215516.806.jpg",
-      "name": "珍珠奶茶千層",
+      "name": "珍珠奶茶千層 (建議當天食用完畢)",
       "name_en": "Pearl Milk Tea Mille-feuille",
-      "description": "建議當天食用完畢\n\n唐寧伯爵茶，鐵觀音，阿薩姆，紅玉\n(茶可自選)\n紅茶奶酥碎\n珍珠糖\n珍珠",
-      "description_en": "Indulge in your choice of Darjeeling Earl Grey, Tie Guan Yin, Assam, or Ruby Black Tea infused into this exquisite cake. Topped with crispy red tea crumble, pearl sugar, and delicate tapioca pearls. Best enjoyed on the day of purchase.",
+      "description": "唐寧伯爵茶，鐵觀音，阿薩姆，紅玉\n(茶可自選)\n紅茶奶酥碎\n珍珠糖\n珍珠",
+      "description_en": "Choice of teas: Earl Grey, Tie Guan Yin, Assam, or Ruby Red. Topped with red tea buttery crumble, pearl sugar, and pearls.",
       "tags": [
         "奶蛋素",
         "無酒精"
@@ -321,7 +327,10 @@
         "size6": "1680",
         "size8": "2980",
         "slice": "280"
-      }
+      },
+      "subImages": [
+        "assets/images/products/珍珠奶茶千層 (建議當天食用完畢)-2.jpg"
+      ]
     },
     {
       "image": "assets/images/products/微醺栗香千層.jpg",
