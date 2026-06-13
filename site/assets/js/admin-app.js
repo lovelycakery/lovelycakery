@@ -827,23 +827,10 @@
       label.className = 'sub-image-label';
       label.textContent = '子圖 ' + (idx + 1);
 
-      var setMainBtn = document.createElement('button');
-      setMainBtn.type = 'button';
-      setMainBtn.className = 'btn btn-secondary btn-sm sub-image-setmain';
-      setMainBtn.textContent = '設為主圖';
-      (function (i) {
-        setMainBtn.addEventListener('click', function (e) {
-          e.preventDefault();
-          e.stopPropagation();
-          setSubImageAsMain(i);
-        });
-      })(idx);
-
       row.appendChild(handle);
       row.appendChild(checkbox);
       row.appendChild(thumb);
       row.appendChild(label);
-      row.appendChild(setMainBtn);
 
       // 拖曳排序
       row.addEventListener('dragstart', function (e) {
@@ -992,31 +979,6 @@
     } catch (e) {
       showError('壓縮失敗：' + (e.message || String(e)));
     }
-  }
-
-  // 方案 B：把某張子圖設為主圖，原主圖移到該子圖原位置（檔案都已存在，純資料對調）
-  function setSubImageAsMain(subIdx) {
-    var item = getEditingItem();
-    if (!item || !Array.isArray(item.subImages) || subIdx < 0 || subIdx >= item.subImages.length) return;
-    var type = isImageTab(state.currentTab) ? state.currentTab : 'products';
-    if (!Array.isArray(item._subImagesPreview)) item._subImagesPreview = [];
-
-    var oldMain = item.image;
-    var oldMainPreview = item._previewUrl;
-    // 子圖 → 主圖
-    item.image = item.subImages[subIdx];
-    item._previewUrl = item._subImagesPreview[subIdx] || undefined;
-    // 原主圖 → 放回剛空出的子圖位置
-    item.subImages[subIdx] = oldMain;
-    item._subImagesPreview[subIdx] = oldMainPreview || undefined;
-
-    dirty[type] = true;
-    updatePublishButton();
-    var mainThumb = $('mainImageThumb');
-    if (mainThumb) mainThumb.src = previewImageSrc(item, type);
-    renderSubImagesList();
-    sendImageDataToPreview(type);
-    showSuccess('已設為主圖（本地）');
   }
 
   function deleteSelectedSubImages() {

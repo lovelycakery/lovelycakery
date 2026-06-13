@@ -582,18 +582,10 @@
       const img = document.createElement('img');
       // 先不設 src，由 IntersectionObserver 觸發載入
       img.dataset.src = imageSrc;
-      if (!item._previewUrl && imageSrc.includes('/products/') && !imageSrc.includes('/sm/')) {
+      if (!item._previewUrl && imageSrc.includes('/products/')) {
         const smSrc = imageSrc.replace('/products/', '/products/sm/');
         img.dataset.srcset = smSrc + ' 480w, ' + imageSrc + ' 1000w';
         img.dataset.sizes = '(max-width: 768px) 50vw, 500px';
-        // 防呆：若小圖（sm/）不存在（例如主圖原是無 sm 版的子圖），
-        // 退回完整圖避免破圖
-        img.addEventListener('error', function onErr() {
-          img.removeEventListener('error', onErr);
-          img.removeAttribute('srcset');
-          img.removeAttribute('sizes');
-          img.src = imageSrc;
-        });
       }
       img.alt = imageAlt;
       img.className = 'gallery-image';

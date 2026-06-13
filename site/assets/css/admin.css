@@ -479,14 +479,6 @@ body {
 .sub-image-label {
   font-size: 13px;
   color: #5a4a35;
-  flex: 1 1 auto;
-}
-
-.sub-image-setmain {
-  flex: 0 0 auto;
-  white-space: nowrap;
-  padding: 4px 10px;
-  font-size: 12px;
 }
 
 /* 主照片區（編輯面板頂部） */
