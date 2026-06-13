@@ -260,14 +260,27 @@
     }, '*');
   }
 
-  // ── Weekly slices（本週切片）：從 products 勾選參照 ──────────────────
+  // ── Weekly slices（本週切片）：從 全部品項 + 新品上市 勾選參照 ────────────
 
-  // 依 weeklySlices 路徑陣列，從 products items 取出對應商品（保持順序，略過找不到的）
+  // 可被勾進本週切片的來源：全部品項 + 新品上市（用 image 路徑當參照鍵；
+  // 兩者圖片在不同資料夾，路徑不會衝突）
+  var WEEKLY_SLICE_SOURCES = ['products', 'seasonal'];
+
+  // 蒐集所有可勾選的來源品項（依來源順序串接）
+  function weeklySliceSourceItems() {
+    var all = [];
+    WEEKLY_SLICE_SOURCES.forEach(function (type) {
+      var items = (state.imageData[type] && state.imageData[type].items) || [];
+      items.forEach(function (it) { all.push(it); });
+    });
+    return all;
+  }
+
+  // 依 weeklySlices 路徑陣列，從來源品項取出對應商品（保持順序，略過找不到的）
   function resolveWeeklySliceItems() {
     var paths = state.imageData.sets.weeklySlices || [];
-    var products = (state.imageData.products && state.imageData.products.items) || [];
     var byImage = {};
-    products.forEach(function (it) { byImage[it.image] = it; });
+    weeklySliceSourceItems().forEach(function (it) { byImage[it.image] = it; });
     return paths.map(function (p) { return byImage[p]; }).filter(Boolean);
   }
 
@@ -284,13 +297,13 @@
     var picker = $('weeklySlicesPicker');
     if (!picker) return;
     picker.innerHTML = '';
-    var products = (state.imageData.products && state.imageData.products.items) || [];
+    var sourceItems = weeklySliceSourceItems();
     var selected = state.imageData.sets.weeklySlices || [];
-    if (products.length === 0) {
-      picker.innerHTML = '<p class="weekly-slices-hint">全部品項尚無資料。</p>';
+    if (sourceItems.length === 0) {
+      picker.innerHTML = '<p class="weekly-slices-hint">全部品項與新品上市尚無資料。</p>';
       return;
     }
-    products.forEach(function (item) {
+    sourceItems.forEach(function (item) {
       var row = document.createElement('label');
       row.className = 'weekly-slice-row';
 
@@ -339,13 +352,17 @@
     sendWeeklySlicesToPreview();
   }
 
-  // 確保 sets 與 products 資料都已載入，再 render 勾選清單
+  // 確保 sets（weeklySlices 參照）與所有來源品項資料都已載入，再 render 勾選清單
   async function setupWeeklySlicesPicker() {
     if (!dirty.sets && (!state.imageData.sets.weeklySlices)) {
       await loadImageData('sets');
     }
-    if (!dirty.products && (!state.imageData.products.items || state.imageData.products.items.length === 0)) {
-      await loadImageData('products');
+    // 載入勾選來源：全部品項 + 新品上市（沒載過才載，避免覆蓋未發布的編輯）
+    for (var i = 0; i < WEEKLY_SLICE_SOURCES.length; i++) {
+      var t = WEEKLY_SLICE_SOURCES[i];
+      if (!dirty[t] && (!state.imageData[t].items || state.imageData[t].items.length === 0)) {
+        await loadImageData(t);
+      }
     }
     if (!Array.isArray(state.imageData.sets.weeklySlices)) state.imageData.sets.weeklySlices = [];
     // 切回別的 tab 後再回來時才 render（避免 await 期間使用者已切走）

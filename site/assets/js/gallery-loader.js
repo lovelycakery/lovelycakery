@@ -28,23 +28,27 @@
     return await response.json();
   }
 
-  // 依 weeklySlices 路徑陣列，從 products items 取出對應商品（保持選取順序，略過找不到的）
-  function resolveWeeklySlices(slicePaths, productItems) {
-    if (!Array.isArray(slicePaths) || !Array.isArray(productItems)) return [];
-    const byImage = new Map(productItems.map(it => [it.image, it]));
+  // 依 weeklySlices 路徑陣列，從來源品項取出對應商品（保持選取順序，略過找不到的）
+  function resolveWeeklySlices(slicePaths, sourceItems) {
+    if (!Array.isArray(slicePaths) || !Array.isArray(sourceItems)) return [];
+    const byImage = new Map(sourceItems.map(it => [it.image, it]));
     return slicePaths.map(p => byImage.get(p)).filter(Boolean);
   }
 
   async function loadGalleryData(type) {
     try {
       if (type === 'weekly-slices') {
-        const [setsData, productsData] = await Promise.all([
+        // 來源：全部品項 + 新品上市（image 路徑當參照鍵）
+        const [setsData, productsData, seasonalData] = await Promise.all([
           fetchData('sets-data.json'),
           fetchData('products-data.json'),
+          fetchData('seasonal-data.json'),
         ]);
         const slicePaths = setsData && Array.isArray(setsData.weeklySlices) ? setsData.weeklySlices : [];
-        const productItems = productsData && Array.isArray(productsData.items) ? productsData.items : [];
-        return resolveWeeklySlices(slicePaths, productItems);
+        const sourceItems = []
+          .concat(productsData && Array.isArray(productsData.items) ? productsData.items : [])
+          .concat(seasonalData && Array.isArray(seasonalData.items) ? seasonalData.items : []);
+        return resolveWeeklySlices(slicePaths, sourceItems);
       }
       const data = await fetchData(`${type}-data.json`);
       return data && Array.isArray(data.items) ? data.items : [];

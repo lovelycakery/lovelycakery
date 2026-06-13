@@ -967,17 +967,17 @@ body {
 .weekly-slices-picker {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  max-height: 360px;
+  gap: 6px;
+  max-height: 600px;
   overflow-y: auto;
 }
 
 .weekly-slice-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 6px 8px;
-  border-radius: 8px;
+  gap: 14px;
+  padding: 12px 12px;
+  border-radius: 10px;
   cursor: pointer;
   border: 1px solid transparent;
 }
@@ -987,24 +987,24 @@ body {
 }
 
 .weekly-slice-checkbox {
-  width: 18px;
-  height: 18px;
+  width: 22px;
+  height: 22px;
   accent-color: var(--accent);
   flex: 0 0 auto;
   cursor: pointer;
 }
 
 .weekly-slice-thumb {
-  width: 44px;
-  height: 44px;
+  width: 88px;
+  height: 88px;
   object-fit: cover;
-  border-radius: 6px;
+  border-radius: 8px;
   flex: 0 0 auto;
   background: var(--panel-2);
 }
 
 .weekly-slice-name {
-  font-size: 13px;
+  font-size: 16px;
   color: var(--text);
   overflow: hidden;
   text-overflow: ellipsis;
