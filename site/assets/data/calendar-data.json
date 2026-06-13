@@ -425,7 +425,8 @@
       "items": [
         {
           "text": "休息",
-          "color": "#cc0000"
+          "color": "#cc0000",
+          "text_en": "Closed"
         }
       ]
     },
@@ -434,12 +435,15 @@
       "items": [
         {
           "text": "切片優惠組合",
-          "color": "#e67700"
+          "color": "#e67700",
+          "text_en": "Slice Combo"
         },
         {
           "text": "本周切片口味",
           "color": "#0066cc",
-          "detail": "雲朵千層/ 蜂蜜柚香/ 微醺栗香堤拉米蘇/抹茶乳酪/蜜桃玫瑰/夏日山色"
+          "detail": "雲朵千層/ 蜂蜜柚香/ 微醺栗香堤拉米蘇/抹茶乳酪/蜜桃玫瑰/夏日山色",
+          "text_en": "Slice flavors",
+          "detail_en": "Cloud mille-feuille / Honey yuzu / Tipsy chestnut tiramisu / Matcha cheese / Peach rose / Summer mountain"
         }
       ]
     },
@@ -448,7 +452,8 @@
       "items": [
         {
           "text": "10am -2pm",
-          "color": "#1a8a1a"
+          "color": "#1a8a1a",
+          "text_en": "10am–2pm"
         }
       ]
     },
@@ -457,7 +462,8 @@
       "items": [
         {
           "text": "10am -2pm",
-          "color": "#1a8a1a"
+          "color": "#1a8a1a",
+          "text_en": "10am - 2pm"
         }
       ]
     },
@@ -466,7 +472,8 @@
       "items": [
         {
           "text": "休息",
-          "color": "#cc0000"
+          "color": "#cc0000",
+          "text_en": "Closed"
         }
       ]
     },
@@ -475,12 +482,15 @@
       "items": [
         {
           "text": "切片優惠組合",
-          "color": "#e67700"
+          "color": "#e67700",
+          "text_en": "Slice combo"
         },
         {
           "text": "本周切片口味",
           "color": "#0066cc",
-          "detail": "一根香草莢／琥珀焙香／珍珠伯爵／檸檬綠葡萄／夏日山色"
+          "detail": "一根香草莢／琥珀焙香／珍珠伯爵／檸檬綠葡萄／夏日山色",
+          "text_en": "Slice flavors",
+          "detail_en": "Vanilla bean / Amber roast / Pearl Earl Grey / Lemon green grape / Summer mountain"
         }
       ]
     },
@@ -489,7 +499,8 @@
       "items": [
         {
           "text": "10am -2pm",
-          "color": "#1a8a1a"
+          "color": "#1a8a1a",
+          "text_en": "10am - 2pm"
         }
       ]
     },
@@ -498,7 +509,8 @@
       "items": [
         {
           "text": "10am -2pm",
-          "color": "#1a8a1a"
+          "color": "#1a8a1a",
+          "text_en": "10am-2pm"
         }
       ]
     },
@@ -507,7 +519,8 @@
       "items": [
         {
           "text": "休息",
-          "color": "#cc0000"
+          "color": "#cc0000",
+          "text_en": "Closed"
         }
       ]
     },
@@ -516,7 +529,8 @@
       "items": [
         {
           "text": "切片優惠組合",
-          "color": "#e67700"
+          "color": "#e67700",
+          "text_en": "Slice combo deal"
         }
       ]
     },
@@ -525,7 +539,8 @@
       "items": [
         {
           "text": "10am -2pm",
-          "color": "#1a8a1a"
+          "color": "#1a8a1a",
+          "text_en": "10am-2pm"
         }
       ]
     },
@@ -534,7 +549,8 @@
       "items": [
         {
           "text": "10am -2pm",
-          "color": "#1a8a1a"
+          "color": "#1a8a1a",
+          "text_en": "10am-2pm"
         }
       ]
     },
@@ -543,7 +559,8 @@
       "items": [
         {
           "text": "休息",
-          "color": "#cc0000"
+          "color": "#cc0000",
+          "text_en": "Closed"
         }
       ]
     },
@@ -552,7 +569,8 @@
       "items": [
         {
           "text": "切片優惠組合",
-          "color": "#e67700"
+          "color": "#e67700",
+          "text_en": "Slice combo"
         }
       ]
     },
@@ -561,7 +579,8 @@
       "items": [
         {
           "text": "10am -2pm",
-          "color": "#1a8a1a"
+          "color": "#1a8a1a",
+          "text_en": "10am–2pm"
         }
       ]
     },
@@ -570,7 +589,8 @@
       "items": [
         {
           "text": "10am -2pm",
-          "color": "#1a8a1a"
+          "color": "#1a8a1a",
+          "text_en": "10am–2pm"
         }
       ]
     },
@@ -579,7 +599,8 @@
       "items": [
         {
           "text": "休息",
-          "color": "#cc0000"
+          "color": "#cc0000",
+          "text_en": "Closed"
         }
       ]
     }
