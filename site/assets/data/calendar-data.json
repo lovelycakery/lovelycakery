@@ -396,7 +396,9 @@
         {
           "text": "本周切片口味",
           "color": "#0066cc",
-          "detail": "玫瑰荔枝/ 芒果星星/伯爵芒果/椰香拿鐵/石板路巧克力/微醺栗香"
+          "detail": "玫瑰荔枝/ 芒果星星/伯爵芒果/椰香拿鐵/石板路巧克力/微醺栗香",
+          "text_en": "Slice flavors",
+          "detail_en": "Rose lychee / Mango star / Earl grey mango / Coconut latte / Slate chocolate / Tipsy chestnut"
         }
       ]
     },
