@@ -36,7 +36,10 @@
         "size6": "1680",
         "size8": "2980",
         "slice": "280"
-      }
+      },
+      "subImages": [
+        "assets/images/products/雲朵千層-2.jpg"
+      ]
     },
     {
       "image": "assets/images/products/未命名設計 - 2026-05-13T132922.097.jpg",
