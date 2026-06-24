@@ -169,6 +169,9 @@
       "tags": [
         "奶蛋素",
         "無酒精"
+      ],
+      "subImages": [
+        "assets/images/products/抹茶乳酪千層-2.jpg"
       ]
     },
     {
@@ -391,6 +394,19 @@
       "subImages": [
         "assets/images/products/未命名設計 - 2026-04-16T080659.889-2.jpg"
       ]
+    },
+    {
+      "image": "assets/images/products/未命名設計 - 2026-06-24T115815.529.jpg",
+      "name": "未命名設計 - 2026-06-24T115815.529",
+      "name_en": "",
+      "description": "",
+      "description_en": "",
+      "tags": [],
+      "prices": {
+        "size6": "",
+        "size8": "",
+        "slice": ""
+      }
     }
   ]
 }
