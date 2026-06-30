@@ -9,6 +9,9 @@ Thumbs.db
 *.swo
 *~
 
+# Python 快取
+__pycache__/
+
 # 臨時檔案
 *.log
 *.tmp
@@ -22,5 +25,8 @@ assets/js/admin-password-config.local.js
 
 # Original high-res images (backup only; do not deploy / do not commit by default)
 site/assets/images/_originals/
+
+# 影片產生工具與產物（本地用,不部署、不提交）
+/video/
 
 

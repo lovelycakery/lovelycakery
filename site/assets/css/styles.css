@@ -301,6 +301,7 @@ body.calendar-page-body {
 .home-page .main-content {
     display: flex;
     align-items: center;
+    position: relative;  /* 作為浮動公告 .notice-banner 的定位基準 */
 }
 
 /* 內容網格：左右兩欄版面配置 */
@@ -316,6 +317,79 @@ body.calendar-page-body {
     display: flex;
     flex-direction: column;
     gap: 24px;
+}
+
+/* 休息公告橫幅（首頁 hero 上方留白處）— 浮動、不佔版面 */
+/* 純 CSS/SVG 重現：淺藍天空 + 雲朵 + 粉色飛機 + 置中文字 */
+.notice-banner {
+    position: absolute;
+    top: 13%;  /* 落在 hero 上方空白區的中段，而非緊貼頂部 */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    box-sizing: border-box;
+    width: 620px;
+    max-width: calc(100% - 80px);
+    font-family: 'Inter', 'Noto Sans TC', sans-serif;
+    background: linear-gradient(180deg, #d4e8f2 0%, #c5dff0 100%);
+    border-radius: 16px;
+    padding: 20px 24px;
+    box-shadow: 0 6px 22px rgba(61, 40, 23, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    overflow: hidden;
+}
+
+/* 左側雲朵 */
+.notice-banner__cloud {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 120px;
+    height: auto;
+    opacity: 0.95;
+    filter: drop-shadow(0 2px 3px rgba(70, 110, 140, 0.12));
+    pointer-events: none;
+}
+
+/* 右側飛機 */
+.notice-banner__plane {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 88px;
+    height: auto;
+    pointer-events: none;
+}
+
+/* 文字：置中、深藍 */
+.notice-banner__text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+    z-index: 1;  /* 文字壓在雲/機之上，確保可讀 */
+}
+
+.notice-banner__title {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #2f4a6b;
+    line-height: 1.2;
+}
+
+.notice-banner__sub {
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    line-height: 1.3;
+    color: #3a5878;
 }
 
 /* 主標題樣式 */
@@ -477,8 +551,48 @@ img {
         padding: 40px 0;
     }
 
+    /* 首頁：手機版預留浮動公告的空間，避免蓋到內容 */
+    .home-page .main-content {
+        padding-top: 110px;
+    }
+
     .container {
         padding: 0 12px;  /* 進一步減少左右padding，讓導覽有更多空間 */
+    }
+
+    .notice-banner {
+        top: 24px;
+        width: auto;
+        max-width: calc(100% - 24px);
+        padding: 14px 14px;
+        gap: 8px;
+    }
+
+    .notice-banner__cloud {
+        width: 64px;
+        left: 6px;
+        opacity: 0.7;
+    }
+
+    .notice-banner__plane {
+        width: 56px;
+        right: 6px;
+    }
+
+    .notice-banner__title {
+        font-size: 16px;
+    }
+
+    .notice-banner__sub {
+        font-size: 13px;
+    }
+
+    .notice-banner__title {
+        font-size: 16px;
+    }
+
+    .notice-banner__sub {
+        font-size: 13px;
     }
 
     .main-headline {

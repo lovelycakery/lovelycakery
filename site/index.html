@@ -30,6 +30,29 @@
     <header class="header" id="site-header"></header>
 
     <main class="main-content">
+        <div class="notice-banner" role="status">
+            <!-- 純 CSS/SVG 重現公告橫幅（無圖片，雙語可切換） -->
+            <svg class="notice-banner__cloud" aria-hidden="true" viewBox="0 0 130 80">
+                <!-- 後方淡雲 -->
+                <path d="M96 64c8 0 14-6 14-13 0-7-6-12-13-12-1-8-8-14-16-14-7 0-13 4-15 10-2-1-4-1-6-1-8 0-14 6-14 13 0 8 6 13 14 13Z" fill="#eef6fb"/>
+                <!-- 主雲（蓬鬆圓潤） -->
+                <path d="M34 70c-10 0-18-7-18-16 0-9 8-16 17-16 2-11 11-19 23-19 10 0 19 6 22 15 2-1 4-1 6-1 9 0 16 7 16 15 0 12-9 22-22 22Z" fill="#ffffff"/>
+            </svg>
+            <div class="notice-banner__text">
+                <span class="notice-banner__title" data-en="On Summer Break — Closed in July &amp; August" data-zh="暑假休息中 — 7、8 月暫停營業">暑假休息中 — 7、8 月暫停營業</span>
+                <span class="notice-banner__sub" data-en="Back in September. Thank you for your love!" data-zh="9 月回歸，敬請期待　謝謝大家的喜愛！">9 月回歸，敬請期待　謝謝大家的喜愛！</span>
+            </div>
+            <svg class="notice-banner__plane" aria-hidden="true" viewBox="0 0 70 64">
+                <!-- 飛行虛線軌跡 -->
+                <path d="M4 58c10-2 18-6 24-14" fill="none" stroke="#c97b6b" stroke-width="2" stroke-linecap="round" stroke-dasharray="1 7" opacity="0.55"/>
+                <!-- 紙飛機：上半亮面 -->
+                <path d="M62 6 10 28l20 6Z" fill="#fce0e0" stroke="#c97b6b" stroke-width="2.4" stroke-linejoin="round"/>
+                <!-- 紙飛機：下半暗面 -->
+                <path d="M62 6 30 34l4 22Z" fill="#f3c4c0" stroke="#c97b6b" stroke-width="2.4" stroke-linejoin="round"/>
+                <!-- 機腹中央摺線 -->
+                <path d="M62 6 30 34" fill="none" stroke="#c97b6b" stroke-width="2.4" stroke-linejoin="round"/>
+            </svg>
+        </div>
         <div class="container">
             <div class="content-grid">
                 <div class="content-left">
