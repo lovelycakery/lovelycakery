@@ -493,6 +493,16 @@ img {
         margin-top: var(--header-h, 120px);
     }
 
+    /* 首頁：單欄後內容上移，需為浮動公告預留頂部空間，避免重疊標題 */
+    .home-page .main-content {
+        padding-top: 130px;
+    }
+
+    /* 浮動公告改為固定距頂（取代百分比），落在預留區內、不壓到內容 */
+    .notice-banner {
+        top: 24px;
+    }
+
     .content-grid {
         grid-template-columns: 1fr;  /* 改為單欄 */
         gap: 40px;
@@ -564,35 +574,48 @@ img {
         top: 24px;
         width: auto;
         max-width: calc(100% - 24px);
-        padding: 14px 14px;
-        gap: 8px;
+        padding: 14px 18px;
+        gap: 0;
     }
 
+    /* 雲：縮小、移到左下角當淡背景裝飾，不擋文字 */
     .notice-banner__cloud {
-        width: 64px;
+        width: 50px;
         left: 6px;
-        opacity: 0.7;
+        top: auto;
+        bottom: 6px;
+        transform: none;
+        opacity: 0.5;
+        z-index: 0;
     }
 
+    /* 飛機：縮小、移到右上角當淡背景裝飾 */
     .notice-banner__plane {
-        width: 56px;
-        right: 6px;
+        width: 38px;
+        right: 8px;
+        top: 10px;
+        transform: none;
+        opacity: 0.8;
+        z-index: 0;
+    }
+
+    /* 文字置中、均衡換行，並壓在裝飾圖之上 */
+    .notice-banner__text {
+        position: relative;
+        z-index: 1;
+        padding: 2px 0;
     }
 
     .notice-banner__title {
         font-size: 16px;
+        line-height: 1.4;
+        text-wrap: balance;
     }
 
     .notice-banner__sub {
         font-size: 13px;
-    }
-
-    .notice-banner__title {
-        font-size: 16px;
-    }
-
-    .notice-banner__sub {
-        font-size: 13px;
+        line-height: 1.45;
+        text-wrap: balance;
     }
 
     .main-headline {
