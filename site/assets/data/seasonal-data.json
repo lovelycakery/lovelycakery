@@ -29,7 +29,8 @@
       ],
       "prices": {
         "size6": "1680",
-        "size8": "2890"
+        "size8": "2890",
+        "slice": "280"
       },
       "subImages": [
         "assets/images/seasonal/開心果巧脆-2.jpg"
