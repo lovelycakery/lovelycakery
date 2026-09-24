@@ -19,7 +19,7 @@
     },
     {
       "image": "assets/images/seasonal/未命名設計 - 2026-09-23T150552.288.jpg",
-      "name": "開心果巧脆",
+      "name": "開心果巧脆千層",
       "name_en": "Pistachio with Dark Chocolate & Caramel Biscuit Mille Crepes",
       "description": "義大利開心果醬\n比利時黑巧克力\n比利時焦糖脆餅",
       "description_en": "Creamy Italian pistachio paste combined with rich Belgian dark chocolate and delicate caramel brittle for a sophisticated taste journey.",
@@ -29,7 +29,8 @@
       ],
       "prices": {
         "size6": "1680",
-        "size8": "2890"
+        "size8": "2890",
+        "slice": "280"
       },
       "subImages": [
         "assets/images/seasonal/開心果巧脆-2.jpg"
