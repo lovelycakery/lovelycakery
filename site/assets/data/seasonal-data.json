@@ -29,8 +29,7 @@
       ],
       "prices": {
         "size6": "1680",
-        "size8": "2890",
-        "slice": "280"
+        "size8": "2890"
       },
       "subImages": [
         "assets/images/seasonal/開心果巧脆-2.jpg"
@@ -38,15 +37,15 @@
     },
     {
       "image": "assets/images/seasonal/未命名設計 - 2026-09-24T164727.747.jpg",
-      "name": "未命名設計 - 2026-09-24T164727.747",
-      "name_en": "",
-      "description": "",
-      "description_en": "",
+      "name": "薄荷巧克力千層",
+      "name_en": "Mint Chocolate Mille-feuille",
+      "description": "法國MONIN薄荷果露\nOREO夾心\n比利時堅果黑巧淋醬",
+      "description_en": "French MONIN mint fruit syrup with Oreo filling and Belgian hazelnut dark chocolate ganache",
       "tags": [],
       "prices": {
-        "size6": "",
-        "size8": "",
-        "slice": ""
+        "size6": "1680",
+        "size8": "2980",
+        "slice": "280"
       },
       "subImages": [
         "assets/images/seasonal/未命名設計 - 2026-09-24T164727.747-2.jpg"
