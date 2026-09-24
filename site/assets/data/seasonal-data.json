@@ -51,6 +51,24 @@
       "subImages": [
         "assets/images/seasonal/未命名設計 - 2026-09-24T164727.747-2.jpg"
       ]
+    },
+    {
+      "image": "assets/images/seasonal/未命名設計 - 2026-09-24T162620.164.jpg",
+      "name": "榛果摩卡千層",
+      "name_en": "Hazelnut Mocha Mille-feuille",
+      "description": "榛果醬\n貝禮詩巧克力香甜酒\n手工熬煮咖啡焦糖\n可可粉\n香草香緹鮮奶油\nMINI OREO \n糖漬橙片",
+      "description_en": "Layers of hazelnut paste, Baileys chocolate liqueur, handcrafted coffee caramel, cocoa powder, vanilla chantilly cream, Mini Oreos, and candied orange slices",
+      "tags": [
+        "奶蛋素"
+      ],
+      "prices": {
+        "size6": "1680",
+        "size8": "2980",
+        "slice": "280"
+      },
+      "subImages": [
+        "assets/images/seasonal/未命名設計 - 2026-09-24T162620.164-2.jpg"
+      ]
     }
   ]
 }
