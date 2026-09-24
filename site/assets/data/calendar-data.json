@@ -1247,7 +1247,9 @@
         {
           "text": "本週切片口味",
           "color": "#0066cc",
-          "detail": "抹茶提拉米蘇/微醺栗香/玫瑰乳酪/秋季新口味***"
+          "detail": "抹茶提拉米蘇/微醺栗香/玫瑰乳酪/榛果摩卡/開心果巧脆/薄荷巧克力*",
+          "text_en": "Slice flavors",
+          "detail_en": "Matcha tiramisu / Boozy chestnut / Rose cheesecake / Hazelnut mocha / Pistachio crunch / Mint chocolate*"
         }
       ]
     },
