@@ -1333,21 +1333,30 @@
     // 只有排序、上傳、刪除才呼叫 sendImageDataToPreview
   }
 
+  // 刪除品項時排定移除一個圖檔：取消它尚未發布的上傳，並排入待刪除。
+  // 兩件事都做：同一路徑可能是已發布的檔、又被「換主圖」排了覆寫上傳。
+  // 若檔案其實從未發布（新上傳就刪掉），發布時刪除會得到 404，視為已刪除。
+  function queueImageRemoval(path) {
+    var fullPath = SITE + '/' + path;
+    dropPendingImage(fullPath);
+    if (dirty.pendingDeletes.indexOf(fullPath) < 0) dirty.pendingDeletes.push(fullPath);
+  }
+
+  // 品項的所有圖檔：主圖 + 主圖的 sm/ 縮圖 + 子圖
+  function queueItemImagesRemoval(item) {
+    if (item.image) {
+      queueImageRemoval(item.image);
+      queueImageRemoval(smPathOf(item.image));
+    }
+    (item.subImages || []).forEach(queueImageRemoval);
+  }
+
   function deleteImage(type, index) {
     var item = state.imageData[type].items[index];
     if (!item) return;
     if (!confirm('確定要刪除「' + item.name + '」嗎？')) return;
 
-    dirty.pendingDeletes.push(SITE + '/' + item.image);
-    // 連帶刪除所有子圖檔案
-    if (Array.isArray(item.subImages)) {
-      item.subImages.forEach(function (p) {
-        var fullPath = SITE + '/' + p;
-        var pendingIdx = dirty.pendingImages.findIndex(function (pi) { return pi.repoPath === fullPath; });
-        if (pendingIdx >= 0) dirty.pendingImages.splice(pendingIdx, 1);
-        else dirty.pendingDeletes.push(fullPath);
-      });
-    }
+    queueItemImagesRemoval(item);
     state.imageData[type].items.splice(index, 1);
     dirty[type] = true;
     updatePublishButton();
@@ -1405,15 +1414,7 @@
     indices.forEach(function (idx) {
       var item = state.imageData[type].items[idx];
       if (item) {
-        dirty.pendingDeletes.push(SITE + '/' + item.image);
-        if (Array.isArray(item.subImages)) {
-          item.subImages.forEach(function (p) {
-            var fullPath = SITE + '/' + p;
-            var pendingIdx = dirty.pendingImages.findIndex(function (pi) { return pi.repoPath === fullPath; });
-            if (pendingIdx >= 0) dirty.pendingImages.splice(pendingIdx, 1);
-            else dirty.pendingDeletes.push(fullPath);
-          });
-        }
+        queueItemImagesRemoval(item);
         state.imageData[type].items.splice(idx, 1);
       }
     });
@@ -1586,6 +1587,8 @@
         try {
           await GitHubAPI.deleteFile(dirty.pendingDeletes[k], '刪除：' + dirty.pendingDeletes[k].split('/').pop());
         } catch (e) {
+          // 檔案不存在（從未發布過，例如新上傳後還沒發布就刪掉）＝已達成目的
+          if (/\(404\)/.test(e.message || '')) continue;
           logStatus('⚠️ 刪除失敗（可手動清理）：' + e.message);
         }
       }
