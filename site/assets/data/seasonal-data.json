@@ -107,6 +107,22 @@
       "subImages": [
         "assets/images/seasonal/1-2.jpg"
       ]
+    },
+    {
+      "image": "assets/images/seasonal/1.jpg",
+      "name": "橙香太妃千層",
+      "name_en": "Orange Caramel Mille-feuille",
+      "description": "手工熬煮太妃醬\n糖漬柳橙片夾心\n柑橘瓣\n可可粉\n綜合堅果碎",
+      "description_en": "Handcrafted toffee sauce with candied orange slices, citrus segments, cocoa powder, and mixed nut brittle.",
+      "tags": [
+        "奶蛋素",
+        "無酒精"
+      ],
+      "prices": {
+        "size6": "1680",
+        "size8": "2980",
+        "slice": "280"
+      }
     }
   ]
 }
