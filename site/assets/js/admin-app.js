@@ -81,11 +81,6 @@
     return String(name || '').replace(/[/\\:*?"<>|]/g, '-').replace(/\s+/g, ' ').trim();
   }
 
-  function getImageFilename(name) {
-    var s = sanitizeFilename(name);
-    return s ? s + '.jpg' : 'untitled.jpg';
-  }
-
   // ── Helpers: calendar validation ──────────────────────────────────
 
   function validateCalendarData(data) {
@@ -889,16 +884,41 @@
     sendImageDataToPreview(type);
   }
 
+  // 某分頁目前被佔用的圖片路徑（相對 SITE）：所有品項的主圖/子圖 + 待上傳 + 待刪除。
+  // 新檔名必須避開這些：撞到品項的圖會覆蓋別人的圖；撞到待刪除的會在同次發布中
+  // 先上傳、再被刪掉（JSON 仍指向它 → 破圖）。
+  function takenImagePaths(type) {
+    var taken = {};
+    var items = (state.imageData[type] && state.imageData[type].items) || [];
+    items.forEach(function (it) {
+      if (it.image) taken[it.image] = true;
+      (it.subImages || []).forEach(function (p) { taken[p] = true; });
+    });
+    var prefix = SITE + '/';
+    dirty.pendingImages.map(function (pi) { return pi.repoPath; })
+      .concat(dirty.pendingDeletes)
+      .forEach(function (p) {
+        if (p && p.indexOf(prefix) === 0) taken[p.slice(prefix.length)] = true;
+      });
+    return taken;
+  }
+
+  // 新主圖檔名：沿用原始檔名，已被佔用就加後綴（1.jpg → 1-1.jpg → 1-2.jpg …）
+  function uniqueImageFilename(type, imageDir, base) {
+    var name = base || 'untitled';
+    var taken = takenImagePaths(type);
+    var candidate = name + '.jpg';
+    var n = 1;
+    while (taken[imageDir + '/' + candidate]) candidate = name + '-' + (n++) + '.jpg';
+    return candidate;
+  }
+
   function nextSubImageFilename(item, type) {
     var base = sanitizeFilename(item.name) || 'untitled';
-    var taken = {};
-    (item.subImages || []).forEach(function (p) { taken[p.split('/').pop()] = true; });
-    dirty.pendingImages.forEach(function (pi) {
-      var fname = pi.repoPath.split('/').pop();
-      if (fname) taken[fname] = true;
-    });
+    var imageDir = TYPE_IMAGEDIR[type] || 'assets/images/products';
+    var taken = takenImagePaths(type);
     var n = 2;
-    while (taken[base + '-' + n + '.jpg']) n++;
+    while (taken[imageDir + '/' + base + '-' + n + '.jpg']) n++;
     return base + '-' + n + '.jpg';
   }
 
@@ -1417,7 +1437,7 @@
       var file = files[i];
       var baseName = file.name.replace(/\.[^.]+$/, '') || 'untitled';
       var sanitized = sanitizeFilename(baseName);
-      var filename = getImageFilename(sanitized);
+      var filename = uniqueImageFilename(type, imageDir, sanitized);
 
       logStatus('⏳ 壓縮圖片：' + file.name + '…');
       try {
@@ -1542,8 +1562,27 @@
         logStatus('✅ 已 commit：' + msg);
       }
 
+      // 保險：這次剛上傳、或仍被任何品項引用的檔案不刪
+      // （避免同名檔「先上傳再被刪」，或刪品項時連帶刪掉別的品項共用的圖）
+      var keepPaths = {};
+      dirty.pendingImages.forEach(function (pi) { keepPaths[pi.repoPath] = true; });
+      IMAGE_TYPES.forEach(function (t) {
+        var items = (state.imageData[t] && state.imageData[t].items) || [];
+        items.forEach(function (it) {
+          if (it.image) {
+            keepPaths[SITE + '/' + it.image] = true;
+            keepPaths[SITE + '/' + smPathOf(it.image)] = true;
+          }
+          (it.subImages || []).forEach(function (p) { keepPaths[SITE + '/' + p] = true; });
+        });
+      });
+
       // Delete files (explicit deletes from image deletion) — must be after commit
       for (var k = 0; k < dirty.pendingDeletes.length; k++) {
+        if (keepPaths[dirty.pendingDeletes[k]]) {
+          logStatus('ℹ️ 略過刪除（檔案仍在使用）：' + dirty.pendingDeletes[k].split('/').pop());
+          continue;
+        }
         try {
           await GitHubAPI.deleteFile(dirty.pendingDeletes[k], '刪除：' + dirty.pendingDeletes[k].split('/').pop());
         } catch (e) {
