@@ -107,6 +107,25 @@
       "subImages": [
         "assets/images/seasonal/橙香太妃千層-2.jpg"
       ]
+    },
+    {
+      "image": "assets/images/seasonal/微醺開心果1.jpg",
+      "name": "微醺開心果千層",
+      "name_en": "Tipsy Pistachio Mille-feuille",
+      "description": "義大利開心果泥\n貝禮詩香甜酒\n依思尼海鹽焦糖丁\n綜合堅果碎\n香烤開心果粒",
+      "description_en": "Italian pistachio paste, Baileys sweet liqueur, Isigny salted caramel bits, mixed nut crumble, and roasted pistachio pieces",
+      "tags": [
+        "奶蛋素",
+        "無咖啡因"
+      ],
+      "prices": {
+        "size6": "1780",
+        "size8": "3180",
+        "slice": "300"
+      },
+      "subImages": [
+        "assets/images/seasonal/微醺開心果1-2.jpg"
+      ]
     }
   ]
 }
