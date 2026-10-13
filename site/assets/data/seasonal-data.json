@@ -126,6 +126,22 @@
       "subImages": [
         "assets/images/seasonal/微醺開心果1-2.jpg"
       ]
+    },
+    {
+      "image": "assets/images/seasonal/未命名設計 - 2026-10-13T091628.278.jpg",
+      "name": "開心果布朗尼千層",
+      "name_en": "Pistachio Brownie Mille-feuille",
+      "description": "義大利開心果醬\n萬人迷布朗尼　\n香烤綜合堅果\nＯＲＥＯ碎",
+      "description_en": "Decadent brownie topped with creamy Italian pistachio paste, roasted mixed nuts, and crushed Oreo cookies for irresistible texture and flavor",
+      "tags": [],
+      "prices": {
+        "size6": "1780",
+        "size8": "3180",
+        "slice": "300"
+      },
+      "subImages": [
+        "assets/images/seasonal/未命名設計 - 2026-10-13T091628.278-2.jpg"
+      ]
     }
   ]
 }
