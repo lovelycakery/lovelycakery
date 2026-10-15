@@ -164,6 +164,25 @@
       "subImages": [
         "assets/images/seasonal/未命名設計 - 2026-10-08T114251.393-2.jpg"
       ]
+    },
+    {
+      "image": "assets/images/seasonal/未命名設計 - 2026-10-15T145425.763.jpg",
+      "name": "桂花甜酒釀千層",
+      "name_en": "Osmanthus & Sweet Fermented Rice Mille Crepes",
+      "description": "純米發酵甜酒釀\n南庄桂花蜜",
+      "description_en": "Delicate cake infused with pure fermented rice wine and aromatic Nanzhuang osmanthus honey, offering a harmonious blend of subtle floral notes and gentle sweetness.",
+      "tags": [
+        "奶蛋素",
+        "無咖啡因"
+      ],
+      "prices": {
+        "size6": "1680",
+        "size8": "2980",
+        "slice": "280"
+      },
+      "subImages": [
+        "assets/images/seasonal/未命名設計 - 2026-10-15T145425.763-2.jpg"
+      ]
     }
   ]
 }
