@@ -38,22 +38,6 @@
       "subImages": [
         "assets/images/seasonal/未命名設計 - 2026-10-08T114251.393-2.jpg"
       ]
-    },
-    {
-      "image": "assets/images/seasonal/未命名設計 - 2026-10-15T150651.078.jpg",
-      "name": "檸香甜酒釀千層",
-      "name_en": "Lemon & Sweet Fermented Rice Mille Crepes",
-      "description": "純米發酵甜酒釀\n新鮮檸檬皮\n新鮮藍莓",
-      "description_en": "Pure fermented rice wine paired with fresh lemon zest and vibrant blueberries for a delightfully aromatic and fruity experience.",
-      "tags": [
-        "奶蛋素",
-        "無咖啡因"
-      ],
-      "prices": {
-        "size6": "1780",
-        "size8": "3180",
-        "slice": "300"
-      }
     }
   ]
 }
