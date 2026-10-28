@@ -286,6 +286,38 @@
         "size8": "3180",
         "slice": "300"
       }
+    },
+    {
+      "image": "assets/images/products/微醺開心果1.jpg",
+      "name": "微醺開心果",
+      "name_en": "Tipsy Happiness Nut Cake",
+      "description": "義大利開心果醬\n貝禮詩香甜酒",
+      "description_en": "Italian pistachio butter blended with sweet Baileys liqueur",
+      "tags": [
+        "無咖啡因",
+        "奶蛋素"
+      ],
+      "prices": {
+        "size6": "1780",
+        "size8": "3180",
+        "slice": "300"
+      },
+      "subImages": [
+        "assets/images/products/微醺開心果1-2.jpg"
+      ]
+    },
+    {
+      "image": "assets/images/products/未命名設計 - 2026-10-20T094400.942.jpg",
+      "name": "檸香甜酒釀千層",
+      "name_en": "Lemon Sweet Fermented Rice Mille Crepes",
+      "description": "純米發酵甜酒釀\n新鮮檸檬皮\n新鮮藍莓",
+      "description_en": "Delicate fermented sweet rice wine paired with vibrant fresh lemon zest and plump fresh blueberries for a sophisticated, fruity delight.",
+      "tags": [],
+      "prices": {
+        "size6": "1780",
+        "size8": "3180",
+        "slice": "300"
+      }
     }
   ]
 }
