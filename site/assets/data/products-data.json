@@ -270,6 +270,22 @@
         "size8": "3180",
         "slice": "300"
       }
+    },
+    {
+      "image": "assets/images/products/未命名設計 - 2026-10-21T152319.107.jpg",
+      "name": "秋日蘋果茶千層",
+      "name_en": "Autumn Apple Tea Mille-feuille",
+      "description": "靜岡小柳津焙茶\n(唐寧伯爵茶/鐵觀音/紅玉 皆可替換)\n肉桂奶油炒蘋果夾心\n焦糖餅乾碎\n花果茶 日曬橙乾",
+      "description_en": "Roasted tea from Shizuoka's Koyanagidzu region with your choice of Twinings Earl Grey, Iron Goddess Oolong, or Ruby Black Tea. Layered with spiced brown butter caramelized apple filling, topped with caramel cookie crumbles, and finished with floral fruit tea and sun-dried orange zest.",
+      "tags": [
+        "無酒精",
+        "奶蛋素"
+      ],
+      "prices": {
+        "size6": "1780",
+        "size8": "3180",
+        "slice": "300"
+      }
     }
   ]
 }
