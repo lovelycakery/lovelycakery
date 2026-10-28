@@ -21,22 +21,37 @@
       ]
     },
     {
-      "image": "assets/images/products/抹茶乳酪千層.jpg",
-      "name": "抹茶乳酪千層",
-      "name_en": "Matcha Cheese Mille Crepes",
-      "prices": {
-        "size6": "1580",
-        "size8": "2780",
-        "slice": "270"
-      },
-      "description": "靜岡小柳津抹茶粉\n香烤堅果\n法國珍珠糖",
-      "description_en": "Shizuoka Koyanagi matcha powder with roasted nuts and French pearl sugar",
+      "image": "assets/images/products/未命名設計 - 2026-09-24T193120.153.jpg",
+      "name": "榛果摩卡",
+      "name_en": "Hazelnut Mocha",
+      "description": "榛果醬\n貝禮詩巧克力香甜酒\n手工熬煮咖啡焦糖\n可可粉\n香草香緹鮮奶油\nMINI OREO \n糖漬橙片",
+      "description_en": "Hazelnut paste, Baileys chocolate liqueur, handcrafted coffee caramel, cocoa powder, vanilla chantilly cream, mini Oreos, and candied orange slices",
       "tags": [
-        "奶蛋素",
-        "無酒精"
+        "奶蛋素"
       ],
+      "prices": {
+        "size6": "1680",
+        "size8": "2980",
+        "slice": "280"
+      }
+    },
+    {
+      "image": "assets/images/products/未命名設計 - 2026-09-24T164727.747.jpg",
+      "name": "薄荷巧克力千層",
+      "name_en": "Mint Chocolate Mille-feuille",
+      "description": "法國MONIN薄荷果露\nOREO夾心\n比利時堅果黑巧淋醬",
+      "description_en": "French MONIN mint syrup with Oreo filling and Belgian hazelnut dark chocolate ganache",
+      "tags": [
+        "無酒精",
+        "奶蛋素"
+      ],
+      "prices": {
+        "size6": "1680",
+        "size8": "2980",
+        "slice": "280"
+      },
       "subImages": [
-        "assets/images/products/抹茶乳酪千層-2.jpg"
+        "assets/images/products/未命名設計 - 2026-09-24T164727.747-2.jpg"
       ]
     },
     {
@@ -205,25 +220,6 @@
       ]
     },
     {
-      "image": "assets/images/products/未命名設計 - 2026-10-15T145425.763.jpg",
-      "name": "桂花甜酒釀千層",
-      "name_en": "Osmanthus & Sweet Fermented Rice Mille Crepes",
-      "description": "純米發酵甜酒釀\n南庄桂花蜜",
-      "description_en": "Delicate cake infused with fermented sweet rice wine and adorned with fragrant Nanzhuang osmanthus honey, offering a subtle floral sweetness and tender crumb.",
-      "tags": [
-        "無咖啡因",
-        "奶蛋素"
-      ],
-      "prices": {
-        "size6": "1680",
-        "size8": "2980",
-        "slice": "280"
-      },
-      "subImages": [
-        "assets/images/products/未命名設計 - 2026-10-15T145425.763-2.jpg"
-      ]
-    },
-    {
       "image": "assets/images/products/未命名設計 - 2026-10-02T162014.873.jpg",
       "name": "太妃OREO千層",
       "name_en": "Toffee Oreo Mille-feuille",
@@ -240,19 +236,23 @@
       }
     },
     {
-      "image": "assets/images/products/未命名設計 - 2026-09-24T193120.153.jpg",
-      "name": "榛果摩卡",
-      "name_en": "Hazelnut Mocha",
-      "description": "榛果醬\n貝禮詩巧克力香甜酒\n手工熬煮咖啡焦糖\n可可粉\n香草香緹鮮奶油\nMINI OREO \n糖漬橙片",
-      "description_en": "Hazelnut paste, Baileys chocolate liqueur, handcrafted coffee caramel, cocoa powder, vanilla chantilly cream, mini Oreos, and candied orange slices",
+      "image": "assets/images/products/橙香太妃1.jpg",
+      "name": "橙香太妃千層",
+      "name_en": "Orange Toffee Mille Crepes",
+      "description": "手工熬煮太妃醬\n糖漬柳橙片\n小橘瓣\n可可粉\n堅果碎",
+      "description_en": "Handcrafted toffee sauce, candied orange slices, candied tangerine segments, cocoa powder, and crushed nuts",
       "tags": [
-        "奶蛋素"
+        "奶蛋素",
+        "無酒精"
       ],
       "prices": {
         "size6": "1680",
         "size8": "2980",
         "slice": "280"
-      }
+      },
+      "subImages": [
+        "assets/images/products/橙香太妃1-2.jpg"
+      ]
     },
     {
       "image": "assets/images/products/未命名設計 - 2026-10-22T155848.173.jpg",
@@ -272,6 +272,44 @@
       }
     },
     {
+      "image": "assets/images/products/抹茶乳酪千層.jpg",
+      "name": "抹茶乳酪千層",
+      "name_en": "Matcha Cheese Mille Crepes",
+      "prices": {
+        "size6": "1580",
+        "size8": "2780",
+        "slice": "270"
+      },
+      "description": "靜岡小柳津抹茶粉\n香烤堅果\n法國珍珠糖",
+      "description_en": "Shizuoka Koyanagi matcha powder with roasted nuts and French pearl sugar",
+      "tags": [
+        "奶蛋素",
+        "無酒精"
+      ],
+      "subImages": [
+        "assets/images/products/抹茶乳酪千層-2.jpg"
+      ]
+    },
+    {
+      "image": "assets/images/products/未命名設計 - 2026-10-28T154010.569.jpg",
+      "name": "抹茶白玉千層",
+      "name_en": "Matcha Shiratama Mille Crepes",
+      "description": "靜岡小柳津抹茶\n手工白玉團子\n榛果",
+      "description_en": "Shizuoka Koiyugawa matcha paired with handcrafted white mochi dumplings and roasted hazelnut",
+      "tags": [
+        "奶蛋素",
+        "無酒精"
+      ],
+      "prices": {
+        "size6": "1780",
+        "size8": "3180",
+        "slice": "300"
+      },
+      "subImages": [
+        "assets/images/products/未命名設計 - 2026-10-28T154010.569-2.jpg"
+      ]
+    },
+    {
       "image": "assets/images/products/未命名設計 - 2026-10-21T152319.107.jpg",
       "name": "秋日蘋果茶千層",
       "name_en": "Autumn Apple Tea Mille-feuille",
@@ -288,22 +326,22 @@
       }
     },
     {
-      "image": "assets/images/products/微醺開心果1.jpg",
-      "name": "微醺開心果",
-      "name_en": "Tipsy Happiness Nut Cake",
-      "description": "義大利開心果醬\n貝禮詩香甜酒",
-      "description_en": "Italian pistachio butter blended with sweet Baileys liqueur",
+      "image": "assets/images/products/未命名設計 - 2026-10-15T145425.763.jpg",
+      "name": "桂花甜酒釀千層",
+      "name_en": "Osmanthus & Sweet Fermented Rice Mille Crepes",
+      "description": "純米發酵甜酒釀\n南庄桂花蜜",
+      "description_en": "Delicate cake infused with fermented sweet rice wine and adorned with fragrant Nanzhuang osmanthus honey, offering a subtle floral sweetness and tender crumb.",
       "tags": [
         "無咖啡因",
         "奶蛋素"
       ],
       "prices": {
-        "size6": "1780",
-        "size8": "3180",
-        "slice": "300"
+        "size6": "1680",
+        "size8": "2980",
+        "slice": "280"
       },
       "subImages": [
-        "assets/images/products/微醺開心果1-2.jpg"
+        "assets/images/products/未命名設計 - 2026-10-15T145425.763-2.jpg"
       ]
     },
     {
@@ -341,41 +379,22 @@
       ]
     },
     {
-      "image": "assets/images/products/未命名設計 - 2026-10-15T145425.763-1.jpg",
-      "name": "桂花甜酒釀千層",
-      "name_en": "Osmanthus Sweet Fermented Rice Mille Crepes",
-      "description": "南庄桂花釀\n純米甜酒釀",
-      "description_en": "Pure rice sweet sake ferment infused with delicate osmanthus flowers",
+      "image": "assets/images/products/微醺開心果1.jpg",
+      "name": "微醺開心果",
+      "name_en": "Tipsy Happiness Nut Cake",
+      "description": "義大利開心果醬\n貝禮詩香甜酒",
+      "description_en": "Italian pistachio butter blended with sweet Baileys liqueur",
       "tags": [
         "無咖啡因",
         "奶蛋素"
       ],
       "prices": {
-        "size6": "1680",
-        "size8": "2980",
-        "slice": "280"
+        "size6": "1780",
+        "size8": "3180",
+        "slice": "300"
       },
       "subImages": [
-        "assets/images/products/未命名設計 - 2026-10-15T145425.763-3.jpg"
-      ]
-    },
-    {
-      "image": "assets/images/products/未命名設計 - 2026-09-24T164727.747.jpg",
-      "name": "薄荷巧克力千層",
-      "name_en": "Mint Chocolate Mille-feuille",
-      "description": "法國MONIN薄荷果露\nOREO夾心\n比利時堅果黑巧淋醬",
-      "description_en": "French MONIN mint syrup with Oreo filling and Belgian hazelnut dark chocolate ganache",
-      "tags": [
-        "無酒精",
-        "奶蛋素"
-      ],
-      "prices": {
-        "size6": "1680",
-        "size8": "2980",
-        "slice": "280"
-      },
-      "subImages": [
-        "assets/images/products/未命名設計 - 2026-09-24T164727.747-2.jpg"
+        "assets/images/products/微醺開心果1-2.jpg"
       ]
     },
     {
@@ -395,25 +414,6 @@
       },
       "subImages": [
         "assets/images/products/未命名設計 - 2026-09-23T150552.288-2.jpg"
-      ]
-    },
-    {
-      "image": "assets/images/products/橙香太妃1.jpg",
-      "name": "橙香太妃千層",
-      "name_en": "Orange Toffee Mille Crepes",
-      "description": "手工熬煮太妃醬\n糖漬柳橙片\n小橘瓣\n可可粉\n堅果碎",
-      "description_en": "Handcrafted toffee sauce, candied orange slices, candied tangerine segments, cocoa powder, and crushed nuts",
-      "tags": [
-        "奶蛋素",
-        "無酒精"
-      ],
-      "prices": {
-        "size6": "1680",
-        "size8": "2980",
-        "slice": "280"
-      },
-      "subImages": [
-        "assets/images/products/橙香太妃1-2.jpg"
       ]
     }
   ]
