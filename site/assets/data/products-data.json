@@ -396,6 +396,25 @@
       "subImages": [
         "assets/images/products/未命名設計 - 2026-09-23T150552.288-2.jpg"
       ]
+    },
+    {
+      "image": "assets/images/products/橙香太妃1.jpg",
+      "name": "橙香太妃千層",
+      "name_en": "Orange Toffee Mille Crepes",
+      "description": "手工熬煮太妃醬\n糖漬柳橙片\n小橘瓣\n可可粉\n堅果碎",
+      "description_en": "Handcrafted toffee sauce, candied orange slices, candied tangerine segments, cocoa powder, and crushed nuts",
+      "tags": [
+        "奶蛋素",
+        "無酒精"
+      ],
+      "prices": {
+        "size6": "1680",
+        "size8": "2980",
+        "slice": "280"
+      },
+      "subImages": [
+        "assets/images/products/橙香太妃1-2.jpg"
+      ]
     }
   ]
 }
