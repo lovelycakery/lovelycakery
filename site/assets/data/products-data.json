@@ -2,6 +2,25 @@
   "schema_version": 1,
   "items": [
     {
+      "image": "assets/images/products/未命名設計 - 2026-10-27T131006.715.jpg",
+      "name": "香料紅酒千層",
+      "name_en": "Spiced Mulled Wine Mille Crepes",
+      "description": "勃根地黑皮諾紅酒 肉桂 有機香草 \n糖漬甜橙 日曬橙片 香烤胡桃 綜合堅果碎",
+      "description_en": "Burgundy Pinot Noir wine cake with cinnamon and organic vanilla, candied citrus, sun-dried orange slices, toasted walnuts, and mixed nut crumble",
+      "tags": [
+        "無咖啡因",
+        "奶蛋素"
+      ],
+      "prices": {
+        "size6": "1980",
+        "size8": "3680",
+        "slice": "330"
+      },
+      "subImages": [
+        "assets/images/products/未命名設計 - 2026-10-27T131006.715-2.jpg"
+      ]
+    },
+    {
       "image": "assets/images/products/抹茶乳酪千層.jpg",
       "name": "抹茶乳酪千層",
       "name_en": "Matcha Cheese Mille Crepes",
@@ -205,23 +224,35 @@
       ]
     },
     {
-      "image": "assets/images/products/未命名設計 - 2026-10-27T131006.715.jpg",
-      "name": "香料紅酒千層",
-      "name_en": "Spiced Mulled Wine Mille Crepes",
-      "description": "勃根地黑皮諾紅酒 肉桂 有機香草 \n糖漬甜橙 日曬橙片 香烤胡桃 綜合堅果碎",
-      "description_en": "Burgundy Pinot Noir wine cake with cinnamon and organic vanilla, candied citrus, sun-dried orange slices, toasted walnuts, and mixed nut crumble",
+      "image": "assets/images/products/未命名設計 - 2026-10-02T162014.873.jpg",
+      "name": "榛果摩卡",
+      "name_en": "Hazelnut Mocha",
+      "description": "手工熬煮太妃醬\n法國依思尼海鹽焦糖丁\n可可粉\n花生醬\nOREO塊\n黑巧克力脆果",
+      "description_en": "Handcrafted toffee sauce, Isigny French sea salt caramel pieces, cocoa powder, peanut butter, Oreo crumbles, and dark chocolate crispies",
       "tags": [
-        "無咖啡因",
+        "奶蛋素",
+        "無酒精"
+      ],
+      "prices": {
+        "size6": "1680",
+        "size8": "2980",
+        "slice": "280"
+      }
+    },
+    {
+      "image": "assets/images/products/未命名設計 - 2026-09-24T193120.153.jpg",
+      "name": "榛果摩卡",
+      "name_en": "Hazelnut Mocha",
+      "description": "榛果醬\n貝禮詩巧克力香甜酒\n手工熬煮咖啡焦糖\n可可粉\n香草香緹鮮奶油\nMINI OREO \n糖漬橙片",
+      "description_en": "Hazelnut paste, Baileys chocolate liqueur, handcrafted coffee caramel, cocoa powder, vanilla chantilly cream, mini Oreos, and candied orange slices",
+      "tags": [
         "奶蛋素"
       ],
       "prices": {
-        "size6": "1980",
-        "size8": "3680",
-        "slice": "330"
-      },
-      "subImages": [
-        "assets/images/products/未命名設計 - 2026-10-27T131006.715-2.jpg"
-      ]
+        "size6": "1680",
+        "size8": "2980",
+        "slice": "280"
+      }
     }
   ]
 }
