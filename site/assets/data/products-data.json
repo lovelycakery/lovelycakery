@@ -225,8 +225,8 @@
     },
     {
       "image": "assets/images/products/未命名設計 - 2026-10-02T162014.873.jpg",
-      "name": "榛果摩卡",
-      "name_en": "Hazelnut Mocha",
+      "name": "太妃OREO千層",
+      "name_en": "Toffee Oreo Mille-feuille",
       "description": "手工熬煮太妃醬\n法國依思尼海鹽焦糖丁\n可可粉\n花生醬\nOREO塊\n黑巧克力脆果",
       "description_en": "Handcrafted toffee sauce, Isigny French sea salt caramel pieces, cocoa powder, peanut butter, Oreo crumbles, and dark chocolate crispies",
       "tags": [
@@ -252,6 +252,23 @@
         "size6": "1680",
         "size8": "2980",
         "slice": "280"
+      }
+    },
+    {
+      "image": "assets/images/products/未命名設計 - 2026-10-22T155848.173.jpg",
+      "name": "無限太妃千層",
+      "name_en": "Infinite Toffee Mille-feuille",
+      "description": "手工熬煮太妃醬\n法國伊思尼海鹽焦糖\n比例時焦糖餅乾\n巧克力脆果",
+      "description_en": "Handcrafted toffee sauce with French Échiré salted caramel, caramelized crackers, and chocolate-covered crispy nuts.",
+      "tags": [
+        "奶蛋素",
+        "無咖啡因",
+        "無酒精"
+      ],
+      "prices": {
+        "size6": "1780",
+        "size8": "3180",
+        "slice": "300"
       }
     }
   ]
