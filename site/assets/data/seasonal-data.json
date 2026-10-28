@@ -183,24 +183,6 @@
         "size8": "3180",
         "slice": "300"
       }
-    },
-    {
-      "image": "assets/images/seasonal/未命名設計 - 2026-10-18T110705.587.jpg",
-      "name": "玫瑰紫米甜酒釀千層",
-      "name_en": "Rose & Fermented Purple Rice Mille Crepes",
-      "description": "紫米甜酒釀\n大花農場食用玫瑰泥\n車矢菊\n花山農場有機玫瑰花茶",
-      "description_en": "Delicate blend of purple rice sweet fermented wine, edible rose puree from Big Flower Farm, cornflower, and organic rose tea from Flower Mountain Farm",
-      "tags": [
-        "奶蛋素",
-        "無咖啡因"
-      ],
-      "prices": {
-        "size8": "3180",
-        "slice": "300"
-      },
-      "subImages": [
-        "assets/images/seasonal/未命名設計 - 2026-10-18T110705.587-2.jpg"
-      ]
     }
   ]
 }
