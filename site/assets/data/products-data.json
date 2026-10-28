@@ -339,6 +339,25 @@
       "subImages": [
         "assets/images/products/未命名設計 - 2026-10-18T110705.587-2.jpg"
       ]
+    },
+    {
+      "image": "assets/images/products/未命名設計 - 2026-10-15T145425.763-1.jpg",
+      "name": "桂花甜酒釀千層",
+      "name_en": "Osmanthus Sweet Fermented Rice Mille Crepes",
+      "description": "南庄桂花釀\n純米甜酒釀",
+      "description_en": "Pure rice sweet sake ferment infused with delicate osmanthus flowers",
+      "tags": [
+        "無咖啡因",
+        "奶蛋素"
+      ],
+      "prices": {
+        "size6": "1680",
+        "size8": "2980",
+        "slice": "280"
+      },
+      "subImages": [
+        "assets/images/products/未命名設計 - 2026-10-15T145425.763-3.jpg"
+      ]
     }
   ]
 }
