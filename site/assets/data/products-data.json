@@ -312,12 +312,33 @@
       "name_en": "Lemon Sweet Fermented Rice Mille Crepes",
       "description": "純米發酵甜酒釀\n新鮮檸檬皮\n新鮮藍莓",
       "description_en": "Delicate fermented sweet rice wine paired with vibrant fresh lemon zest and plump fresh blueberries for a sophisticated, fruity delight.",
-      "tags": [],
+      "tags": [
+        "無咖啡因"
+      ],
       "prices": {
         "size6": "1780",
         "size8": "3180",
         "slice": "300"
       }
+    },
+    {
+      "image": "assets/images/products/未命名設計 - 2026-10-18T110705.587.jpg",
+      "name": "玫瑰紫米甜酒釀千層",
+      "name_en": "Rose Purple Sweet Fermented Rice Mille-feuille",
+      "description": "紫米甜酒釀\n大花農場食用玫瑰泥\n車矢菊\n花山農場有機玫瑰花茶",
+      "description_en": "Delicate layers infused with purple rice and sweet wine ferment, adorned with edible rose puree from Big Flower Farm, chrysanthemum petals, and finished with organic rose tea from Flower Mountain Farm for an enchanting floral symphony.",
+      "tags": [
+        "奶蛋素",
+        "無咖啡因"
+      ],
+      "prices": {
+        "size6": "1780",
+        "size8": "3180",
+        "slice": "300"
+      },
+      "subImages": [
+        "assets/images/products/未命名設計 - 2026-10-18T110705.587-2.jpg"
+      ]
     }
   ]
 }
