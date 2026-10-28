@@ -358,6 +358,25 @@
       "subImages": [
         "assets/images/products/未命名設計 - 2026-10-15T145425.763-3.jpg"
       ]
+    },
+    {
+      "image": "assets/images/products/未命名設計 - 2026-09-24T164727.747.jpg",
+      "name": "薄荷巧克力千層",
+      "name_en": "Mint Chocolate Mille-feuille",
+      "description": "法國MONIN薄荷果露\nOREO夾心\n比利時堅果黑巧淋醬",
+      "description_en": "French MONIN mint syrup with Oreo filling and Belgian hazelnut dark chocolate ganache",
+      "tags": [
+        "無酒精",
+        "奶蛋素"
+      ],
+      "prices": {
+        "size6": "1680",
+        "size8": "2980",
+        "slice": "280"
+      },
+      "subImages": [
+        "assets/images/products/未命名設計 - 2026-09-24T164727.747-2.jpg"
+      ]
     }
   ]
 }
