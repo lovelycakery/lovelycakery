@@ -1,4 +1,25 @@
 {
   "schema_version": 1,
-  "items": []
+  "items": [
+    {
+      "image": "assets/images/seasonal/未命名設計 - 2026-10-30T134229.713.jpg",
+      "name": "球球派對千層",
+      "name_en": "Melon & Grape Ball Party Mille Crepes",
+      "description": "麝香葡萄 雙色哈密瓜 \n小玉西瓜 金鑽鳳梨星星",
+      "description_en": "A delightful medley featuring aromatic musk grapes, dual-colored cantaloupe, petite watermelon, and golden pineapple stars",
+      "tags": [
+        "奶蛋素",
+        "無咖啡因",
+        "無酒精"
+      ],
+      "prices": {
+        "size6": "1880",
+        "size8": "3380",
+        "slice": "315"
+      },
+      "subImages": [
+        "assets/images/seasonal/未命名設計 - 2026-10-30T134229.713-2.jpg"
+      ]
+    }
+  ]
 }
