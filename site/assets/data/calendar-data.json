@@ -1538,7 +1538,18 @@
       "items": [
         {
           "text": "本週切片口味",
-          "color": "#0066cc"
+          "color": "#0066cc",
+          "detail": "香草草莓",
+          "text_en": "Slice flavors",
+          "detail_en": "Vanilla strawberry"
+        },
+        {
+          "text": "微醺栗香草莓",
+          "color": "#7b2d8e"
+        },
+        {
+          "text": "香草草莓",
+          "color": "#7b2d8e"
         }
       ]
     },
