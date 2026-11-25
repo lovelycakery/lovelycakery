@@ -608,6 +608,24 @@
         "size8": "3180",
         "slice": "300"
       }
+    },
+    {
+      "image": "assets/images/products/未命名設計 - 2026-11-25T211321.545.jpg",
+      "name": "蜂蜜柚香草莓千層",
+      "name_en": "Honey Yuzu Strawberry Mille　Crêpes",
+      "description": "蜂蜜柚子千層\n新鮮大湖草莓 (頂層裝飾和夾心)\n新鮮藍莓 小蜜柑 香烤堅果碎",
+      "description_en": "Delicate layers featuring fresh Dahu strawberries as both decoration and filling, topped with blueberries, mandarin segments, and aromatic toasted nut crumble.",
+      "tags": [
+        "奶蛋素",
+        "無咖啡因",
+        "無酒精"
+      ],
+      "prices": {
+        "size6": "1780",
+        "size8": "3180",
+        "slice": "300"
+      },
+      "category": "strawberry"
     }
   ],
   "categories": [
