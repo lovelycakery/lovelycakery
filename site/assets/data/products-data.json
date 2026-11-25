@@ -538,6 +538,24 @@
         "slice": "320"
       },
       "category": "strawberry"
+    },
+    {
+      "image": "assets/images/products/未命名設計 - 2026-11-25T211216.472.jpg",
+      "name": "蘋果花園千層",
+      "name_en": "Apple Garden Mille Crêpes",
+      "description": "奶油肉桂蘋果丁 \n水嫩蘋果花\n新鮮大湖草莓 (頂層裝飾和夾心)",
+      "description_en": "Tender cinnamon-infused cream with diced apples, topped with delicate apple blossoms and fresh Lake Dahu strawberries as both decoration and filling.",
+      "tags": [
+        "奶蛋素",
+        "無咖啡因",
+        "無酒精"
+      ],
+      "prices": {
+        "size6": "1780",
+        "size8": "3180",
+        "slice": "300"
+      },
+      "category": "strawberry"
     }
   ],
   "categories": [
