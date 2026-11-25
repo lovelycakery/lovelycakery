@@ -626,6 +626,22 @@
         "slice": "300"
       },
       "category": "strawberry"
+    },
+    {
+      "image": "assets/images/products/未命名設計 - 2026-11-25T211327.045.jpg",
+      "name": "微醺栗香草莓千層",
+      "name_en": "Tipsy Chestnut Strawberry Mille-feuille",
+      "description": "法國沙巴東栗子泥 貝禮詩香甜酒\n新鮮大湖草莓 (頂層裝飾和夾心)\n比利時黑巧克力 香烤堅果碎",
+      "description_en": "Luxurious French Sabayenne chestnut puree infused with Baileys Irish Cream, layered with fresh Lake District strawberries as both garnish and filling, crowned with Belgian dark chocolate and roasted hazelnut crunch.",
+      "tags": [
+        "奶蛋素"
+      ],
+      "prices": {
+        "size6": "1880",
+        "size8": "3380",
+        "slice": "320"
+      },
+      "category": "strawberry"
     }
   ],
   "categories": [
