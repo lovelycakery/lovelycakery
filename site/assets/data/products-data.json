@@ -503,6 +503,24 @@
         "slice": "320"
       },
       "category": "strawberry"
+    },
+    {
+      "image": "assets/images/products/未命名設計 - 2026-11-25T211202.485.jpg",
+      "name": "水果百匯千層",
+      "name_en": "Assorted Fruit Mille Crêpes",
+      "description": "香草千層\n新鮮大湖草莓(頂層裝飾和夾心)\n新鮮藍莓 新鮮綠葡萄 小蜜柑",
+      "description_en": "Delicate vanilla layers adorned with fresh Lake District strawberries, complemented by blueberries, green grapes, and mandarin segments throughout.",
+      "tags": [
+        "奶蛋素",
+        "無咖啡因",
+        "無酒精"
+      ],
+      "prices": {
+        "size6": "1880",
+        "size8": "3380",
+        "slice": "320"
+      },
+      "category": "strawberry"
     }
   ],
   "categories": [
