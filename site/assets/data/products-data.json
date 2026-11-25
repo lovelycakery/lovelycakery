@@ -469,6 +469,22 @@
         "slice": "330"
       },
       "category": "strawberry"
+    },
+    {
+      "image": "assets/images/products/未命名設計 - 2026-11-25T210249.527.jpg",
+      "name": "女王千層",
+      "name_en": "Queen's Mille-feuille",
+      "description": "大花農場食用玫瑰泥\n比利時紅寶石巧克力\n新鮮大湖草莓 300g up\n新鮮藍莓 珍珠彩糖 香烤堅果碎",
+      "description_en": "Belgian ruby chocolate layered with farm-fresh rose puree, topped with premium Lake strawberries (300g+), fresh blueberries, pearl sugar, and toasted nut crumble",
+      "tags": [
+        "無咖啡因",
+        "奶蛋素"
+      ],
+      "prices": {
+        "size6": "1980",
+        "size8": "3580",
+        "slice": "330"
+      }
     }
   ],
   "categories": [
