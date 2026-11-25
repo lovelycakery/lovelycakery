@@ -556,6 +556,23 @@
         "slice": "300"
       },
       "category": "strawberry"
+    },
+    {
+      "image": "assets/images/products/未命名設計 - 2026-11-25T211223.145.jpg",
+      "name": "伯爵草莓千層",
+      "name_en": "Earl Grey Strawberry Mille Crêpes",
+      "description": "唐寧伯爵千層\n新鮮大湖草莓 (頂層裝飾和夾心)\n唐寧伯爵奶酥碎 法國珍珠糖",
+      "description_en": "Fresh Lake Dianhu strawberries adorning the top and nestled between delicate layers, combined with Earl Grey crumble and French pearl sugar for a sophisticated crunch.",
+      "tags": [
+        "奶蛋素",
+        "無酒精"
+      ],
+      "prices": {
+        "size6": "1780",
+        "size8": "3180",
+        "slice": "300"
+      },
+      "category": "strawberry"
     }
   ],
   "categories": [
