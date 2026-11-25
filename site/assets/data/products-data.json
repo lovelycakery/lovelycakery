@@ -660,6 +660,24 @@
         "slice": "300"
       },
       "category": "strawberry"
+    },
+    {
+      "image": "assets/images/products/未命名設計 - 2026-11-25T211339.683.jpg",
+      "name": "芝麻草莓千層",
+      "name_en": "Sesame Strawberry Mille-feuille",
+      "description": "100%黑芝麻粉\n新鮮大湖草莓(頂層裝飾和夾心)\n法國珍珠糖",
+      "description_en": "100% pure black sesame powder layered with fresh Dahu strawberries and French pearl sugar, featuring strawberries both as decoration and filling.",
+      "tags": [
+        "奶蛋素",
+        "無咖啡因",
+        "無酒精"
+      ],
+      "prices": {
+        "size6": "1780",
+        "size8": "3180",
+        "slice": "300"
+      },
+      "category": "strawberry"
     }
   ],
   "categories": [
