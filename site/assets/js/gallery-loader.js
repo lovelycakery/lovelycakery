@@ -54,6 +54,243 @@
     return slicePaths.map(p => byImage.get(p)).filter(Boolean).map(sliceFirstView);
   }
 
+  // ── 優惠組合頁（sets.html）兩個區塊的顯示開關 ─────────────────────────
+  // 來源：sets-data.json 的 showSets / showWeeklySlices（admin 可勾選；舊資料沒有就當 true）。
+  // 本週切片有開但沒有勾選任何品項時，不隱藏，改顯示一段文字（weeklyEmptyText，admin 可改）。
+  const WEEKLY_EMPTY_DEFAULT = {
+    zh: '本週切片暫停，期待下週見面～ 🌸',
+    en: 'Weekly slices are taking a break — see you next week! 🌸',
+  };
+  const setsVisibility = {
+    showSets: true,
+    showWeeklySlices: true,
+    weeklyHasItems: false,
+    weeklyEmptyText: WEEKLY_EMPTY_DEFAULT.zh,
+    weeklyEmptyTextEn: WEEKLY_EMPTY_DEFAULT.en,
+  };
+
+  function nonEmptyText(v, fallback) {
+    return (typeof v === 'string' && v.trim()) ? v.trim() : fallback;
+  }
+
+  function readSetsVisibility(data) {
+    if (!data) return;
+    setsVisibility.showSets = data.showSets !== false;
+    setsVisibility.showWeeklySlices = data.showWeeklySlices !== false;
+    setsVisibility.weeklyEmptyText = nonEmptyText(data.weeklyEmptyText, WEEKLY_EMPTY_DEFAULT.zh);
+    // 英文沒填時：中文是預設值就用預設英文，否則沿用中文（避免英文版顯示跟中文不相干的舊句子）
+    setsVisibility.weeklyEmptyTextEn = nonEmptyText(
+      data.weeklyEmptyText_en,
+      setsVisibility.weeklyEmptyText === WEEKLY_EMPTY_DEFAULT.zh ? WEEKLY_EMPTY_DEFAULT.en : setsVisibility.weeklyEmptyText
+    );
+  }
+
+  // 本週切片沒有品項時的提示文字。
+  // 注意：不要用 .gallery-coming-soon 這個 class——它會觸發 :has(.gallery-coming-soon) 的 flex 規則，
+  // 把整個 .container 變成 flex（同頁還有優惠組合相簿時欄數會亂跳）。樣式直接寫 inline。
+  function renderEmptyText(container, zh, en) {
+    if (!container) return;
+    container.innerHTML = '';
+    const p = document.createElement('p');
+    p.className = 'gallery-empty-text';
+    p.style.cssText = 'grid-column:1/-1;text-align:center;padding:40px 16px;margin:0;color:#d4809a;' +
+      'letter-spacing:1px;font-size:clamp(18px,3.2vw,28px);font-family:"Playfair Display","Noto Serif TC",serif;font-weight:400;';
+    p.setAttribute('data-zh', zh);
+    p.setAttribute('data-en', en);
+    p.textContent = (localStorage.getItem('language') === 'en') ? en : zh;
+    container.appendChild(p);
+  }
+
+  function renderWeeklyEmpty(container) {
+    renderEmptyText(container, setsVisibility.weeklyEmptyText, setsVisibility.weeklyEmptyTextEn);
+  }
+
+  // ── 全部品項頁的分類分頁 ───────────────────────────────────────────────
+  // 分類清單存在 products-data.json 的 categories（admin 可新增／移除／排序／隱藏／改空白文字）。
+  // 品項歸屬：
+  //   - 'seasonal'（新品上市）：內建，品項來自 seasonal-data.json（admin 的「新品上市」分頁）
+  //   - 'products'（季節品項）：內建，products-data.json 裡沒有指定分類（或分類已被刪除）的品項
+  //   - 其他自訂分類：products-data.json 裡 item.category === 分類 id 的品項
+  // 舊資料沒有 categories 時，等同原本寫死的「新品上市 + 季節品項」。
+  const DEFAULT_CATEGORIES = [
+    { id: 'seasonal', name: '新品上市', name_en: 'Seasonal Specials', show: true,
+      emptyText: '🍰 新品籌備中，敬請期待～ ✨', emptyText_en: 'Coming Soon — Stay Tuned!', style: '' },
+    { id: 'products', name: '季節品項', name_en: 'Menu', show: true, emptyText: '', emptyText_en: '', style: '' },
+  ];
+  const CATEGORY_EMPTY_DEFAULT = { zh: '籌備中，敬請期待～', en: 'Coming Soon — Stay Tuned!' };
+  const catState = { categories: DEFAULT_CATEGORIES, products: [], seasonal: [] };
+
+  function normalizeCategories(list) {
+    const src = (Array.isArray(list) && list.length) ? list : DEFAULT_CATEGORIES;
+    const out = [];
+    const seen = {};
+    src.forEach(function (c) {
+      if (!c || typeof c.id !== 'string' || !c.id || seen[c.id]) return;
+      seen[c.id] = true;
+      out.push({
+        id: c.id,
+        name: typeof c.name === 'string' ? c.name : '',
+        name_en: typeof c.name_en === 'string' ? c.name_en : '',
+        show: c.show !== false,
+        emptyText: typeof c.emptyText === 'string' ? c.emptyText : '',
+        emptyText_en: typeof c.emptyText_en === 'string' ? c.emptyText_en : '',
+        // style 會變成 class 名稱的一部分，只允許小寫英數與連字號
+        style: (typeof c.style === 'string' && /^[a-z0-9-]+$/.test(c.style)) ? c.style : '',
+      });
+    });
+    // 兩個內建分類一定存在（資料裡漏掉就補在最後）
+    DEFAULT_CATEGORIES.forEach(function (d) { if (!seen[d.id]) out.push(Object.assign({}, d)); });
+    return out;
+  }
+
+  function itemsForCategory(cat) {
+    if (cat.id === 'seasonal') return catState.seasonal;
+    const customIds = {};
+    catState.categories.forEach(function (c) { if (c.id !== 'seasonal' && c.id !== 'products') customIds[c.id] = true; });
+    return catState.products.filter(function (it) {
+      const known = it && typeof it.category === 'string' && customIds[it.category];
+      return cat.id === 'products' ? !known : (known && it.category === cat.id);
+    });
+  }
+
+  // 依 catState 重建分類列與各分類區塊（初次載入、admin 即時預覽都走這裡）
+  function buildCategoryPage() {
+    const nav = document.getElementById('categoryTabs');
+    const wrap = document.getElementById('categorySections');
+    if (!wrap) return;
+    if (nav) nav.innerHTML = '';
+    wrap.innerHTML = '';
+    const lang = localStorage.getItem('language') || 'zh';
+    const grids = [];
+
+    // 「草莓季」樣式（pink）的分頁用襯線中文字（Noto Serif TC），有這種分頁時才載入（非阻塞；Google Fonts 依 unicode-range 切片，只下載用到的字）
+    if (catState.categories.some(function (c) { return c.show && c.style === 'pink'; }) &&
+        !document.querySelector('link[data-font="tab-serif"]')) {
+      const fontLink = document.createElement('link');
+      fontLink.rel = 'stylesheet';
+      fontLink.setAttribute('data-font', 'tab-serif');
+      fontLink.href = 'https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600&display=swap';
+      fontLink.media = 'print';
+      fontLink.onload = function () { this.media = 'all'; };
+      document.head.appendChild(fontLink);
+    }
+
+    catState.categories.filter(function (c) { return c.show; }).forEach(function (cat) {
+      const nameZh = cat.name || cat.id;
+      const nameEn = cat.name_en || nameZh;
+
+      if (nav) {
+        const a = document.createElement('a');
+        a.className = 'order-tag' + (cat.style ? ' order-tag--' + cat.style : '');
+        a.href = '#' + cat.id;
+        a.setAttribute('data-zh', nameZh);
+        a.setAttribute('data-en', nameEn);
+        a.textContent = lang === 'en' ? nameEn : nameZh;
+        nav.appendChild(a);
+      }
+
+      const section = document.createElement('section');
+      section.id = cat.id;
+      section.className = 'all-items-section';
+      const h2 = document.createElement('h2');
+      h2.className = 'all-items-section-title';
+      h2.setAttribute('data-zh', nameZh);
+      h2.setAttribute('data-en', nameEn);
+      h2.textContent = lang === 'en' ? nameEn : nameZh;
+      const grid = document.createElement('div');
+      grid.className = 'gallery-grid';
+      // seasonal 的圖片在 images/seasonal/，其餘都當 products（決定縮圖路徑等行為）
+      const type = cat.id === 'seasonal' ? 'seasonal' : 'products';
+      grid.setAttribute('data-gallery-type', type);
+      grid.setAttribute('data-category', cat.id);
+      section.appendChild(h2);
+      section.appendChild(grid);
+      wrap.appendChild(section);
+
+      const items = itemsForCategory(cat);
+      if (items.length === 0) {
+        const zh = (cat.emptyText || '').trim() || CATEGORY_EMPTY_DEFAULT.zh;
+        const en = (cat.emptyText_en || '').trim() || ((cat.emptyText || '').trim() ? zh : CATEGORY_EMPTY_DEFAULT.en);
+        renderEmptyText(grid, zh, en);
+      } else {
+        renderGallery(items, grid, type, { skipLegend: true });
+        setupLazyImages(grid);
+        grids.push(grid);
+      }
+    });
+
+    renderSharedLegend(grids);
+    if (window.LovelyI18n) window.LovelyI18n.applyLanguage(lang);
+    // 分類列的高度變了：通知頁面重算 --tags-h / --header-h（all-items.html 與 i18n.js 都監聽 resize）
+    window.dispatchEvent(new Event('resize'));
+  }
+
+  async function initCategoryPage() {
+    const results = await Promise.all([
+      fetchData('products-data.json').catch(function (e) { console.warn('Failed to load products data:', e); return null; }),
+      fetchData('seasonal-data.json').catch(function (e) { console.warn('Failed to load seasonal data:', e); return null; }),
+    ]);
+    const productsData = results[0], seasonalData = results[1];
+    catState.categories = normalizeCategories(productsData && productsData.categories);
+    catState.products = (productsData && Array.isArray(productsData.items)) ? productsData.items : [];
+    catState.seasonal = (seasonalData && Array.isArray(seasonalData.items)) ? seasonalData.items : [];
+    buildCategoryPage();
+    // 帶 #分類 進來時，區塊是載入後才產生的，這裡補捲一次
+    if (location.hash.length > 1) {
+      const target = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+      if (target) target.scrollIntoView();
+    }
+  }
+
+  // admin 編輯模式的預覽頁帶 ?forceShow=all（或 sets / weekly-slices）：
+  // 即使該區塊設成「不顯示」也照樣顯示，否則關掉後就沒辦法在預覽裡編輯它。
+  // 這種「訪客其實看不到」的區塊會變半透明並加一行提示（見 markAdminHidden）。
+  function isForcedVisible(which) {
+    const v = new URLSearchParams(window.location.search).get('forceShow');
+    return v === which || v === 'all';
+  }
+
+  // 只在 admin 編輯預覽出現：標示「這段目前不會顯示在網站上」
+  function markAdminHidden(section, hiddenForVisitors) {
+    if (!section) return;
+    let note = section.querySelector(':scope > .admin-hidden-note');
+    section.style.opacity = hiddenForVisitors ? '0.45' : '';
+    if (hiddenForVisitors && !note) {
+      note = document.createElement('div');
+      note.className = 'admin-hidden-note';
+      note.style.cssText = 'text-align:center;margin:0 auto 16px;padding:6px 14px;width:fit-content;border-radius:999px;' +
+        'background:#3d2817;color:#fff;font-size:14px;font-family:"Inter","Noto Sans TC",sans-serif;';
+      note.textContent = '目前設定為不在網站上顯示';
+      section.insertBefore(note, section.firstChild);
+    } else if (!hiddenForVisitors && note) {
+      note.remove();
+    }
+  }
+
+  function isSetsSectionVisible() {
+    return setsVisibility.showSets || isForcedVisible('sets');
+  }
+
+  function applySetsVisibility() {
+    const setsSection = document.getElementById('setsSection');
+    const weeklySection = document.getElementById('weeklySlicesSection');
+    const setsVisible = isSetsSectionVisible();
+    if (setsSection) {
+      setsSection.style.display = setsVisible ? '' : 'none';
+      markAdminHidden(setsSection, setsVisible && !setsVisibility.showSets);
+    }
+    if (weeklySection) {
+      // 沒有品項時也顯示（內容是 renderWeeklyEmpty 的提示文字）；只有開關關掉才整段隱藏
+      const weeklyVisible = setsVisibility.showWeeklySlices || isForcedVisible('weekly-slices');
+      weeklySection.style.display = weeklyVisible ? '' : 'none';
+      markAdminHidden(weeklySection, weeklyVisible && !setsVisibility.showWeeklySlices);
+      // 本週切片上方的分隔線與留白是用來跟優惠組合隔開的；優惠組合隱藏時它是頁面第一段，要拿掉
+      weeklySection.style.borderTop = setsVisible ? '' : '0';
+      weeklySection.style.marginTop = setsVisible ? '' : '0';
+      weeklySection.style.paddingTop = setsVisible ? '' : '0';
+    }
+  }
+
   async function loadGalleryData(type) {
     try {
       if (type === 'weekly-slices') {
@@ -63,6 +300,7 @@
           fetchData('products-data.json'),
           fetchData('seasonal-data.json'),
         ]);
+        readSetsVisibility(setsData);
         const slicePaths = setsData && Array.isArray(setsData.weeklySlices) ? setsData.weeklySlices : [];
         const sourceItems = []
           .concat(productsData && Array.isArray(productsData.items) ? productsData.items : [])
@@ -70,6 +308,7 @@
         return resolveWeeklySlices(slicePaths, sourceItems);
       }
       const data = await fetchData(`${type}-data.json`);
+      if (type === 'sets') readSetsVisibility(data);
       return data && Array.isArray(data.items) ? data.items : [];
     } catch (e) {
       console.warn(`Failed to load ${type} data:`, e);
@@ -353,28 +592,35 @@
     };
   }
 
-  // 標籤顏色定義（精緻可愛風格 - 單色）
+  // 標籤顏色定義（暖色低飽和，跟整站的米色／咖啡／磚紅同調）
+  // bg：照片上的便利貼、modal 標籤的底色，也是圖例圓圈未勾選時的底色
+  // text：圖例文字與 modal 標籤文字（同色系、較深，讀得清楚）
+  // dot：圖例圓圈的框線，勾選後整顆填滿這個顏色並打白色勾
   const TAG_COLORS = {
     '奶蛋素': {
-      bg: '#d4edd0',
-      text: '#4d8050',
-      shadow: 'rgba(106, 171, 136, 0.25)'
-    },      // 粉綠便利貼
+      bg: '#dfe5cc',
+      text: '#64794f',
+      dot: '#7f9468',
+      shadow: 'rgba(127, 148, 104, 0.25)'
+    },      // 鼠尾草綠
     '無咖啡因': {
-      bg: '#c6e0ee',
-      text: '#3d7a9e',
-      shadow: 'rgba(122, 173, 197, 0.25)'
-    },    // 粉藍便利貼
+      bg: '#ebdde3',
+      text: '#86627a',
+      dot: '#a27f91',
+      shadow: 'rgba(162, 127, 145, 0.25)'
+    },    // 灰玫瑰
     '無酒精': {
-      bg: '#f8d4c4',
-      text: '#a05a45',
-      shadow: 'rgba(212, 135, 106, 0.25)'
-    },      // 粉橘便利貼
+      bg: '#f6dcc6',
+      text: '#a8673b',
+      dot: '#c98a5c',
+      shadow: 'rgba(201, 138, 92, 0.25)'
+    },      // 杏桃
   };
 
   const TAG_COLOR_DEFAULT = {
     bg: '#e8e0f0',
     text: '#6b5a8a',
+    dot: '#8f7aa8',
     shadow: 'rgba(150, 130, 180, 0.25)'
   };
 
@@ -472,7 +718,7 @@
         <div class="tag-legend-item">
           <label class="tag-legend-checkbox-label">
             <input type="checkbox" class="tag-legend-checkbox" value="${tag}" data-tag="${tag}">
-            <span class="tag-badge tag-legend-badge" data-en="${tagTextEn}" data-zh="${tagTextZh}" style="background-color: ${color.bg}; color: ${color.text}; box-shadow: 0 2px 8px ${color.shadow}; --tag-bg-color: ${color.bg};">${tagText}</span>
+            <span class="tag-badge tag-legend-badge" data-en="${tagTextEn}" data-zh="${tagTextZh}" style="color: ${color.text}; --tag-dot: ${color.dot}; --tag-bg: ${color.bg};">${tagText}</span>
           </label>
         </div>
       `;
@@ -501,39 +747,6 @@
       const currentLang = localStorage.getItem('language') || 'zh';
       window.LovelyI18n.applyLanguage(currentLang, legend);
     }
-  }
-
-  // 渲染圖片標籤（右下角）
-  function renderImageTags(imageWrapper, tags) {
-    if (!tags || !Array.isArray(tags) || tags.length === 0) return;
-
-    // 獲取當前語言
-    const currentLang = localStorage.getItem('language') || 'zh';
-
-    const tagsContainer = document.createElement('div');
-    tagsContainer.className = 'gallery-image-tags';
-
-    tags.forEach(tag => {
-      const color = TAG_COLORS[tag] || TAG_COLOR_DEFAULT;
-      const tagText = getTagText(tag, currentLang);
-      const tagTextZh = TAG_I18N[tag] ? TAG_I18N[tag].zh : tag;
-      const tagTextEn = TAG_I18N[tag] ? TAG_I18N[tag].en : tag;
-      const tagBadge = document.createElement('span');
-      tagBadge.className = 'tag-badge gallery-image-tag';
-      tagBadge.textContent = tagText;
-      tagBadge.setAttribute('data-en', tagTextEn);
-      tagBadge.setAttribute('data-zh', tagTextZh);
-      tagBadge.setAttribute('data-tag-key', tag); // 保存原始標籤鍵，用於語言切換
-      tagBadge.style.backgroundColor = color.bg;
-      tagBadge.style.color = color.text;
-      tagBadge.style.boxShadow = `0 2px 8px ${color.shadow}`;
-      // 設置箭頭尾巴的顏色（使用 CSS 變數）
-      tagBadge.style.setProperty('--tag-bg-color', color.bg);
-      // 使用 ::before 和 ::after 偽元素來創建箭頭
-      tagsContainer.appendChild(tagBadge);
-    });
-
-    imageWrapper.appendChild(tagsContainer);
   }
 
   function renderGallery(items, container, type, options) {
@@ -595,10 +808,8 @@
       img.onload = () => imageWrapper.classList.add('loaded');
       imageWrapper.appendChild(img);
 
-      // 如果有標籤，在圖片上顯示標籤（sets / 本週切片 不需要）
-      if (showsTagUI(type) && item.tags && Array.isArray(item.tags) && item.tags.length > 0) {
-        renderImageTags(imageWrapper, item.tags);
-      }
+      // 照片上不顯示標籤（奶蛋素等只出現在上方圖例與點開後的大圖說明）；
+      // 篩選靠 .gallery-item 的 data-tags，跟照片上有沒有標籤無關。
 
       const itemInfo = document.createElement('div');
       itemInfo.className = 'gallery-item-info';
@@ -881,15 +1092,27 @@
     if (type === 'weekly-slices') {
       var section = document.getElementById('weeklySlicesSection');
       if (!items || items.length === 0) {
-        if (section) section.style.display = 'none';
-        container.innerHTML = '';
+        setsVisibility.weeklyHasItems = false;
+        applySetsVisibility();
+        renderWeeklyEmpty(container);
         return;
       }
-      if (section) section.style.display = '';
+      setsVisibility.weeklyHasItems = true;
+      applySetsVisibility();
       renderGallery(items, container, type, options);
       setupLazyImages(container);
       if (window.LovelyI18n) window.LovelyI18n.applyLanguage(localStorage.getItem('language') || 'zh', section);
       return;
+    }
+
+    if (type === 'sets') {
+      applySetsVisibility();
+      // 優惠組合設成不顯示且沒有品項：不要塞「籌備中」文字。
+      // 它即使被 display:none 也會讓下面的 :has(.gallery-coming-soon) 規則生效，把整個容器變成 flex。
+      if (!isSetsSectionVisible() && (!items || items.length === 0)) {
+        container.innerHTML = '';
+        return;
+      }
     }
 
     if (items === null) {
@@ -907,12 +1130,15 @@
         document.head.appendChild(fontLink);
       }
       // 注入樣式：透過 html[lang] 自動跟隨 i18n 語言切換
+      // 前兩條把 .main-content / .container 改成 flex 讓文字垂直置中，只適用於「整頁只有這一個相簿」。
+      // 全部品項合併頁（body.is-test-mode）同一個 .container 內還有其他相簿：容器一旦變 flex，
+      // 相簿寬度會變成由內容決定，auto-fill 欄數隨圖片載入時機亂跳（1/2/3 欄）。所以合併頁要排除。
       if (!document.getElementById('coming-soon-styles')) {
         var style = document.createElement('style');
         style.id = 'coming-soon-styles';
         style.textContent =
-          '.main-content:has(.gallery-coming-soon){display:flex;flex-direction:column;}' +
-          '.main-content:has(.gallery-coming-soon) .container{flex:1;display:flex;flex-direction:column;}' +
+          'body:not(.is-test-mode) .main-content:has(.gallery-coming-soon){display:flex;flex-direction:column;}' +
+          'body:not(.is-test-mode) .main-content:has(.gallery-coming-soon) .container{flex:1;display:flex;flex-direction:column;}' +
           '.gallery-grid:has(.gallery-coming-soon){flex:1;display:flex;align-items:center;justify-content:center;}' +
           '.gallery-coming-soon{text-align:center;padding:40px;color:#d4809a;letter-spacing:1px;font-size:28px;font-family:"Playfair Display",serif;font-weight:400;}' +
           'html[lang="en"] .gallery-coming-soon{font-size:36px;font-family:"Dancing Script",cursive;font-weight:600;}' +
@@ -1077,6 +1303,19 @@
       return;
     }
 
+    // Admin: 全部品項分類頁（預覽模式）的即時更新——分類設定或品項有變就整頁重建
+    if (document.getElementById('categorySections') && e.data &&
+        (e.data.type === 'admin-categories-update' ||
+         (e.data.type === 'admin-gallery-update' && Array.isArray(e.data.items)))) {
+      if (Array.isArray(e.data.categories)) catState.categories = normalizeCategories(e.data.categories);
+      if (e.data.type === 'admin-gallery-update') {
+        if (e.data.galleryType === 'seasonal') catState.seasonal = e.data.items;
+        else if (e.data.galleryType === 'products') catState.products = e.data.items;
+      }
+      buildCategoryPage();
+      return;
+    }
+
     // Admin: full re-render (for upload/delete — use sparingly)
     if (e.data && e.data.type === 'admin-gallery-update' && Array.isArray(e.data.items)) {
       // 在合併版（test mode）有多個 grid，要用 galleryType 精確找到對應 grid，
@@ -1115,17 +1354,32 @@
       return;
     }
 
+    // Admin: 優惠組合／本週切片「是否顯示」勾選的即時預覽
+    if (e.data && e.data.type === 'admin-sets-visibility') {
+      setsVisibility.showSets = e.data.showSets !== false;
+      setsVisibility.showWeeklySlices = e.data.showWeeklySlices !== false;
+      readSetsVisibility(e.data);
+      applySetsVisibility();
+      // 目前是空的狀態才需要重畫提示文字（有品項時不動相簿）
+      if (!setsVisibility.weeklyHasItems) {
+        renderWeeklyEmpty(document.querySelector('.gallery-grid[data-gallery-type="weekly-slices"]'));
+      }
+      return;
+    }
+
     // Admin: 本週切片即時更新（admin 已解析好對應的 product items）
     if (e.data && e.data.type === 'admin-weekly-slices-update' && Array.isArray(e.data.items)) {
       var wsSection = document.getElementById('weeklySlicesSection');
       var wsContainer = document.querySelector('.gallery-grid[data-gallery-type="weekly-slices"]');
       if (!wsContainer) return;
       if (e.data.items.length === 0) {
-        if (wsSection) wsSection.style.display = 'none';
-        wsContainer.innerHTML = '';
+        setsVisibility.weeklyHasItems = false;
+        applySetsVisibility();
+        renderWeeklyEmpty(wsContainer);
         return;
       }
-      if (wsSection) wsSection.style.display = '';
+      setsVisibility.weeklyHasItems = true;
+      applySetsVisibility();
       renderGallery(e.data.items, wsContainer, 'weekly-slices', {});
       setupLazyImages(wsContainer);
       if (window.LovelyI18n) {
@@ -1240,7 +1494,7 @@
       return '<div class="tag-legend-item">' +
           '<label class="tag-legend-checkbox-label">' +
             '<input type="checkbox" class="tag-legend-checkbox" value="' + tag + '" data-tag="' + tag + '">' +
-            '<span class="tag-badge tag-legend-badge" data-en="' + tagTextEn + '" data-zh="' + tagTextZh + '" style="background-color: ' + color.bg + '; color: ' + color.text + '; box-shadow: 0 2px 8px ' + color.shadow + '; --tag-bg-color: ' + color.bg + ';">' + tagText + '</span>' +
+            '<span class="tag-badge tag-legend-badge" data-en="' + tagTextEn + '" data-zh="' + tagTextZh + '" style="color: ' + color.text + '; --tag-dot: ' + color.dot + '; --tag-bg: ' + color.bg + ';">' + tagText + '</span>' +
           '</label>' +
         '</div>';
     }).join('');
@@ -1248,10 +1502,11 @@
     legend.innerHTML = '<div class="tag-legend-items">' + legendItems +
       '<span class="tag-legend-hint" data-en="clickable" data-zh="可勾選">可勾選</span></div>';
 
-    // 插入到 .order-tags 之後（fixed nav 底下），fallback 放第一個 grid 之前
+    // 放進 .order-tags（fixed 分類列）裡面、排在分類按鈕右邊（版面由 styles.css 的
+    // .all-items-page .order-tags 規則處理）；沒有分類列時 fallback 放第一個 grid 之前
     var anchor = document.querySelector('.order-tags');
-    if (anchor && anchor.parentNode) {
-      anchor.parentNode.insertBefore(legend, anchor.nextSibling);
+    if (anchor) {
+      anchor.appendChild(legend);
     } else if (grids[0] && grids[0].parentNode) {
       grids[0].parentNode.insertBefore(legend, grids[0]);
     }
@@ -1279,6 +1534,11 @@
   // Usage: <div class="gallery-grid" data-gallery-type="seasonal">
   // 支援同頁多個 grid（例如 all-items.html admin 預覽合併版）
   function autoInit() {
+    // 全部品項分類頁：區塊與相簿由 buildCategoryPage 動態產生，不走下面的靜態 grid 流程
+    if (document.getElementById('categorySections')) {
+      initCategoryPage();
+      return;
+    }
     var containers = Array.from(document.querySelectorAll('.gallery-grid[data-gallery-type]'));
     // 只有「會顯示標籤圖例」的 grid 才算合併版（sets / weekly-slices 不算）。
     // 否則 sets.html 有 sets + weekly-slices 兩個 grid 會被誤判成合併版而塞共享圖例。

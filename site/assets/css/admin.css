@@ -1031,3 +1031,56 @@ body {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* 分頁管理（全部品項 tab：全部品項頁上方的分類分頁） */
+.category-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.category-row {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px;
+  background: var(--panel-2);
+}
+
+.category-row__main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.category-row__main .input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.category-row__btn {
+  flex: 0 0 auto;
+  padding: 4px 8px;
+  min-width: 30px;
+}
+
+.category-row__details {
+  margin-top: 8px;
+}
+
+.category-row__details summary {
+  font-size: 12px;
+  color: var(--muted);
+  cursor: pointer;
+  user-select: none;
+}
+
+.category-row__details .label {
+  margin-top: 8px;
+}
+
+.category-row__builtin {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 6px 0 0;
+  line-height: 1.5;
+}

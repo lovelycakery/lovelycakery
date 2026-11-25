@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "headline": "美好蛋糕店",
+  "headline_en": "Lovely Cakery",
+  "description": "",
+  "description_en": "",
+  "buttonText": "草莓季限定品項",
+  "buttonText_en": "STRAWBERRY SEASON",
+  "buttonLink": "all-items.html#strawberry",
+  "image": "assets/images/home/spring.jpg",
+  "imageCaption": "",
+  "imageCaption_en": ""
+}

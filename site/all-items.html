@@ -14,9 +14,10 @@
     <link rel="icon" href="favicon.ico" sizes="any">
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link rel="preload" href="assets/data/products-data.json" as="fetch" crossorigin>
+    <link rel="preload" href="assets/data/seasonal-data.json" as="fetch" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="assets/css/styles.css?v=20260613-1">
+    <link rel="stylesheet" href="assets/css/styles.css?v=20261125-1">
     <!-- Google Fonts loaded by site-header.js -->
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=AW-10994472042"></script>
@@ -37,32 +38,23 @@
                 <p class="page-subtitle" data-en="Layer by layer, made with love." data-zh="層層手作，每一層，都是用心。">層層手作，每一層，都是用心。</p>
             </div>
 
-            <!-- 分頁標籤 -->
-            <nav class="order-tags admin-only" aria-label="商品分類">
-                <a class="order-tag" href="#seasonal" data-en="Seasonal" data-zh="新品上市">新品上市</a>
-                <a class="order-tag" href="#products" data-en="Menu" data-zh="季節品項">季節品項</a>
-            </nav>
+            <!-- 分類分頁列（新品上市／季節品項／自訂分頁…）：
+                 由 gallery-loader.js 依 products-data.json 的 categories 動態產生，admin 可增減、排序、隱藏 -->
+            <nav class="order-tags admin-only" id="categoryTabs" aria-label="商品分類"></nav>
 
-            <!-- 新品上市區 -->
-            <section id="seasonal" class="all-items-section admin-only">
-                <h2 class="all-items-section-title" data-en="Seasonal Specials" data-zh="新品上市">新品上市</h2>
-                <div class="gallery-grid" data-gallery-type="seasonal">
-                    <!-- Images loaded dynamically by gallery-loader.js -->
-                </div>
-            </section>
+            <!-- 各分類的區塊（訪客頁與 admin 預覽模式）；同樣由 gallery-loader.js 產生 -->
+            <div id="categorySections" class="admin-only"></div>
 
-            <!-- 季節品項標題 -->
-            <h2 id="products" class="all-items-section-title admin-only" data-en="Menu" data-zh="季節品項">季節品項</h2>
-
-            <div class="gallery-grid" data-gallery-type="products">
+            <!-- admin 編輯模式專用：不分類的單一相簿，順序＝products-data.json 的 items（拖曳排序與點擊編輯靠這個索引） -->
+            <div class="gallery-grid edit-only" data-gallery-type="products">
                 <!-- Images loaded dynamically by gallery-loader.js -->
             </div>
         </div>
     </main>
     <noscript><p style="text-align:center;padding:40px;font-size:16px;color:#3d2817;">本網站需要 JavaScript 才能正常顯示。請啟用 JavaScript 後重新整理頁面。<br>This website requires JavaScript. Please enable it and reload.</p></noscript>
 
-    <!-- admin 編輯/預覽模式（非測試）：移除分類導覽和新品區，只顯示當前 tab 的單一 grid -->
-    <!-- 公開頁與 admin 測試模式：顯示完整合併版（新品上市 + 季節品項 + 分類 tabs） -->
+    <!-- admin 編輯模式：移除分類列與分類區塊（.admin-only），只留不分類的單一相簿（.edit-only） -->
+    <!-- 公開頁與 admin 預覽模式：反過來，移除 .edit-only，顯示依分類分區的完整版 -->
     <script>
     (function () {
         var params = new URLSearchParams(window.location.search);
@@ -70,13 +62,14 @@
             document.querySelectorAll('.admin-only').forEach(function (el) { el.remove(); });
         } else {
             document.body.classList.add('is-test-mode');
+            document.querySelectorAll('.edit-only').forEach(function (el) { el.remove(); });
         }
     })();
     </script>
 
-    <script defer src="assets/js/site-header.js?v=20260428-5"></script>
+    <script defer src="assets/js/site-header.js?v=20261125-2"></script>
     <script defer src="assets/js/i18n.js"></script>
-    <script defer src="assets/js/gallery-loader.js?v=20260613-4"></script>
+    <script defer src="assets/js/gallery-loader.js?v=20261125-4"></script>
     <script defer src="assets/js/image-protection.js"></script>
 
     <!-- 計算 fixed 分頁列高度，提供給 .all-items-section 的 scroll-margin-top 使用 -->

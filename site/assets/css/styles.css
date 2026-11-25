@@ -76,13 +76,18 @@ body.calendar-page-body {
     right: 0;
     width: 100%;
     max-width: 100%;
-    padding: 30px 0;
+    padding: 10px 0;  /* 上下留白（原 30px；縮小讓導覽列少佔畫面） */
     background-color: #ffffff;  /* 頂層白色背景 */
     border-bottom: 1px solid rgba(61, 40, 23, 0.08);
     z-index: 1000;  /* 確保在最上層 */
     box-shadow: 0 2px 8px rgba(61, 40, 23, 0.05);
     box-sizing: border-box;
     overflow-x: hidden;
+}
+
+/* 導覽列的內容寬度：全站一致 1400px（比一般內容的 1200px 寬），讓品牌名旁放得下「美好蛋糕店」 */
+.header .container {
+    max-width: 1400px;
 }
 
 /* 導覽列容器：品牌名稱和導覽連結的容器 */
@@ -138,11 +143,14 @@ body.calendar-page-body {
     font-weight: 700;
     color: #3d2817;
     letter-spacing: 0.5px;
-    margin-left: -80px; /* 讓品牌更靠左（超出容器padding），給分頁選項更多空間 */
+    /* 讓品牌更靠左（超出容器 padding），給分頁選項更多空間；最多往左 80px，
+       但視窗比導覽列（1400px）窄時，至少離螢幕左緣 24px，避免 logo 被切掉 */
+    margin-left: clamp(-80px, calc(-16px - (100vw - 1400px) / 2), -16px);
 }
 
 .logo a {
     display: inline-flex;
+    white-space: nowrap;
     align-items: center;
     gap: 16px;
     text-decoration: none;
@@ -155,6 +163,28 @@ body.calendar-page-body {
     display: block;
     object-fit: contain;
     flex: 0 0 auto;
+}
+
+/* 品牌名旁的中文店名「美好蛋糕店」：細直線隔開、字比英文小一號。
+   中英文版都顯示（店名不翻譯）；969–1340px 的視窗放不下，下面的斷點會把它藏起來。 */
+.logo-zh {
+    font-family: 'Noto Serif TC', 'Songti TC', 'PMingLiU', serif;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    color: #3d2817;
+    padding-left: 16px;
+    border-left: 1px solid rgba(61, 40, 23, 0.25);
+    line-height: 1.2;
+}
+
+@media (max-width: 1340px) and (min-width: 969px) {
+    .logo-zh { display: none; }
+}
+
+@media (max-width: 640px) {
+    .logo-zh { font-size: 16px; letter-spacing: 2px; padding-left: 12px; }
+    .logo a { gap: 12px; }
 }
 
 /* 導覽連結容器 */
@@ -303,6 +333,62 @@ body.calendar-page-body {
     align-items: center;
 }
 
+/* 首頁大圖版面：上下排列——草莓季橫幅在上，按鈕置中在下方（店名已移到導覽列）（用 order 調順序，HTML 不動）。
+   圖片寬度依視窗高度自動縮放，讓「圖＋店名＋按鈕」在筆電一個畫面內看完：
+   (100svh - 420px) 是扣掉導覽列、按鈕、上下留白後留給圖片的高度，× 2.7 換算成寬度（橫幅約 2.7:1）；
+   最寬 1000px、最窄 520px（太矮的視窗寧可捲動也不要圖太小）；手機上則是佔滿螢幕寬。 */
+.home-page .main-content {
+    padding: 40px 0 48px;
+}
+
+.home-page .main-content .container {
+    width: 100%;
+    max-width: 1400px;
+}
+
+.home-page .content-grid {
+    grid-template-columns: 1fr;
+    gap: 36px;
+}
+
+.home-page .content-left {
+    order: 2;
+    align-items: center;
+    text-align: center;
+    gap: 18px;
+}
+
+.home-page .content-right {
+    order: 1;
+}
+
+/* 店名已移到導覽列（品牌名旁），首頁照片下方不再顯示；
+   h2 留在 HTML 給螢幕閱讀器與搜尋引擎（視覺上隱藏，不是 display:none） */
+.home-page .main-headline {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+@media (max-width: 640px) {
+    .home-page .content-grid { gap: 26px; }
+}
+
+.home-page .cta-button {
+    margin-top: 0;
+}
+
+.home-page .image-wrapper {
+    max-width: min(1000px, max(520px, calc((100svh - 420px) * 2.7)));
+    margin: 0 auto;
+}
+
 /* 內容網格：左右兩欄版面配置 */
 .content-grid {
     display: grid;
@@ -343,7 +429,7 @@ body.calendar-page-body {
     font-size: 16px;  /* ⭐ 調整按鈕文字字型大小：改這個數字 */
     font-weight: 500;
     color: #3d2817;
-    background-color: #e8d5c4;
+    background-color: #ffd3de;  /* 粉紅（原本是米色 #e8d5c4） */
     border: none;
     text-decoration: none;
     display: inline-block;
@@ -358,16 +444,72 @@ body.calendar-page-body {
 
 /* 按鈕滑鼠懸停效果 */
 .cta-button:hover {
-    background-color: #d4c0a8;
+    background-color: #ffbccb;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(61, 40, 23, 0.15);
 }
 
-/* 右側內容區域：圖片容器 */
+/* 首頁標題下方那行文字用紅色（與草莓季按鈕的紅字同色） */
+.home-page .description {
+    color: #d42a4c;
+}
+
+/* 首頁按鈕：復古雙線框（呼應首頁草莓季橫幅的磚紅與襯線字）。
+   淡粉紅底、磚紅細框＋內圈細線（inset box-shadow 畫出雙線），襯線中文字（Noto Serif TC 由 home-loader.js 載入），
+   字距拉開；結尾的線條小草莓是 ::after 畫的（mask 圖＋currentColor，hover 反轉時跟著變色），
+   所以按鈕文字本身不用加 emoji（admin 可改文字）。滑鼠移上去反轉成磚紅底米白字。 */
+.home-page .cta-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-family: 'Noto Serif TC', 'Songti TC', 'PMingLiU', serif;
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 5px;
+    color: #a44a34;
+    background-color: #fbe3e1;  /* 淡粉紅（略帶紅） */
+    padding: 19px 42px 19px 47px;
+    border: 1px solid #a44a34;
+    border-radius: 2px;
+    box-shadow: inset 0 0 0 4px #fbe3e1, inset 0 0 0 5px rgba(164, 74, 52, 0.55), 0 2px 10px rgba(61, 40, 23, 0.06);
+}
+
+.home-page .cta-button::after {
+    content: '';
+    flex: none;
+    width: 28px;
+    height: 28px;
+    margin: -4px 0;
+    background-color: currentColor;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 8.2c-4.2 0-7 1.9-7 5 0 3.9 3.6 7.8 7 7.8s7-3.9 7-7.8c0-3.1-2.8-5-7-5z'/%3E%3Cpath d='M7.6 7.6 12 9.4l4.4-1.8M12 9.4V5.2M12 5.2l1.8-1.6'/%3E%3Cg fill='%23000' stroke='none'%3E%3Ccircle cx='9.3' cy='13' r='.75'/%3E%3Ccircle cx='14.7' cy='13' r='.75'/%3E%3Ccircle cx='12' cy='15.4' r='.75'/%3E%3Ccircle cx='9.9' cy='17.6' r='.75'/%3E%3Ccircle cx='14.1' cy='17.6' r='.75'/%3E%3C/g%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 8.2c-4.2 0-7 1.9-7 5 0 3.9 3.6 7.8 7 7.8s7-3.9 7-7.8c0-3.1-2.8-5-7-5z'/%3E%3Cpath d='M7.6 7.6 12 9.4l4.4-1.8M12 9.4V5.2M12 5.2l1.8-1.6'/%3E%3Cg fill='%23000' stroke='none'%3E%3Ccircle cx='9.3' cy='13' r='.75'/%3E%3Ccircle cx='14.7' cy='13' r='.75'/%3E%3Ccircle cx='12' cy='15.4' r='.75'/%3E%3Ccircle cx='9.9' cy='17.6' r='.75'/%3E%3Ccircle cx='14.1' cy='17.6' r='.75'/%3E%3C/g%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.home-page .cta-button:hover {
+    background-color: #a44a34;
+    color: #faf6ee;
+    transform: none;
+    box-shadow: inset 0 0 0 4px #a44a34, inset 0 0 0 5px rgba(250, 246, 238, 0.7), 0 4px 14px rgba(164, 74, 52, 0.25);
+}
+
+/* 右側內容區域：圖片容器（下方可接一段說明文字） */
 .content-right {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
+    gap: 16px;
+}
+
+/* 首頁圖片下方的說明文字（選填） */
+.hero-caption {
+    font-family: 'Inter', 'Noto Sans TC', sans-serif;
+    font-size: 16px;
+    font-weight: 300;
+    color: #6b5d4f;
+    line-height: 1.6;
+    text-align: center;
+    white-space: pre-line;  /* admin 輸入的換行照樣換行 */
 }
 
 /* 圖片外層容器 */
@@ -412,7 +554,7 @@ img {
 /* 平板尺寸（968px 以下）：改為單欄版面配置 */
 @media (max-width: 968px) {
     .header {
-        padding: 20px 0;
+        padding: 10px 0;
     }
 
     .main-content {
@@ -803,8 +945,15 @@ img {
     border-radius: 0 0 2px 0;
 }
 
-/* ── 圖片標籤（覆蓋差異） ── */
+/* ── 圖片標籤（覆蓋差異） ──
+   照片上的標籤不顯示文字，只留一張色塊小便利貼（顏色對照上方的標籤圖例）。
+   文字仍留在 DOM 裡（font-size: 0 隱藏），語言切換與螢幕閱讀器照常運作。 */
 .gallery-image-tag {
+    font-size: 0;
+    padding: 0;
+    width: 32px;
+    height: 20px;
+    letter-spacing: 0;
     transform: rotate(-2deg);
 }
 
@@ -864,39 +1013,48 @@ img {
     padding: 0;
 }
 
-/* ── 圖例標籤（覆蓋差異：稍大尺寸） ── */
+/* ── 圖例標籤：「圓圈＋文字」（不是便利貼）──
+   顏色由 gallery-loader.js 寫在 inline style：color（文字）、--tag-dot（圓圈框線／勾選後填色）。沒勾選時圓圈是空心的。
+   勾選後圓圈填滿並出現白色勾勾；文字用同色系的深色。照片上的標籤仍是便利貼（同色系的淡色）。 */
 .tag-legend-badge {
-    padding: 7px 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 8px;
     font-size: 14.5px;
+    background: transparent;
+    box-shadow: none;
+    border-radius: 20px;
 }
 
-.tag-legend-checkbox:checked + .tag-legend-badge {
-    box-shadow: 2px 3px 8px rgba(0, 0, 0, 0.25) !important;
-    transform: translateY(-2px);
+.tag-legend-badge::after {
+    display: none;  /* 不要便利貼的摺角 */
 }
 
-.tag-legend-checkbox-label:hover .tag-legend-badge {
-    transform: translateY(-2px);
-    box-shadow: 2px 3px 8px rgba(0, 0, 0, 0.2) !important;
+.tag-legend-badge::before {
+    content: '';
+    flex: none;
+    width: 15px;
+    height: 15px;
+    box-sizing: border-box;
+    border-radius: 50%;
+    border: 1.5px solid var(--tag-dot);
+    background: transparent center / 11px 11px no-repeat;  /* 沒勾選時空心 */
+    transition: background-color 0.2s ease;
 }
 
 .tag-legend-checkbox:checked + .tag-legend-badge::before {
-    content: '✓';
-    position: absolute;
-    top: -6px;
-    right: -6px;
-    width: 18px;
-    height: 18px;
-    background-color: rgba(255, 255, 255, 0.95);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11px;
-    color: #3d2817;
-    font-weight: 700;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    z-index: 10;
+    background-color: var(--tag-dot);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 6.3 5 8.6 9.6 3.6' fill='none' stroke='%23fff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+.tag-legend-checkbox-label:hover .tag-legend-badge {
+    background-color: #f6f1ea;
+}
+
+.tag-legend-checkbox:focus-visible + .tag-legend-badge {
+    outline: 2px solid var(--tag-dot);
+    outline-offset: 1px;
 }
 
 .tag-legend-hint {
@@ -927,6 +1085,12 @@ img {
     transform-origin: center;
     border-radius: 20px;
     box-shadow: 0 4px 16px rgba(61, 40, 23, 0.1);
+}
+
+.all-items-page .gallery-image-tags {
+    /* 照片縮成 85%（四邊各內縮 7.5%），標籤也跟著內縮，整個貼在照片內側右下角 */
+    bottom: calc(7.5% + 10px);
+    right: calc(7.5% + 10px);
 }
 
 .all-items-page .gallery-item-name {
@@ -1015,8 +1179,8 @@ img {
     margin-bottom: 40px;
 }
 
-/* 第二區（季節品項）上方用與 sets「本週切片」相同的乾淨分隔線 */
-.is-test-mode #products.all-items-section-title {
+/* 分類區塊之間（第二區起）用與 sets「本週切片」相同的乾淨分隔線 */
+#categorySections .all-items-section + .all-items-section {
     margin-top: 20px;
     padding-top: 40px;
     border-top: 1px solid var(--skin-border, rgba(61, 40, 23, 0.08));
@@ -1059,8 +1223,9 @@ img {
 
 .seasonal-page .gallery-image-tags,
 .sets-page .gallery-image-tags {
-    bottom: -6px;
-    right: -6px;
+    /* 整個貼在照片內側右下角（原本 -6px 會讓便利貼一部分跑出照片外） */
+    bottom: 10px;
+    right: 10px;
 }
 
 /* 響應式���平板 - 分頁樣式 */
@@ -1167,7 +1332,8 @@ img {
 
     .tag-legend-badge {
         font-size: 12px;
-        padding: 6px 12px;
+        padding: 5px 6px;
+        gap: 5px;
     }
 }
 
@@ -1419,6 +1585,79 @@ img {
     border-color: #f5d97a;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(245, 217, 122, 0.4);
+}
+
+/* 全部品項頁的分類分頁（新品上市／季節品項…）：比訂購說明頁的 tag 大一號，並加底色讓它更顯眼 */
+.all-items-page .order-tag {
+    padding: 9px 22px;
+    font-size: 16.5px;
+    background-color: #fcf3d6;
+    border-color: #f3e4b0;
+    color: #3d2817;
+}
+
+.all-items-page .order-tag:hover {
+    background-color: #f5d97a;
+    border-color: #f5d97a;
+}
+
+/* 分類分頁的「草莓季」樣式（class 為 order-tag--pink；admin 分頁管理可選，例如草莓季限定）：
+   與首頁「草莓季限定品項」按鈕同一套設計但顏色反過來——平常磚紅底、淡粉紅字，滑鼠移上去變淡粉紅底、磚紅字；磚紅細框＋內圈細線（inset box-shadow 畫雙線），
+   襯線中文字（Noto Serif TC，由 gallery-loader.js 在有這種分頁時載入），左右各一顆線條小草莓
+   （mask 圖＋currentColor，hover 反轉時跟著變色）。保留分頁本來的圓角膠囊形狀，跟旁邊的分頁一致。 */
+.all-items-page .order-tag.order-tag--pink {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Noto Serif TC', 'Songti TC', 'PMingLiU', serif;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: #fbe3e1;
+    background-color: #a44a34;
+    border: 1px solid #a44a34;
+    box-shadow: inset 0 0 0 3px #a44a34, inset 0 0 0 4px rgba(251, 227, 225, 0.7), 0 2px 8px rgba(164, 74, 52, 0.2);
+    margin: 0 6px;
+}
+
+.all-items-page .order-tag.order-tag--pink::before,
+.all-items-page .order-tag.order-tag--pink::after {
+    content: '';
+    flex: none;
+    width: 1.15em;
+    height: 1.15em;
+    background-color: currentColor;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 8.2c-4.2 0-7 1.9-7 5 0 3.9 3.6 7.8 7 7.8s7-3.9 7-7.8c0-3.1-2.8-5-7-5z'/%3E%3Cpath d='M7.6 7.6 12 9.4l4.4-1.8M12 9.4V5.2M12 5.2l1.8-1.6'/%3E%3Cg fill='%23000' stroke='none'%3E%3Ccircle cx='9.3' cy='13' r='.75'/%3E%3Ccircle cx='14.7' cy='13' r='.75'/%3E%3Ccircle cx='12' cy='15.4' r='.75'/%3E%3Ccircle cx='9.9' cy='17.6' r='.75'/%3E%3Ccircle cx='14.1' cy='17.6' r='.75'/%3E%3C/g%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 8.2c-4.2 0-7 1.9-7 5 0 3.9 3.6 7.8 7 7.8s7-3.9 7-7.8c0-3.1-2.8-5-7-5z'/%3E%3Cpath d='M7.6 7.6 12 9.4l4.4-1.8M12 9.4V5.2M12 5.2l1.8-1.6'/%3E%3Cg fill='%23000' stroke='none'%3E%3Ccircle cx='9.3' cy='13' r='.75'/%3E%3Ccircle cx='14.7' cy='13' r='.75'/%3E%3Ccircle cx='12' cy='15.4' r='.75'/%3E%3Ccircle cx='9.9' cy='17.6' r='.75'/%3E%3Ccircle cx='14.1' cy='17.6' r='.75'/%3E%3C/g%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.all-items-page .order-tag.order-tag--pink:hover {
+    background-color: #fbe3e1;
+    color: #a44a34;
+    border-color: #a44a34;
+    box-shadow: inset 0 0 0 3px #fbe3e1, inset 0 0 0 4px rgba(164, 74, 52, 0.55), 0 4px 12px rgba(164, 74, 52, 0.2);
+}
+
+/* 全部品項頁的分類列：分類按鈕置中，標籤圖例（奶蛋素…）放同一排右邊。
+   做法：::before 當左側等寬的空白、圖例佔右側，兩者 flex:1 把按鈕夾在中間；
+   寬度不夠時圖例自動換到第二排。左右 padding 決定圖例離右邊多遠：
+   1400px 比頁面內容（1120px）寬，圖例會比內容邊緣更靠右；數字越大越靠右。 */
+.all-items-page .order-tags {
+    align-items: center;
+    padding-left: max(16px, calc((100% - 1400px) / 2));
+    padding-right: max(16px, calc((100% - 1400px) / 2));
+}
+
+.all-items-page .order-tags::before {
+    content: '';
+    flex: 1 1 0;
+}
+
+.all-items-page .order-tags .tag-legend--shared {
+    flex: 1 1 0;
+    min-width: max-content;
+    justify-content: flex-end;
+    margin: 0;
+    padding: 0;
 }
 
 .order-section {
@@ -1780,6 +2019,22 @@ img {
     .order-tag {
         padding: 6px 12px;
         font-size: 12.5px;
+    }
+
+    .all-items-page .order-tag {
+        padding: 7px 14px;
+        font-size: 14px;
+    }
+
+    /* 手機：圖例固定換到第二排並置中 */
+    .all-items-page .order-tags::before {
+        display: none;
+    }
+
+    .all-items-page .order-tags .tag-legend--shared {
+        flex: 1 1 100%;
+        min-width: 0;
+        justify-content: center;
     }
 
     .order-section {
@@ -2200,3 +2455,19 @@ img {
     }
 }
 
+/* 導覽列 969–1180px：logo 不再超出螢幕左緣（見 .logo 的 margin-left）後，右側選單空間變少；
+   縮小 logo、選單間距與字級，避免選單文字斷成兩行。放在檔案最後，才蓋得過前面 .nav-link 等的基本設定。 */
+@media (max-width: 1180px) and (min-width: 969px) {
+    .logo { font-size: 27px; }
+    .logo a { gap: 12px; }
+    .site-logo { width: 62px; height: 62px; }
+    .nav { gap: 16px; }
+    .nav-right { gap: 16px; }
+    .nav-link { font-size: 20px; }
+}
+
+/* 首頁按鈕的手機尺寸。放在檔案最後，才蓋得過前面 .home-page .cta-button 的基本設定。 */
+@media (max-width: 640px) {
+    .home-page .cta-button { font-size: 15px; letter-spacing: 3px; padding: 12px 24px 12px 27px; gap: 10px; }
+    .home-page .cta-button::after { width: 22px; height: 22px; }
+}

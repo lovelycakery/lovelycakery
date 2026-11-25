@@ -47,6 +47,7 @@
   // Tracks what has been modified locally (not yet published)
   const dirty = {
     calendar: false,
+    home: false,
     seasonal: false,
     products: false,
     sets: false,
@@ -57,7 +58,7 @@
   };
 
   function hasPendingChanges() {
-    return dirty.calendar || dirty.seasonal || dirty.products || dirty.sets ||
+    return dirty.calendar || dirty.home || dirty.seasonal || dirty.products || dirty.sets ||
       dirty.pendingImages.length > 0 || dirty.pendingDeletes.length > 0;
   }
 
@@ -67,6 +68,7 @@
     btn.disabled = !hasPendingChanges();
     var count = 0;
     if (dirty.calendar) count++;
+    if (dirty.home) count++;
     if (dirty.seasonal) count++;
     if (dirty.products) count++;
     if (dirty.sets) count++;
@@ -217,13 +219,19 @@
   }
 
   function reloadPreview() {
-    var pageMap = { calendar: 'calendar.html', seasonal: 'seasonal.html', sets: 'sets.html', products: 'all-items.html', 'weekly-slices': 'sets.html' };
+    var pageMap = { home: 'index.html', calendar: 'calendar.html', seasonal: 'seasonal.html', sets: 'sets.html', products: 'all-items.html', 'weekly-slices': 'sets.html' };
     var page = pageMap[state.currentTab] || 'calendar.html';
     // 本週切片 tab 的編輯入口是右側勾選清單，預覽頁本身不需可編輯，
     // 強制用 preview 模式避免 sets 圖片出現拖曳/編輯互動造成混淆。
     var mode = state.currentTab === 'weekly-slices' ? 'preview' : (state.currentMode || 'edit');
+    // 編輯「優惠組合」或「本週切片」時，即使該區塊設成不顯示，預覽也強制顯示它（否則無從編輯）；
+    // 切到「預覽」模式則完全照訪客實際會看到的樣子。
+    var forceShow = '';
+    if ((state.currentMode || 'edit') === 'edit' && state.currentTab === 'sets') {
+      forceShow = '&forceShow=all';
+    }
     var iframe = $('previewFrame');
-    iframe.src = getPreviewBaseUrl() + '/' + page + '?adminPreview=1&mode=' + mode + '&ts=' + Date.now();
+    iframe.src = getPreviewBaseUrl() + '/' + page + '?adminPreview=1&mode=' + mode + forceShow + '&ts=' + Date.now();
     state.clickHookInstalled = false;
     if (state.hookTimer) { clearInterval(state.hookTimer); state.hookTimer = 0; }
   }
@@ -248,11 +256,340 @@
   function sendImageDataToPreview(type) {
     var iframe = $('previewFrame');
     if (!iframe || !iframe.contentWindow) return;
-    iframe.contentWindow.postMessage({
+    var msg = {
       type: 'admin-gallery-update',
       galleryType: type,
       items: state.imageData[type].items,
-    }, '*');
+    };
+    // 全部品項的預覽模式是依分類分區的頁面，分類設定要一起送
+    if (type === 'products' && Array.isArray(state.imageData.products.categories)) {
+      msg.categories = state.imageData.products.categories;
+    }
+    iframe.contentWindow.postMessage(msg, '*');
+  }
+
+  // ── 首頁（主圖與文字）────────────────────────────────────────────────
+  // 存在 assets/data/home-data.json；網站端由 home-loader.js 套用。
+  var HOME_DEFAULTS = {
+    schema_version: 1,
+    headline: '美好蛋糕店', headline_en: 'Lovely Cakery',
+    description: '用愛精心製作，層層堆疊。僅接受預訂。', description_en: 'Crafted with love, layer by layer. Pre-order only.',
+    buttonText: '查看菜單', buttonText_en: 'VIEW MENU',
+    buttonLink: 'all-items.html',
+    image: 'assets/images/cakes.jpg',
+    imageCaption: '', imageCaption_en: '',   // 圖片下方的說明文字（選填）
+  };
+  var HOME_TEXT_KEYS = ['headline', 'headline_en', 'description', 'description_en', 'buttonText', 'buttonText_en', 'buttonLink', 'image', 'imageCaption', 'imageCaption_en'];
+  // admin 上傳的首頁圖都放這個資料夾；換圖時只會刪這裡面的舊圖，不會動到預設的 cakes.jpg
+  var HOME_IMAGE_DIR = 'assets/images/home';
+
+  async function loadHomeData() {
+    var data = {};
+    try {
+      var res = await GitHubAPI.getJSON(SITE + '/assets/data/home-data.json');
+      data = res.data || {};
+    } catch (e) {
+      // 檔案還不存在（第一次使用）就用預設值
+      logStatus('ℹ️ 尚無首頁資料檔，使用預設值');
+    }
+    var merged = Object.assign({}, HOME_DEFAULTS);
+    HOME_TEXT_KEYS.forEach(function (k) { if (typeof data[k] === 'string') merged[k] = data[k]; });
+    state.homeData = merged;
+    if (state.currentTab === 'home') renderHomePanel();
+  }
+
+  function sendHomeToPreview() {
+    var iframe = $('previewFrame');
+    if (!iframe || !iframe.contentWindow || !state.homeData) return;
+    iframe.contentWindow.postMessage({ type: 'admin-home-update', data: state.homeData }, '*');
+  }
+
+  function markHomeChanged() {
+    dirty.home = true;
+    updatePublishButton();
+    sendHomeToPreview();
+  }
+
+  // 按鈕可以連去的地方：全部品項的各個分頁 + 其他頁面
+  function homeLinkOptions() {
+    var opts = [{ value: 'all-items.html', label: '全部品項（最上方）' }];
+    var cats = categoriesLoaded() ? state.imageData.products.categories : BUILTIN_CATEGORIES;
+    cats.forEach(function (c) { opts.push({ value: 'all-items.html#' + c.id, label: '全部品項 ›' + ' ' + (c.name || '(未命名分頁)') }); });
+    opts.push({ value: 'sets.html', label: '本週切片' });
+    opts.push({ value: 'calendar.html', label: '月曆' });
+    opts.push({ value: 'order.html', label: '訂購說明' });
+    opts.push({ value: 'contact.html', label: '地圖' });
+    return opts;
+  }
+
+  function renderHomePanel() {
+    var loaded = !!state.homeData;
+    var d = state.homeData || {};
+    document.querySelectorAll('.home-field').forEach(function (el) {
+      el.disabled = !loaded;
+      el.value = loaded ? (d[el.dataset.key] || '') : '';
+    });
+    $('homeImageReplaceBtn').disabled = !loaded;
+    var thumb = $('homeImageThumb');
+    if (loaded) thumb.src = d._previewUrl || d.image; else thumb.removeAttribute('src');
+
+    var sel = $('homeButtonLinkSelect');
+    sel.disabled = !loaded;
+    sel.innerHTML = '';
+    if (!loaded) return;
+    var opts = homeLinkOptions();
+    // 目前的連結不在清單裡（例如指向已刪除的分頁）也要顯示出來，不能默默換掉
+    if (!opts.some(function (o) { return o.value === d.buttonLink; })) {
+      opts.unshift({ value: d.buttonLink, label: '（目前設定）' + d.buttonLink });
+    }
+    opts.forEach(function (o) {
+      var el = document.createElement('option');
+      el.value = o.value; el.textContent = o.label;
+      if (o.value === d.buttonLink) el.selected = true;
+      sel.appendChild(el);
+    });
+  }
+
+  async function setupHomePanel() {
+    renderHomePanel();
+    if (!dirty.home && !state.homeData) await loadHomeData();
+    // 連結選單要列出全部品項的分頁，沒載過就載一次
+    if (!dirty.products && !categoriesLoaded()) await loadImageData('products');
+    if (state.currentTab === 'home') renderHomePanel();
+  }
+
+  async function replaceHomeImage(files) {
+    if (!state.homeData || !files || files.length === 0) return;
+    var file = files[0];
+    logStatus('⏳ 壓縮首頁圖片：' + file.name + '…');
+    try {
+      var compressed = await ImageCompress.compress(file);
+      var oldImage = state.homeData.image;
+      // 舊圖若是之前從 admin 上傳的就排入刪除（還沒發布的則直接取消上傳）
+      if (oldImage && oldImage.indexOf(HOME_IMAGE_DIR + '/') === 0) queueImageRemoval(oldImage);
+      var newPath = HOME_IMAGE_DIR + '/hero-' + Date.now() + '.jpg';
+      dirty.pendingImages.push({ repoPath: SITE + '/' + newPath, base64: compressed.desktop.base64 });
+      state.homeData.image = newPath;
+      state.homeData._previewUrl = URL.createObjectURL(compressed.desktop.blob);
+      markHomeChanged();
+      renderHomePanel();
+      showSuccess('已更換首頁圖片（本地）');
+      logStatus('✅ 首頁圖片已替換：' + newPath);
+    } catch (e) {
+      showError('壓縮失敗：' + (e.message || String(e)));
+    }
+  }
+
+  // ── 全部品項頁的分類分頁（分頁管理）──────────────────────────────────
+  // 存在 products-data.json 的 categories。規則與 gallery-loader.js 的 normalizeCategories 一致：
+  //   - 'seasonal'（新品上市）：內建，品項來自「新品上市」分頁（seasonal-data.json）
+  //   - 'products'（季節品項）：內建，沒有指定分頁（或分頁已刪除）的全部品項
+  //   - 其他：自訂分頁，品項用編輯面板的「所屬分頁」指定（item.category）
+  var BUILTIN_CATEGORIES = [
+    { id: 'seasonal', name: '新品上市', name_en: 'Seasonal Specials', show: true,
+      emptyText: '🍰 新品籌備中，敬請期待～ ✨', emptyText_en: 'Coming Soon — Stay Tuned!', style: '' },
+    { id: 'products', name: '季節品項', name_en: 'Menu', show: true, emptyText: '', emptyText_en: '', style: '' },
+  ];
+  // 分頁按鈕的樣式選項（value 對應 styles.css 的 .order-tag--<value>）
+  var CATEGORY_STYLES = [
+    { value: '', label: '淡黃（預設）' },
+    { value: 'pink', label: '草莓季' },
+  ];
+
+  function isBuiltinCategory(id) { return id === 'seasonal' || id === 'products'; }
+
+  function normalizeCategories(list) {
+    var src = (Array.isArray(list) && list.length) ? list : BUILTIN_CATEGORIES;
+    var out = [], seen = {};
+    src.forEach(function (c) {
+      if (!c || typeof c.id !== 'string' || !c.id || seen[c.id]) return;
+      seen[c.id] = true;
+      out.push({
+        id: c.id,
+        name: typeof c.name === 'string' ? c.name : '',
+        name_en: typeof c.name_en === 'string' ? c.name_en : '',
+        show: c.show !== false,
+        emptyText: typeof c.emptyText === 'string' ? c.emptyText : '',
+        emptyText_en: typeof c.emptyText_en === 'string' ? c.emptyText_en : '',
+        style: typeof c.style === 'string' ? c.style : '',
+      });
+    });
+    BUILTIN_CATEGORIES.forEach(function (d) { if (!seen[d.id]) out.push(Object.assign({}, d)); });
+    return out;
+  }
+
+  function categoriesLoaded() { return Array.isArray(state.imageData.products.categories); }
+
+  function markCategoriesChanged() {
+    dirty.products = true;
+    updatePublishButton();
+    var iframe = $('previewFrame');
+    if (iframe && iframe.contentWindow) {
+      iframe.contentWindow.postMessage({ type: 'admin-categories-update', categories: state.imageData.products.categories }, '*');
+    }
+  }
+
+  // 編輯面板的「所屬分頁」下拉：季節品項（預設）＋ 所有自訂分頁
+  function renderCategorySelect(selectedId) {
+    var sel = $('imageCategorySelect');
+    if (!sel) return;
+    sel.innerHTML = '';
+    var cats = categoriesLoaded() ? state.imageData.products.categories : BUILTIN_CATEGORIES;
+    var defaultCat = cats.filter(function (c) { return c.id === 'products'; })[0];
+    var opts = [{ value: '', label: (defaultCat && defaultCat.name) || '季節品項' }];
+    cats.forEach(function (c) { if (!isBuiltinCategory(c.id)) opts.push({ value: c.id, label: c.name || '(未命名分頁)' }); });
+    var found = false;
+    opts.forEach(function (o) {
+      var el = document.createElement('option');
+      el.value = o.value; el.textContent = o.label;
+      if (o.value === (selectedId || '')) { el.selected = true; found = true; }
+      sel.appendChild(el);
+    });
+    if (!found) sel.value = '';
+  }
+
+  function makeCategoryField(labelText, value, placeholder, onInput) {
+    var frag = document.createDocumentFragment();
+    var label = document.createElement('label');
+    label.className = 'label';
+    label.textContent = labelText;
+    var input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'input';
+    input.value = value || '';
+    input.placeholder = placeholder || '';
+    input.addEventListener('input', function () { onInput(input.value); markCategoriesChanged(); });
+    frag.appendChild(label);
+    frag.appendChild(input);
+    return frag;
+  }
+
+  function renderCategoryManager() {
+    var list = $('categoryList');
+    if (!list) return;
+    list.innerHTML = '';
+    $('categoryAddBtn').disabled = !categoriesLoaded();
+    if (!categoriesLoaded()) {
+      list.innerHTML = '<p class="weekly-slices-hint">載入中…</p>';
+      return;
+    }
+    var cats = state.imageData.products.categories;
+    cats.forEach(function (cat, i) {
+      var row = document.createElement('div');
+      row.className = 'category-row';
+
+      var main = document.createElement('div');
+      main.className = 'category-row__main';
+
+      var cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.className = 'weekly-slice-checkbox';
+      cb.checked = cat.show;
+      cb.title = '在網站上顯示這個分頁';
+      cb.addEventListener('change', function () { cat.show = cb.checked; markCategoriesChanged(); });
+
+      var nameInput = document.createElement('input');
+      nameInput.type = 'text';
+      nameInput.className = 'input';
+      nameInput.value = cat.name;
+      nameInput.placeholder = '分頁名稱';
+      nameInput.addEventListener('input', function () { cat.name = nameInput.value; markCategoriesChanged(); });
+      // 名稱改完離開欄位時，更新品項編輯面板的下拉選項文字
+      nameInput.addEventListener('change', function () { renderCategorySelect($('imageCategorySelect').value); });
+
+      function mkBtn(text, title, disabled, onClick) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'btn btn-secondary btn-sm category-row__btn';
+        b.textContent = text; b.title = title; b.disabled = !!disabled;
+        b.addEventListener('click', onClick);
+        return b;
+      }
+      var up = mkBtn('▲', '往上移', i === 0, function () { moveCategory(i, -1); });
+      var down = mkBtn('▼', '往下移', i === cats.length - 1, function () { moveCategory(i, 1); });
+
+      main.appendChild(cb);
+      main.appendChild(nameInput);
+      main.appendChild(up);
+      main.appendChild(down);
+      if (!isBuiltinCategory(cat.id)) {
+        main.appendChild(mkBtn('✕', '移除這個分頁', false, function () { removeCategory(i); }));
+      }
+      row.appendChild(main);
+
+      var details = document.createElement('details');
+      details.className = 'category-row__details';
+      var summary = document.createElement('summary');
+      summary.textContent = '更多設定（英文名稱、空白時的文字、樣式）';
+      details.appendChild(summary);
+      details.appendChild(makeCategoryField('英文名稱（留空則沿用中文）', cat.name_en, '', function (v) { cat.name_en = v; }));
+      details.appendChild(makeCategoryField('沒有品項時顯示的文字', cat.emptyText, '籌備中，敬請期待～', function (v) { cat.emptyText = v; }));
+      details.appendChild(makeCategoryField('沒有品項時的文字・英文（留空則沿用中文）', cat.emptyText_en, '', function (v) { cat.emptyText_en = v; }));
+
+      var styleLabel = document.createElement('label');
+      styleLabel.className = 'label';
+      styleLabel.textContent = '分頁按鈕樣式';
+      var styleSel = document.createElement('select');
+      styleSel.className = 'input';
+      CATEGORY_STYLES.forEach(function (s) {
+        var o = document.createElement('option');
+        o.value = s.value; o.textContent = s.label;
+        if (s.value === (cat.style || '')) o.selected = true;
+        styleSel.appendChild(o);
+      });
+      styleSel.addEventListener('change', function () { cat.style = styleSel.value; markCategoriesChanged(); });
+      details.appendChild(styleLabel);
+      details.appendChild(styleSel);
+
+      var note = document.createElement('p');
+      note.className = 'category-row__builtin';
+      if (cat.id === 'seasonal') note.textContent = '內建分頁：品項在上方的「新品上市」分頁編輯。不能移除，但可以取消勾選來隱藏。';
+      else if (cat.id === 'products') note.textContent = '內建分頁：沒有指定「所屬分頁」的品項都放在這裡。不能移除，但可以取消勾選來隱藏。';
+      else note.textContent = '自訂分頁：在下方選取品項後，用「所屬分頁」把品項放進來。';
+      details.appendChild(note);
+
+      row.appendChild(details);
+      list.appendChild(row);
+    });
+  }
+
+  function moveCategory(index, delta) {
+    var cats = state.imageData.products.categories;
+    var to = index + delta;
+    if (to < 0 || to >= cats.length) return;
+    var moved = cats.splice(index, 1)[0];
+    cats.splice(to, 0, moved);
+    markCategoriesChanged();
+    renderCategoryManager();
+  }
+
+  function addCategory() {
+    if (!categoriesLoaded()) return;
+    var name = (prompt('新分頁的名稱：', '') || '').trim();
+    if (!name) return;
+    state.imageData.products.categories.push({
+      id: 'cat-' + Date.now().toString(36),
+      name: name, name_en: '', show: true, emptyText: '', emptyText_en: '', style: '',
+    });
+    markCategoriesChanged();
+    renderCategoryManager();
+    renderCategorySelect($('imageCategorySelect').value);
+  }
+
+  function removeCategory(index) {
+    var cats = state.imageData.products.categories;
+    var cat = cats[index];
+    if (!cat || isBuiltinCategory(cat.id)) return;
+    var items = state.imageData.products.items || [];
+    var count = items.filter(function (it) { return it.category === cat.id; }).length;
+    var msg = '確定移除分頁「' + (cat.name || '(未命名)') + '」？';
+    if (count > 0) msg += '\n這個分頁裡的 ' + count + ' 個品項不會被刪除，會回到「季節品項」。';
+    if (!confirm(msg)) return;
+    cats.splice(index, 1);
+    items.forEach(function (it) { if (it.category === cat.id) delete it.category; });
+    markCategoriesChanged();
+    renderCategoryManager();
+    renderCategorySelect($('imageCategorySelect').value);
   }
 
   // ── Weekly slices（本週切片）：從 全部品項 + 新品上市 勾選參照 ────────────
@@ -304,6 +641,56 @@
       type: 'admin-weekly-slices-update',
       items: resolveWeeklySliceItems(),
     }, '*');
+  }
+
+  // ── 優惠組合／本週切片：整段是否顯示在網站上 ─────────────────────────
+  // 存在 sets-data.json 的 showSets / showWeeklySlices；舊資料沒有這兩欄就當 true。
+
+  // 本週切片沒有勾選任何品項時顯示的預設文字（與 gallery-loader.js 的 WEEKLY_EMPTY_DEFAULT.zh 一致）
+  var WEEKLY_EMPTY_TEXT_DEFAULT = '本週切片暫停，期待下週見面～ 🌸';
+
+  function setsVisibilityLoaded() {
+    return typeof state.imageData.sets.showSets === 'boolean' && typeof state.imageData.sets.showWeeklySlices === 'boolean';
+  }
+
+  // 把 state 反映到兩個勾選框；資料還沒載入前先 disabled，避免勾了又被載入結果蓋掉
+  function syncSetsVisibilityUI() {
+    var loaded = setsVisibilityLoaded();
+    var setsCb = $('showSetsCheckbox'), weeklyCb = $('showWeeklySlicesCheckbox');
+    if (setsCb) { setsCb.disabled = !loaded; setsCb.checked = loaded && state.imageData.sets.showSets; }
+    if (weeklyCb) { weeklyCb.disabled = !loaded; weeklyCb.checked = loaded && state.imageData.sets.showWeeklySlices; }
+    // 本週切片為空時的提示文字（中／英）
+    var zhInput = $('weeklyEmptyTextInput'), enInput = $('weeklyEmptyTextEnInput');
+    if (zhInput) { zhInput.disabled = !loaded; zhInput.value = loaded ? (state.imageData.sets.weeklyEmptyText || '') : ''; }
+    if (enInput) { enInput.disabled = !loaded; enInput.value = loaded ? (state.imageData.sets.weeklyEmptyText_en || '') : ''; }
+  }
+
+  function setWeeklyEmptyText(key, value) {
+    if (!setsVisibilityLoaded()) return;
+    state.imageData.sets[key] = value;
+    dirty.sets = true;
+    updatePublishButton();
+    sendSetsVisibilityToPreview();
+  }
+
+  function sendSetsVisibilityToPreview() {
+    var iframe = $('previewFrame');
+    if (!iframe || !iframe.contentWindow || !setsVisibilityLoaded()) return;
+    iframe.contentWindow.postMessage({
+      type: 'admin-sets-visibility',
+      showSets: state.imageData.sets.showSets,
+      showWeeklySlices: state.imageData.sets.showWeeklySlices,
+      weeklyEmptyText: state.imageData.sets.weeklyEmptyText,
+      weeklyEmptyText_en: state.imageData.sets.weeklyEmptyText_en,
+    }, '*');
+  }
+
+  function setSetsVisibility(key, on) {
+    if (!setsVisibilityLoaded()) return;
+    state.imageData.sets[key] = !!on;
+    dirty.sets = true;
+    updatePublishButton();
+    sendSetsVisibilityToPreview();
   }
 
   function renderWeeklySlicesPicker() {
@@ -380,7 +767,7 @@
     }
     if (!Array.isArray(state.imageData.sets.weeklySlices)) state.imageData.sets.weeklySlices = [];
     // 切回別的 tab 後再回來時才 render（避免 await 期間使用者已切走）
-    if (state.currentTab === 'weekly-slices') renderWeeklySlicesPicker();
+    if (state.currentTab === 'sets') renderWeeklySlicesPicker();
   }
 
   // ── Calendar click hook ───────────────────────────────────────────
@@ -753,6 +1140,19 @@
       // sets 額外帶 weeklySlices（本週切片參照）；舊資料沒有就補空陣列
       if (type === 'sets' && !Array.isArray(state.imageData.sets.weeklySlices)) {
         state.imageData.sets.weeklySlices = [];
+      }
+      // products 的分類分頁清單；舊資料沒有就補上內建的兩個
+      if (type === 'products') {
+        state.imageData.products.categories = normalizeCategories(state.imageData.products.categories);
+        if (state.currentTab === 'products') renderCategoryManager();
+      }
+      // sets 的兩個顯示開關；舊資料沒有就預設顯示
+      if (type === 'sets') {
+        if (typeof state.imageData.sets.showSets !== 'boolean') state.imageData.sets.showSets = true;
+        if (typeof state.imageData.sets.showWeeklySlices !== 'boolean') state.imageData.sets.showWeeklySlices = true;
+        if (typeof state.imageData.sets.weeklyEmptyText !== 'string') state.imageData.sets.weeklyEmptyText = WEEKLY_EMPTY_TEXT_DEFAULT;
+        if (typeof state.imageData.sets.weeklyEmptyText_en !== 'string') state.imageData.sets.weeklyEmptyText_en = '';
+        syncSetsVisibilityUI();
       }
     } catch (e) {
       logStatus('❌ 載入 ' + type + ' 資料失敗：' + (e.message || String(e)));
@@ -1245,6 +1645,7 @@
     if (tabTypeHasTags(type)) {
       if (tags.length !== origTags.length || tags.some(function (t) { return origTags.indexOf(t) === -1; })) return true;
     }
+    if (type === 'products' && $('imageCategorySelect').value !== (item.category || '')) return true;
     return false;
   }
 
@@ -1270,6 +1671,7 @@
     $('imageDescEnInput').value = item.description_en || '';
     state.editingTags = (item.tags && Array.isArray(item.tags)) ? item.tags.slice() : [];
     renderTagChips();
+    if (type === 'products') renderCategorySelect(item.category || '');
     var mainThumb = $('mainImageThumb');
     if (mainThumb) mainThumb.src = previewImageSrc(item, type);
     renderSubImagesList();
@@ -1322,6 +1724,11 @@
     item.description = $('imageDescInput').value.trim();
     item.description_en = $('imageDescEnInput').value.trim();
     item.tags = state.editingTags.slice();
+    // 所屬分頁（僅全部品項）：空值＝季節品項，不寫 category 欄位
+    if (type === 'products') {
+      var catId = $('imageCategorySelect').value;
+      if (catId) item.category = catId; else delete item.category;
+    }
 
     // 名稱和檔名分離：改名稱只改 JSON，不動圖片檔案
     dirty[type] = true;
@@ -1539,11 +1946,35 @@
         parts.push('日曆');
       }
 
+      // 1.5 首頁資料
+      if (dirty.home && state.homeData) {
+        var homeOut = { schema_version: 1 };
+        HOME_TEXT_KEYS.forEach(function (k) { homeOut[k] = String(state.homeData[k] || '').trim(); });
+        if (!homeOut.headline || !homeOut.buttonText) throw new Error('首頁的標題與按鈕文字不能是空的');
+        if (!homeOut.image) homeOut.image = HOME_DEFAULTS.image;
+        if (!homeOut.buttonLink) homeOut.buttonLink = HOME_DEFAULTS.buttonLink;
+        changes.push({ path: SITE + '/assets/data/home-data.json', content: JSON.stringify(homeOut, null, 2) + '\n' });
+        parts.push('首頁');
+      }
+
       // 2. Image-type data (seasonal / products / sets)
       IMAGE_TYPES.forEach(function (t) {
         if (!dirty[t]) return;
         var data = { schema_version: 1, items: cleanItemsForCommit(state.imageData[t].items) };
-        if (t === 'sets') data.weeklySlices = state.imageData.sets.weeklySlices || [];
+        if (t === 'products') {
+          data.categories = normalizeCategories(state.imageData.products.categories).map(function (c) {
+            return { id: c.id, name: c.name.trim(), name_en: c.name_en.trim(), show: c.show,
+                     emptyText: c.emptyText.trim(), emptyText_en: c.emptyText_en.trim(), style: c.style };
+          });
+        }
+        if (t === 'sets') {
+          data.weeklySlices = state.imageData.sets.weeklySlices || [];
+          data.showSets = state.imageData.sets.showSets !== false;
+          data.showWeeklySlices = state.imageData.sets.showWeeklySlices !== false;
+          // 中文留空就寫回預設句（網站端同樣會 fallback，這裡讓資料檔內容明確）
+          data.weeklyEmptyText = (state.imageData.sets.weeklyEmptyText || '').trim() || WEEKLY_EMPTY_TEXT_DEFAULT;
+          data.weeklyEmptyText_en = (state.imageData.sets.weeklyEmptyText_en || '').trim();
+        }
         validateImageData(data);
         changes.push({ path: SITE + '/assets/data/' + TYPE_DATAFILE[t], content: JSON.stringify(data, null, 2) + '\n' });
         parts.push(TYPE_LABEL[t]);
@@ -1595,6 +2026,8 @@
 
       // Reset dirty state
       dirty.calendar = false;
+      var homeWasDirty = dirty.home;
+      dirty.home = false;
       IMAGE_TYPES.forEach(function (t) { dirty[t] = false; });
       dirty.pendingImages = [];
       dirty.pendingDeletes = [];
@@ -1602,6 +2035,7 @@
 
       // Reload data from GitHub to sync
       await refreshCalendarData();
+      if (homeWasDirty) await loadHomeData();
       for (var ti = 0; ti < IMAGE_TYPES.length; ti++) {
         await loadImageData(IMAGE_TYPES[ti]);
       }
@@ -1864,14 +2298,21 @@
     if (tabName !== 'calendar' && state.hookTimer) { clearInterval(state.hookTimer); state.hookTimer = 0; state.clickHookInstalled = false; }
     document.querySelectorAll('.tab-btn').forEach(function (btn) { btn.classList.toggle('active', btn.dataset.tab === tabName); });
     clearError(); clearSuccess();
-    // 三種面板：日曆 / 本週切片（獨立分頁）/ 圖片型（seasonal/products/sets）
+    // 面板：日曆 / 圖片型（seasonal/products/sets）；sets 分頁下方另外接本週切片面板
     $('calendarPanel').style.display = (tabName === 'calendar') ? 'block' : 'none';
-    $('weeklySlicesPanel').style.display = (tabName === 'weekly-slices') ? 'block' : 'none';
+    $('homePanel').style.display = (tabName === 'home') ? 'block' : 'none';
+    if (tabName === 'home') setupHomePanel();
+    $('weeklySlicesPanel').style.display = (tabName === 'sets') ? 'block' : 'none';
     $('imagePanel').style.display = isImageTab(tabName) ? 'block' : 'none';
+    // 分頁管理與「所屬分頁」下拉只屬於全部品項分頁
+    $('categoryManagerSection').style.display = (tabName === 'products') ? '' : 'none';
+    $('categorySelectSection').style.display = (tabName === 'products') ? '' : 'none';
+    if (tabName === 'products') renderCategoryManager();
+    // 「在網站上顯示優惠組合」勾選框只屬於優惠組合分頁
+    $('setsVisibilitySection').style.display = (tabName === 'sets') ? '' : 'none';
+    syncSetsVisibilityUI();
 
-    if (tabName === 'weekly-slices') {
-      setupWeeklySlicesPicker();
-    } else if (isImageTab(tabName)) {
+    if (isImageTab(tabName)) {
       // 在沒有價格的 tab（如 sets）隱藏價格區塊
       var priceSection = $('priceSection');
       if (priceSection) priceSection.style.display = tabTypeHasPrice(tabName) ? '' : 'none';
@@ -1882,9 +2323,12 @@
       var tagManagerSection = $('tagManagerSection');
       if (tagManagerSection) tagManagerSection.style.display = hasTags ? '' : 'none';
       // Only load from GitHub if we haven't loaded yet (or if not dirty)
-      if (!dirty[tabName] && (!state.imageData[tabName].items || state.imageData[tabName].items.length === 0)) {
+      // sets 第一次進來時交給 setupWeeklySlicesPicker 載入（它會 await 再畫勾選清單），避免重複載入互相覆蓋
+      var setsFirstLoad = tabName === 'sets' && !Array.isArray(state.imageData.sets.weeklySlices);
+      if (!setsFirstLoad && !dirty[tabName] && (!state.imageData[tabName].items || state.imageData[tabName].items.length === 0)) {
         loadImageData(tabName);
       }
+      if (tabName === 'sets') setupWeeklySlicesPicker();
       clearImageEditPanel();
     }
     reloadPreview();
@@ -2244,6 +2688,31 @@
 
     $('logoutBtn').addEventListener('click', handleLogout);
 
+    $('categoryAddBtn').addEventListener('click', addCategory);
+
+    document.querySelectorAll('.home-field').forEach(function (el) {
+      el.addEventListener('input', function () {
+        if (!state.homeData) return;
+        state.homeData[el.dataset.key] = el.value;
+        markHomeChanged();
+      });
+    });
+    $('homeButtonLinkSelect').addEventListener('change', function (e) {
+      if (!state.homeData) return;
+      state.homeData.buttonLink = e.target.value;
+      markHomeChanged();
+    });
+    $('homeImageReplaceBtn').addEventListener('click', function () { $('homeImageFileInput').click(); });
+    $('homeImageFileInput').addEventListener('change', function () {
+      var fi = $('homeImageFileInput');
+      replaceHomeImage(Array.from(fi.files || []));
+      fi.value = '';
+    });
+    $('showSetsCheckbox').addEventListener('change', function (e) { setSetsVisibility('showSets', e.target.checked); });
+    $('showWeeklySlicesCheckbox').addEventListener('change', function (e) { setSetsVisibility('showWeeklySlices', e.target.checked); });
+    $('weeklyEmptyTextInput').addEventListener('input', function (e) { setWeeklyEmptyText('weeklyEmptyText', e.target.value); });
+    $('weeklyEmptyTextEnInput').addEventListener('input', function (e) { setWeeklyEmptyText('weeklyEmptyText_en', e.target.value); });
+
     var previewFrame = $('previewFrame');
     previewFrame.setAttribute('tabindex', '-1');
     previewFrame.addEventListener('load', function () {
@@ -2255,9 +2724,12 @@
       if (isImageTab(state.currentTab) && dirty[state.currentTab]) {
         setTimeout(function () { sendImageDataToPreview(state.currentTab); }, 500);
       }
+      if (state.currentTab === 'home' && dirty.home) {
+        setTimeout(function () { sendHomeToPreview(); }, 500);
+      }
       // sets / 本週切片 預覽：若有未發布的本週切片變更，重送以反映勾選狀態
       if ((state.currentTab === 'sets' || state.currentTab === 'weekly-slices') && dirty.sets) {
-        setTimeout(function () { sendWeeklySlicesToPreview(); }, 500);
+        setTimeout(function () { sendWeeklySlicesToPreview(); sendSetsVisibilityToPreview(); }, 500);
       }
       if (state.editingImageIndex >= 0 && state.currentMode === 'edit' && previewFrame.contentWindow) {
         setTimeout(function () { previewFrame.contentWindow.postMessage({ type: 'gallery-select', index: state.editingImageIndex }, '*'); }, 300);

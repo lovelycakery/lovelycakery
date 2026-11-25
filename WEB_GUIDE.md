@@ -59,6 +59,7 @@ site/
     │   ├── calendar-shared.js         # 日曆共用工具
     │   ├── calendar-widget-readonly.js# 只讀日曆 widget
     │   ├── gallery-loader.js          # 相簿動態載入（seasonal / all-items / sets 共用）
+    │   ├── home-loader.js             # 首頁內容載入（讀 home-data.json）
     │   ├── image-protection.js        # 圖片防護（禁右鍵/拖曳）
     │   ├── jszip.min.js               # Web Admin: ZIP 函式庫（第三方）
     │   ├── admin-github-api.js        # Web Admin: GitHub API 封裝
@@ -67,6 +68,7 @@ site/
     │   └── admin-app.js              # Web Admin: UI 邏輯
     ├── data/
     │   ├── calendar-data.json         # 日曆事件資料
+    │   ├── home-data.json             # 首頁主圖與文字
     │   ├── products-data.json         # 全部品項資料
     │   ├── seasonal-data.json         # 季節限定 / 新品上市資料
     │   └── sets-data.json             # 優惠組合資料
@@ -89,10 +91,21 @@ site/
 ### HTML（頁面）
 
 - `index.html`：首頁
+  - 標題、說明、按鈕文字／連結、主圖存在 `assets/data/home-data.json`，由 `assets/js/home-loader.js` 套用；Admin 的「首頁」分頁可編輯
+  - HTML 裡寫的文字是預設值（也給搜尋引擎看）。為避免先看到預設內容再跳成新內容，頁面先加 `html.home-pending` 把 `.content-grid` 藏起來，套用完才顯示（另有 1.5 秒保險）
+  - 主圖 `<img>` 沒有寫 `src`（只有 `data-src` 當預設值），由 home-loader.js 設定，避免換圖後還去下載舊圖
 - `calendar.html`：日曆頁（iframe 嵌入只讀日曆）
 - `seasonal.html`：季節限定 / 新品上市頁（由 gallery-loader.js 動態載入圖片）
 - `all-items.html`：全部品項頁（由 gallery-loader.js 動態載入圖片）
-- `sets.html`：優惠組合頁（由 gallery-loader.js 動態載入圖片）
+  - 上方的分類分頁列（`#categoryTabs`）與各分類區塊（`#categorySections`）都是 gallery-loader.js 依 `products-data.json` 的 `categories` 動態產生（`buildCategoryPage()`），HTML 裡沒有寫死任何分類
+  - 分類的增減、排序、顯示與否、空白時的文字、按鈕樣式都在 Admin「全部品項」分頁的「分頁管理」設定（見 `ADMIN_GUIDE.md`）
+  - 分頁按鈕樣式在 `styles.css` 的 `.all-items-page .order-tag`（預設淡黃）與 `.order-tag--pink`（admin 選項名「草莓季」：磚紅底雙線框、襯線字、線條小草莓）；要加新樣式就加一個 `.order-tag--<名稱>`，並在 `admin-app.js` 的 `CATEGORY_STYLES` 加一個選項
+  - 標籤圖例（奶蛋素…）放在分類列同一排右邊
+  - Admin 編輯模式（`?adminPreview=1&mode=edit`）下改顯示不分類的單一相簿（`.edit-only`），因為拖曳排序與點擊編輯靠 `items` 的索引
+- `sets.html`：本週切片／優惠組合頁（由 gallery-loader.js 動態載入圖片）
+  - 選單上的名稱是「本週切片」（`site-header.js`），頁面標題與 meta 也是本週切片；檔名仍是 `sets.html`
+  - 頁內有兩個區塊：`#setsSection`（優惠組合）與 `#weeklySlicesSection`（本週切片），各自是否顯示由 `sets-data.json` 的 `showSets` / `showWeeklySlices` 決定（Admin 可勾選，見 `ADMIN_GUIDE.md`）
+  - 本週切片有開但沒有勾選任何品項時，顯示 `weeklyEmptyText`（預設「本週切片暫停，期待下週見面～ 🌸」）
 - `order.html`：訂購方式頁
 - `contact.html`：聯絡/地圖頁
 - `calendar-widget-readonly.html`：只讀日曆 widget 頁（iframe 內）
@@ -238,6 +251,7 @@ Admin 相關 JS 的詳細說明見 `ADMIN_GUIDE.md`：
 - **不要重新加回 setInterval 輪詢語言**：目前語言同步用 postMessage（事件驅動）
 - **GitHub Token**：只能放 `github-config.local.js`（不要放回 repo）
 - **iframe 高度/縮放**：只改 `calendar-embed.js`，widget 內高度回報在 `calendar-widget-readonly.js`
+- **「籌備中」文字的 flex 規則不要套到多相簿的頁面**：`gallery-loader.js` 在相簿為空時會注入 `:has(.gallery-coming-soon)` 規則，把 `.main-content` / `.container` 變成 flex 來垂直置中。同一個 `.container` 內若還有其他相簿，相簿寬度會變成由內容決定，`auto-fill` 欄數會隨圖片載入時機亂跳（1/2/3 欄）。全部品項合併頁已用 `body:not(.is-test-mode)` 排除；本週切片的空白提示也因此不使用 `.gallery-coming-soon` 這個 class
 - **`image-protection.js` 與編輯模式拖曳衝突**：`image-protection.js` 會攔截 IMG 的 `dragstart` 事件。`gallery-loader.js` 在編輯模式下已做防護（`img.draggable = false`、`e.stopPropagation()`），不要移除 `image-protection.js` 的 dragstart 攔截
 
 ---

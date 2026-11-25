@@ -37,11 +37,11 @@
             </div>
             <div class="topbar__center" id="topbarCenter">
                 <div class="topbar__tabs">
+                    <button class="tab-btn" data-tab="home" data-page="index.html">首頁</button>
                     <button class="tab-btn" data-tab="calendar" data-page="calendar.html">月曆</button>
-                    <button class="tab-btn" data-tab="sets" data-page="sets.html">優惠組合</button>
+                    <button class="tab-btn" data-tab="sets" data-page="sets.html">本週切片／優惠組合</button>
                     <button class="tab-btn" data-tab="seasonal" data-page="seasonal.html">新品上市</button>
                     <button class="tab-btn" data-tab="products" data-page="all-items.html">全部品項</button>
-                    <button class="tab-btn" data-tab="weekly-slices" data-page="sets.html">本週切片</button>
                 </div>
             </div>
             <div class="topbar__right">
@@ -85,8 +85,66 @@
                     </div>
                 </div>
 
+                <!-- Home panel：首頁的主圖與文字 -->
+                <div id="homePanel" class="panel-content" style="display: none;">
+                    <div class="panel__section">
+                        <div class="panel__title">首頁</div>
+                        <p class="weekly-slices-hint">修改後左邊預覽會即時更新，按「一鍵發布」才會生效。</p>
+                    </div>
+                    <div class="panel__section">
+                        <label class="label">主圖</label>
+                        <div class="main-image-row">
+                            <img id="homeImageThumb" class="main-image-thumb" alt="">
+                            <button id="homeImageReplaceBtn" class="btn btn-secondary btn-sm" type="button" disabled>更換圖片</button>
+                        </div>
+                        <input type="file" id="homeImageFileInput" accept="image/jpeg,image/png,image/webp" style="display: none;">
+                        <p class="weekly-slices-hint" style="margin-top: 8px;">建議用橫式圖片（原圖是 1000×370）。上傳後會自動壓縮到寬 1000px。</p>
+                        <label class="label" for="homeCaptionInput" style="margin-top: 10px;">圖片下方的文字（選填，留空就不顯示）</label>
+                        <textarea id="homeCaptionInput" class="input textarea home-field" data-key="imageCaption" rows="2" disabled></textarea>
+                        <label class="label" for="homeCaptionEnInput" style="margin-top: 10px;">圖片下方的文字（英文，留空則沿用中文）</label>
+                        <textarea id="homeCaptionEnInput" class="input textarea home-field" data-key="imageCaption_en" rows="2" disabled></textarea>
+                    </div>
+                    <div class="panel__section">
+                        <label class="label" for="homeHeadlineInput">標題</label>
+                        <input type="text" id="homeHeadlineInput" class="input home-field" data-key="headline" disabled>
+                        <label class="label" for="homeHeadlineEnInput" style="margin-top: 10px;">標題（英文）</label>
+                        <input type="text" id="homeHeadlineEnInput" class="input home-field" data-key="headline_en" disabled>
+                    </div>
+                    <div class="panel__section">
+                        <label class="label" for="homeDescInput">說明文字</label>
+                        <textarea id="homeDescInput" class="input textarea home-field" data-key="description" rows="2" disabled></textarea>
+                        <label class="label" for="homeDescEnInput" style="margin-top: 10px;">說明文字（英文）</label>
+                        <textarea id="homeDescEnInput" class="input textarea home-field" data-key="description_en" rows="2" disabled></textarea>
+                    </div>
+                    <div class="panel__section">
+                        <label class="label" for="homeButtonTextInput">按鈕文字</label>
+                        <input type="text" id="homeButtonTextInput" class="input home-field" data-key="buttonText" disabled>
+                        <label class="label" for="homeButtonTextEnInput" style="margin-top: 10px;">按鈕文字（英文）</label>
+                        <input type="text" id="homeButtonTextEnInput" class="input home-field" data-key="buttonText_en" disabled>
+                        <label class="label" for="homeButtonLinkSelect" style="margin-top: 10px;">按鈕連到哪裡</label>
+                        <select id="homeButtonLinkSelect" class="input" disabled></select>
+                    </div>
+                </div>
+
                 <!-- Image management panel -->
                 <div id="imagePanel" class="panel-content" style="display: none;">
+                    <!-- 只在「本週切片／優惠組合」分頁出現：優惠組合整段是否顯示在網站上 -->
+                    <div class="panel__section" id="setsVisibilitySection" style="display: none;">
+                        <div class="panel__title">優惠組合</div>
+                        <label class="weekly-slice-row">
+                            <input type="checkbox" id="showSetsCheckbox" class="weekly-slice-checkbox" disabled>
+                            <span class="weekly-slice-name">在網站上顯示「優惠組合」</span>
+                        </label>
+                        <p class="weekly-slices-hint">取消勾選後，訪客不會看到優惠組合區塊；品項與圖片都會保留，可隨時再勾回來。改完後按「一鍵發布」。</p>
+                    </div>
+                    <!-- 只在「全部品項」分頁出現：全部品項頁上方的分類分頁（新增／移除／排序／顯示與否／空白文字） -->
+                    <div class="panel__section" id="categoryManagerSection" style="display: none;">
+                        <div class="panel__title">分頁管理</div>
+                        <p class="weekly-slices-hint">全部品項頁上方的分頁（由上到下＝網站上由左到右、由上到下的順序）。勾選＝在網站上顯示。左邊要切到「預覽」模式才看得到分頁的效果。</p>
+                        <div class="category-list" id="categoryList"></div>
+                        <button id="categoryAddBtn" class="btn btn-secondary btn-sm" type="button" style="margin-top: 8px;">+ 新增分頁</button>
+                    </div>
+
                     <div class="panel__section">
                         <div class="panel__title" id="selectedImage">選取圖片：尚未選取</div>
                     </div>
@@ -145,6 +203,12 @@
                             <textarea id="imageDescEnInput" class="input textarea" rows="3" placeholder="Optional"></textarea>
                         </div>
 
+                        <!-- 只在「全部品項」分頁出現：這個品項放在哪個分頁 -->
+                        <div class="panel__section" id="categorySelectSection" style="display: none;">
+                            <label class="label" for="imageCategorySelect">所屬分頁</label>
+                            <select id="imageCategorySelect" class="input"></select>
+                        </div>
+
                         <div class="panel__section" id="tagSection">
                             <label class="label">標籤</label>
                             <div class="tag-editor">
@@ -201,11 +265,25 @@
                     </div>
                 </div>
 
-                <!-- Weekly slices panel（獨立分頁：從全部品項勾選本週切片） -->
+                <!-- Weekly slices panel（與優惠組合同一個分頁，接在優惠組合的編輯區下方） -->
                 <div id="weeklySlicesPanel" class="panel-content" style="display: none;">
                     <div class="panel__section">
                         <div class="panel__title">本週切片</div>
-                        <p class="weekly-slices-hint">勾選的品項會顯示在「優惠組合」頁的本週切片區塊。可隨時勾選或取消，改完後按「一鍵發布」。</p>
+                        <p class="weekly-slices-hint">勾選的品項會顯示在「本週切片」頁（選單上的本週切片）。可隨時勾選或取消，改完後按「一鍵發布」。</p>
+                    </div>
+                    <div class="panel__section">
+                        <label class="weekly-slice-row">
+                            <input type="checkbox" id="showWeeklySlicesCheckbox" class="weekly-slice-checkbox" disabled>
+                            <span class="weekly-slice-name">在網站上顯示「本週切片」</span>
+                        </label>
+                        <p class="weekly-slices-hint">取消勾選後，訪客不會看到本週切片區塊；下方的勾選清單會保留。</p>
+                    </div>
+                    <div class="panel__section">
+                        <label class="label" for="weeklyEmptyTextInput">沒有勾選任何切片時顯示的文字</label>
+                        <input type="text" id="weeklyEmptyTextInput" class="input" placeholder="本週切片暫停，期待下週見面～ 🌸" disabled>
+                        <label class="label" for="weeklyEmptyTextEnInput" style="margin-top: 10px;">英文版（留空則沿用中文）</label>
+                        <input type="text" id="weeklyEmptyTextEnInput" class="input" placeholder="Weekly slices are taking a break — see you next week! 🌸" disabled>
+                        <p class="weekly-slices-hint" style="margin-top: 8px;">下方清單一個都沒勾時，本週切片頁會顯示這段文字。</p>
                     </div>
                     <div class="panel__section">
                         <div class="weekly-slices-picker" id="weeklySlicesPicker"></div>

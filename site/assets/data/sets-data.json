@@ -22,5 +22,9 @@
     "assets/images/seasonal/未命名設計 - 2026-05-22T150822.091.jpg",
     "assets/images/products/未命名設計 - 2026-05-15T084548.578.jpg",
     "assets/images/seasonal/未命名設計 - 2026-10-15T145425.763.jpg"
-  ]
+  ],
+  "showSets": false,
+  "showWeeklySlices": true,
+  "weeklyEmptyText": "本週切片暫停，期待下週見面～ 🌸",
+  "weeklyEmptyText_en": ""
 }

@@ -35,7 +35,7 @@
     const items = [
       { href: 'index.html', zh: '首頁', en: 'Home', isIcon: true, iconType: 'home' },
       { href: 'calendar.html', zh: '月曆', en: 'Calendar' },
-      { href: 'sets.html', zh: '優惠組合', en: 'Sets' },
+      { href: 'sets.html', zh: '本週切片', en: 'Weekly Slices' },
       { href: 'all-items.html', zh: '全部品項', en: 'Menu' },
       { href: 'order.html', zh: '訂購說明', en: 'Order' },
       { href: 'contact.html', zh: '地圖', en: 'Map' },
@@ -104,6 +104,7 @@
       '      <a href="index.html" style="text-decoration: none; color: inherit;">' +
       '        <img src="assets/images/logo/logo.png" alt="Lovely Cakery logo" class="site-logo" width="78" height="78" decoding="async">' +
       '        <span>Lovely Cakery</span>' +
+      '        <span class="logo-zh">美好蛋糕店</span>' +
       '      </a>' +
       '    </h1>' +
       '    <div class="nav-right">' +
@@ -200,6 +201,19 @@
     document.head.appendChild(ns);
   }
 
+  // 品牌名旁「美好蛋糕店」用的襯線中文字。用 Google Fonts 的 text= 參數只下載這五個字（幾 KB），
+  // 每頁都載入，讓各頁的店名字型一致；跟上面的字型分開載入，互不影響。
+  function ensureLogoZhFont() {
+    if (document.querySelector('link[data-font="logo-zh"]')) return;
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.setAttribute('data-font', 'logo-zh');
+    link.href = 'https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600&text=' + encodeURIComponent('美好蛋糕店') + '&display=swap';
+    link.media = 'print';
+    link.onload = function () { this.media = 'all'; };
+    document.head.appendChild(link);
+  }
+
   function renderFooter() {
     // 如果頁面已有 footer 或是編輯模式就不注入
     if (document.querySelector('.site-footer')) return;
@@ -221,6 +235,7 @@
   function init() {
     // Ensure Google Fonts are loaded (single source, no duplication across pages)
     ensureGoogleFonts();
+    ensureLogoZhFont();
 
     // If called late, render immediately; otherwise render on DOMContentLoaded.
     if (document.readyState === 'loading') {

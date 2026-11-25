@@ -29,7 +29,7 @@ https://github.com/settings/tokens/new?scopes=repo&description=Lovely+Admin
 ### 操作流程
 
 ```
-選擇分頁（日曆/新品上市/全部品項/優惠組合）
+選擇分頁（日曆/本週切片／優惠組合/新品上市/全部品項）
   → 編輯內容（可用 Claude API 一鍵翻譯中→英）
   → 點「儲存」（只存瀏覽器記憶體，預覽即時更新）
   → 全部改完後，點「一鍵發布」
@@ -37,7 +37,7 @@ https://github.com/settings/tokens/new?scopes=repo&description=Lovely+Admin
   → Cloudflare Pages + GitHub Pages 自動部署（兩站同步）
 ```
 
-> 分頁對應：`seasonal` = 新品上市、`products` = 全部品項、`sets` = 優惠組合、`calendar` = 日曆。
+> 分頁對應：`seasonal` = 新品上市、`products` = 全部品項、`sets` = 本週切片／優惠組合（同一個分頁）、`calendar` = 日曆。
 
 ---
 
@@ -185,6 +185,56 @@ const IMAGE_TYPES = ['seasonal', 'products', 'sets'];
 3. admin 修改 items 陣列順序
 4. admin 發送 `{type: 'admin-gallery-reorder-dom', fromIndex, toIndex}` → gallery-loader 直接移動 DOM 元素（不重新渲染）
 
+### 2.3 首頁分頁
+
+「首頁」分頁（`home`）編輯首頁的主圖、圖片下方的文字（選填）、標題、說明文字、按鈕文字（各有中／英）與按鈕連結，存到 `home-data.json`：
+
+- 文字欄位邊打邊即時預覽（`admin-home-update` → `home-loader.js`），算 `dirty.home`。
+- 「按鈕連到哪裡」是下拉選單：全部品項的各個分頁（`all-items.html#<分類 id>`）與其他頁面。
+- 「更換圖片」：壓縮後上傳到 `assets/images/home/hero-<時間戳>.jpg`，`image` 欄位改指向新檔。舊圖若也在 `assets/images/home/` 會被排入刪除；預設的 `assets/images/cakes.jpg` 不會被刪。
+- 標題與按鈕文字不能留空（發布時會擋）。
+
+相關函式：`loadHomeData()`、`renderHomePanel()`、`replaceHomeImage()`、`sendHomeToPreview()`。
+
+### 2.4 全部品項頁的分類分頁（分頁管理）
+
+全部品項頁上方的分頁（草莓季限定／新品上市／季節品項…）存在 `products-data.json` 的 `categories`，在 Admin「全部品項」分頁最上方的「分頁管理」編輯：
+
+- 勾選框：是否在網站上顯示（取消後該分頁與裡面的品項都不顯示，資料保留）
+- 名稱、▲▼ 調整順序、✕ 移除（僅自訂分頁）、「+ 新增分頁」
+- 「更多設定」：英文名稱、沒有品項時顯示的文字（中／英）、分頁按鈕樣式（`CATEGORY_STYLES`）
+
+品項歸屬規則（`admin-app.js` 與 `gallery-loader.js` 的 `normalizeCategories()` / `itemsForCategory()` 必須一致）：
+
+| 分類 id | 品項來源 |
+|---|---|
+| `seasonal`（新品上市，內建） | Admin「新品上市」分頁（`seasonal-data.json`） |
+| `products`（季節品項，內建） | `products-data.json` 中沒有 `category`、或 `category` 指向已不存在分類的品項 |
+| 其他（自訂） | `products-data.json` 中 `item.category === 分類 id` 的品項；在品項編輯面板的「所屬分頁」下拉指定 |
+
+- 兩個內建分類不能移除（只能隱藏）；資料裡若漏掉會自動補在最後。
+- 移除自訂分類時，裡面的品項不會被刪，`category` 欄位被清掉 → 回到季節品項。
+- 一個品項只能屬於一個分類。
+- 編輯模式的預覽是不分類的單一相簿，看不到分類效果；切到「預覽」模式才是分類後的頁面（未發布的分類變更會透過 `admin-categories-update` / `admin-gallery-update` 送進去）。
+
+### 2.5 本週切片分頁與顯示開關
+
+「優惠組合」與「本週切片」顯示在同一個訪客頁（`sets.html`，選單名稱是「本週切片」），資料都存在 `sets-data.json`，Admin 上也是同一個分頁「本週切片／優惠組合」（`sets`），右側面板分成上下兩段：
+
+- **優惠組合**：一般的圖片型編輯區，可上傳圖片。最上方有「在網站上顯示『優惠組合』」勾選框（`showSets`）。
+- **本週切片**（`#weeklySlicesPanel`）：不上傳圖片，從「全部品項 + 新品上市」勾選品項，存成 `weeklySlices`（圖片路徑陣列）。另有：
+  - 「在網站上顯示『本週切片』」勾選框（`showWeeklySlices`）
+  - 沒有勾選任何切片時顯示的文字，中／英兩個輸入框（`weeklyEmptyText` / `weeklyEmptyText_en`）
+
+行為：
+
+- 開關關掉 → 該區塊整段隱藏，資料與圖片保留。
+- 本週切片開著但清單是空的（或勾選的品項已被刪除）→ 顯示 `weeklyEmptyText`。
+- 這些設定都算 `dirty.sets`，跟優惠組合品項一起寫進 `sets-data.json`。
+- **預覽**：編輯模式下，預覽網址會帶 `forceShow=all`，設成不顯示的區塊照樣顯示（否則無從編輯），但會變半透明並標上「目前設定為不在網站上顯示」；切到「預覽」模式則完全照訪客看到的樣子。
+
+相關函式：`syncSetsVisibilityUI()`、`setSetsVisibility()`、`setWeeklyEmptyText()`、`sendSetsVisibilityToPreview()`（`admin-app.js`）；`applySetsVisibility()`、`renderWeeklyEmpty()`（`gallery-loader.js`）。
+
 ### 3. 一鍵發布（`publish`）
 
 ```
@@ -264,6 +314,10 @@ SIZE_THRESHOLD = 500 * 1024 // 500 KB
 | `admin-calendar-update` | 即時更新日曆資料 | `calendar-widget-readonly.js` |
 | `admin-gallery-update` | 完整重新渲染 gallery | `gallery-loader.js` |
 | `admin-gallery-reorder-dom` | DOM 移動元素（排序） | `gallery-loader.js` |
+| `admin-weekly-slices-update` | 即時更新本週切片的品項 | `gallery-loader.js` |
+| `admin-home-update` | 即時更新首頁的文字、連結與主圖 | `home-loader.js` |
+| `admin-categories-update` | 即時更新全部品項頁的分類設定（預覽模式的分類頁才會處理） | `gallery-loader.js` |
+| `admin-sets-visibility` | 即時更新優惠組合／本週切片的顯示開關與空白提示文字 | `gallery-loader.js` |
 | `gallery-select` | 標記/取消選取圖片 | `gallery-loader.js` |
 | `gallery-scroll-to` | 滾動到指定圖片 | `gallery-loader.js` |
 
@@ -336,6 +390,66 @@ status 允許值：`"available"` | `"unavailable"` | `"closed"`
 ```
 `image` 路徑在上傳時決定，之後不因改名稱而改變。  
 tags 允許值：`奶蛋素`、`無咖啡因`、`無酒精`、`可宅配`
+
+### home-data.json
+
+```json
+{
+  "schema_version": 1,
+  "headline": "美好蛋糕店", "headline_en": "Lovely Cakery",
+  "description": "用愛精心製作，層層堆疊。僅接受預訂。", "description_en": "Crafted with love, layer by layer. Pre-order only.",
+  "buttonText": "草莓季限定品項 🍓", "buttonText_en": "STRAWBERRY SEASON ITEMS 🍓",
+  "buttonLink": "all-items.html#strawberry",
+  "image": "assets/images/cakes.jpg",
+  "imageCaption": "", "imageCaption_en": ""
+}
+```
+
+英文欄位留空時沿用中文。`imageCaption` 留空就不顯示圖片下方的文字。按鈕結尾的線條小草莓是 CSS（`.home-page .cta-button::after`）畫的，不是文字，所以 `buttonText` 不必加 emoji；按鈕的樣式（復古雙線框、磚紅色、Noto Serif TC 襯線字，字型由 `home-loader.js` 載入）寫在 `styles.css` 的 `.home-page .cta-button`。`buttonLink` 只接受站內相對路徑，其他會退回 `all-items.html`。
+
+`headline`（店名）目前在首頁**視覺上隱藏**：店名「美好蛋糕店」改放在全站導覽列的品牌名旁（`site-header.js` 的 `.logo-zh`，寫死在程式裡、不從這個檔讀）。首頁的 `<h2 class="main-headline">` 仍保留給螢幕閱讀器與搜尋引擎，所以 admin 改 `headline` 只影響這個隱藏標題。`description` 留空時整行隱藏。
+
+### products-data.json 的 categories
+
+除了 `items`，`products-data.json` 還有全部品項頁的分類清單（順序＝網站上的順序）：
+
+```json
+{
+  "schema_version": 1,
+  "items": [{ "image": "…", "name": "…", "tags": [], "category": "strawberry" }],
+  "categories": [
+    { "id": "strawberry", "name": "草莓季限定", "name_en": "Strawberry Season", "show": true,
+      "emptyText": "🍓 草莓季限定籌備中，敬請期待～", "emptyText_en": "", "style": "pink" },
+    { "id": "seasonal", "name": "新品上市", "name_en": "Seasonal Specials", "show": true,
+      "emptyText": "🍰 新品籌備中，敬請期待～ ✨", "emptyText_en": "Coming Soon — Stay Tuned!", "style": "" },
+    { "id": "products", "name": "季節品項", "name_en": "Menu", "show": true, "emptyText": "", "emptyText_en": "", "style": "" }
+  ]
+}
+```
+
+- `style`：分頁按鈕樣式，對應 `styles.css` 的 `.order-tag--<style>`；空字串＝預設淡黃。
+- `emptyText` 留空時顯示「籌備中，敬請期待～」。
+- 舊資料沒有 `categories` 時，等同只有新品上市＋季節品項。
+
+### sets-data.json
+
+`items` 結構同上（優惠組合沒有價格與標籤），另外多了本週切片相關欄位：
+
+```json
+{
+  "schema_version": 1,
+  "items": [],
+  "weeklySlices": ["assets/images/products/某品項.jpg"],
+  "showSets": false,
+  "showWeeklySlices": true,
+  "weeklyEmptyText": "本週切片暫停，期待下週見面～ 🌸",
+  "weeklyEmptyText_en": ""
+}
+```
+
+- `weeklySlices`：被勾選品項的 `image` 路徑（參照全部品項／新品上市）。對應品項被刪除後，該路徑會被略過。
+- `showSets` / `showWeeklySlices`：缺少時視為 `true`。
+- `weeklyEmptyText_en` 留空時：中文是預設句就用預設英文，否則沿用中文。
 
 ---
 

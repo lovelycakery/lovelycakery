@@ -435,5 +435,34 @@
         "assets/images/products/未命名設計 - 2026-10-13T091628.278-2.jpg"
       ]
     }
+  ],
+  "categories": [
+    {
+      "id": "strawberry",
+      "name": "草莓季限定",
+      "name_en": "Strawberry Season",
+      "show": true,
+      "emptyText": "🍓 草莓季限定籌備中，敬請期待～",
+      "emptyText_en": "",
+      "style": "pink"
+    },
+    {
+      "id": "seasonal",
+      "name": "新品上市",
+      "name_en": "Seasonal Specials",
+      "show": true,
+      "emptyText": "🍰 新品籌備中，敬請期待～ ✨",
+      "emptyText_en": "Coming Soon — Stay Tuned!",
+      "style": ""
+    },
+    {
+      "id": "products",
+      "name": "季節品項",
+      "name_en": "Menu",
+      "show": true,
+      "emptyText": "",
+      "emptyText_en": "",
+      "style": ""
+    }
   ]
 }

@@ -15,8 +15,15 @@
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" href="assets/images/cakes.jpg" as="image">
-    <link rel="stylesheet" href="assets/css/styles.css?v=20260613-1">
+    <link rel="preload" href="assets/data/home-data.json" as="fetch" crossorigin>
+    <!-- 首頁內容由 home-loader.js 依 home-data.json 套用（admin 可改）。套用前先把內容藏起來，
+         避免先看到預設內容再跳成新內容；1.5 秒後不管有沒有載到都顯示（保險）。 -->
+    <style>.home-pending .content-grid { visibility: hidden; }</style>
+    <script>
+      document.documentElement.classList.add('home-pending');
+      setTimeout(function () { document.documentElement.classList.remove('home-pending'); }, 1500);
+    </script>
+    <link rel="stylesheet" href="assets/css/styles.css?v=20261125-1">
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=AW-10994472042"></script>
     <script>
@@ -35,19 +42,22 @@
                 <div class="content-left">
                     <h2 class="main-headline" data-en="Lovely Cakery" data-zh="美好蛋糕店">美好蛋糕店</h2>
                     <p class="description" data-en="Crafted with love, layer by layer. Pre-order only." data-zh="用愛精心製作，層層堆疊。僅接受預訂。">用愛精心製作，層層堆疊。僅接受預訂。</p>
-                    <a class="cta-button" href="all-items.html" data-en="VIEW MENU" data-zh="查看菜單">查看菜單</a>
+                    <a class="cta-button" href="all-items.html#strawberry" data-en="STRAWBERRY SEASON" data-zh="草莓季限定品項">草莓季限定品項</a>
                 </div>
                 <div class="content-right">
                     <div class="image-wrapper">
-                        <img src="assets/images/cakes.jpg" alt="Handmade Mille Crepe Cakes - Strawberry, Matcha, and Chocolate" class="hero-image" fetchpriority="high" decoding="async" width="1000" height="370">
+                        <img data-src="assets/images/cakes.jpg" alt="Handmade Mille Crepe Cakes - Strawberry, Matcha, and Chocolate" class="hero-image" fetchpriority="high" decoding="async" width="1000" height="370">
                     </div>
+                    <!-- 圖片下方的說明文字（選填；admin「首頁」分頁可填，沒填就不顯示） -->
+                    <p class="hero-caption" hidden></p>
                 </div>
             </div>
         </div>
     </main>
     <noscript><p style="text-align:center;padding:40px;font-size:16px;color:#3d2817;">本網站需要 JavaScript 才能正常顯示。請啟用 JavaScript 後重新整理頁面。<br>This website requires JavaScript. Please enable it and reload.</p></noscript>
-    <script defer src="assets/js/site-header.js?v=20260428-5"></script>
+    <script defer src="assets/js/site-header.js?v=20261125-2"></script>
     <script defer src="assets/js/i18n.js"></script>
+    <script defer src="assets/js/home-loader.js?v=20261125-3"></script>
     <script defer src="assets/js/image-protection.js"></script>
 </body>
 </html>
