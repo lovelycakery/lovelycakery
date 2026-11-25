@@ -643,6 +643,23 @@
         "slice": "320"
       },
       "category": "strawberry"
+    },
+    {
+      "image": "assets/images/products/未命名設計 - 2026-11-25T211332.933.jpg",
+      "name": "太妃草莓千層",
+      "name_en": "Toffee Strawberry Mille-feuille",
+      "description": "手工熬煮太妃醬\n新鮮大湖草莓(整顆頂層)\n無糖可可粉 香烤堅果碎",
+      "description_en": "Handcrafted toffee sauce layered with fresh whole Lake strawberries, dusted with unsweetened cocoa powder and topped with roasted nut crumble.",
+      "tags": [
+        "奶蛋素",
+        "無酒精"
+      ],
+      "prices": {
+        "size6": "1780",
+        "size8": "3180",
+        "slice": "300"
+      },
+      "category": "strawberry"
     }
   ],
   "categories": [
