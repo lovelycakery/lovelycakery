@@ -573,6 +573,24 @@
         "slice": "300"
       },
       "category": "strawberry"
+    },
+    {
+      "image": "assets/images/products/未命名設計 - 2026-11-25T211240.993.jpg",
+      "name": "檸檬草莓千層",
+      "name_en": "Lemon Strawberry Mille Crêpes",
+      "description": "6\" NT1780 / 8\" NT3180\n\n手作新鮮檸檬醬千層\n新鮮大湖草莓 (頂層裝飾和夾心)\n香烤堅果碎",
+      "description_en": "Handcrafted fresh lemon curd layers with premium Dahu strawberries adorning the top and filling, finished with toasted nut crumble. 6\" NT1780 / 8\" NT3180",
+      "tags": [
+        "奶蛋素",
+        "無咖啡因",
+        "無酒精"
+      ],
+      "prices": {
+        "size6": "1780",
+        "size8": "3180",
+        "slice": "300"
+      },
+      "category": "strawberry"
     }
   ],
   "categories": [
