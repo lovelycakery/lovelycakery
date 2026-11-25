@@ -434,6 +434,20 @@
       "subImages": [
         "assets/images/products/未命名設計 - 2026-10-13T091628.278-2.jpg"
       ]
+    },
+    {
+      "image": "assets/images/products/未命名設計 - 2026-11-19T110143.590.jpg",
+      "name": "草莓餅乾千層",
+      "name_en": "Strawberry Cookie Mille-feuille",
+      "description": "比利時焦糖餅乾\n新鮮大湖草莓\n棉花糖",
+      "description_en": "Belgian caramel cookies layered with fresh Great Lake strawberries and fluffy marshmallow",
+      "tags": [],
+      "prices": {
+        "size6": "1780",
+        "size8": "3180",
+        "slice": "300"
+      },
+      "category": "strawberry"
     }
   ],
   "categories": [
@@ -450,7 +464,7 @@
       "id": "seasonal",
       "name": "新品上市",
       "name_en": "Seasonal Specials",
-      "show": true,
+      "show": false,
       "emptyText": "🍰 新品籌備中，敬請期待～ ✨",
       "emptyText_en": "Coming Soon — Stay Tuned!",
       "style": ""
