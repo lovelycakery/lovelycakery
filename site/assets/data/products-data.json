@@ -484,7 +484,25 @@
         "size6": "1980",
         "size8": "3580",
         "slice": "330"
-      }
+      },
+      "category": "strawberry"
+    },
+    {
+      "image": "assets/images/products/未命名設計 - 2026-11-25T210613.837.jpg",
+      "name": "草莓水果茶千層",
+      "name_en": "Strawberry Fruit Tea Mille-feuille",
+      "description": "唐寧伯爵/ 鐵觀音/紅烏龍/焙茶\n新鮮大湖草莓(頂層裝飾和夾心)\n新鮮藍莓 新鮮綠葡萄 小蜜柑",
+      "description_en": "A sophisticated blend of Earl Grey, Tie Guan Yin, and roasted red oolong tea. Topped and layered with fresh Lake strawberries, complemented by blueberries, green grapes, and candied mandarin oranges.",
+      "tags": [
+        "奶蛋素",
+        "無酒精"
+      ],
+      "prices": {
+        "size6": "1880",
+        "size8": "3380",
+        "slice": "320"
+      },
+      "category": "strawberry"
     }
   ],
   "categories": [
